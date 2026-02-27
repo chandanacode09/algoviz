@@ -1,0 +1,465 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "longest_palindromic_substring",
+    "title": "Longest Palindromic Substring - Expand Around Center",
+    "description": "Find the longest palindromic substring using expand-around-center approach on 'babad'. Handles both odd-length (single center) and even-length (two-character center) palindromes.",
+    "category": "string",
+    "complexity": {
+      "time": "O(n²)",
+      "space": "O(1)"
+    },
+    "difficulty": "intermediate",
+    "inputDescription": "String: 'babad', find longest palindrome using expand-around-center"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 600
+    },
+    "playback": {
+      "stepDuration": 1200
+    }
+  },
+  "actors": [
+    {
+      "id": "title",
+      "type": "label",
+      "x": 50,
+      "y": 30,
+      "text": "Longest Palindromic Substring - Expand Around Center",
+      "fontSize": 22,
+      "fontWeight": "bold",
+      "fill": "$text"
+    },
+    {
+      "id": "input_label",
+      "type": "label",
+      "x": 50,
+      "y": 80,
+      "text": "Input String: 'babad'",
+      "fontSize": 14,
+      "fill": "$muted"
+    },
+    {
+      "id": "c_b",
+      "type": "cell",
+      "x": 150,
+      "y": 130,
+      "value": "b",
+      "width": 60,
+      "height": 60,
+      "sublabel": "0",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 18
+    },
+    {
+      "id": "c_a",
+      "type": "cell",
+      "x": 220,
+      "y": 130,
+      "value": "a",
+      "width": 60,
+      "height": 60,
+      "sublabel": "1",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 18
+    },
+    {
+      "id": "c_b2",
+      "type": "cell",
+      "x": 290,
+      "y": 130,
+      "value": "b",
+      "width": 60,
+      "height": 60,
+      "sublabel": "2",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 18
+    },
+    {
+      "id": "c_a2",
+      "type": "cell",
+      "x": 360,
+      "y": 130,
+      "value": "a",
+      "width": 60,
+      "height": 60,
+      "sublabel": "3",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 18
+    },
+    {
+      "id": "c_d",
+      "type": "cell",
+      "x": 430,
+      "y": 130,
+      "value": "d",
+      "width": 60,
+      "height": 60,
+      "sublabel": "4",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 18
+    },
+    {
+      "id": "status",
+      "type": "label",
+      "x": 50,
+      "y": 250,
+      "text": "Status: Initialize longest = ''",
+      "fontSize": 12,
+      "fill": "$muted"
+    },
+    {
+      "id": "current",
+      "type": "label",
+      "x": 50,
+      "y": 280,
+      "text": "Current: -",
+      "fontSize": 12,
+      "fill": "$muted"
+    },
+    {
+      "id": "expansion_label",
+      "type": "label",
+      "x": 50,
+      "y": 320,
+      "text": "Expansion Window:",
+      "fontSize": 14,
+      "fill": "$muted"
+    },
+    {
+      "id": "exp_region",
+      "type": "region",
+      "x": 140,
+      "y": 110,
+      "width": 80,
+      "height": 100,
+      "fill": "$warning",
+      "stroke": "$warning",
+      "opacity": 0.2,
+      "label": "Expanding"
+    },
+    {
+      "id": "result_label",
+      "type": "label",
+      "x": 50,
+      "y": 420,
+      "text": "Longest Palindrome Found:",
+      "fontSize": 14,
+      "fill": "$muted"
+    },
+    {
+      "id": "result_display",
+      "type": "label",
+      "x": 300,
+      "y": 420,
+      "text": "'' (length 0)",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$success"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Center at index 0 ('b'): expand, but 'b' is not a palindrome. No match.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Status: Checking odd-length palindrome at center 0"
+          }
+        },
+        {
+          "type": "update",
+          "target": "current",
+          "props": {
+            "text": "Current: 'b' (length 1)"
+          }
+        },
+        {
+          "type": "update",
+          "target": "exp_region",
+          "props": {
+            "x": 140,
+            "y": 110,
+            "width": 80,
+            "height": 100
+          }
+        }
+      ]
+    },
+    {
+      "description": "Center at index 1 ('a'): 'a' is palindrome (length 1). Then try to expand: 'bab' is a palindrome!",
+      "actions": [
+        {
+          "type": "update",
+          "target": "c_a",
+          "props": {
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Status: Center at index 1, 'bab' is palindrome (length 3)"
+          }
+        },
+        {
+          "type": "update",
+          "target": "current",
+          "props": {
+            "text": "Current: 'bab' (length 3)"
+          }
+        },
+        {
+          "type": "update",
+          "target": "exp_region",
+          "props": {
+            "x": 140,
+            "y": 110,
+            "width": 220,
+            "height": 100
+          }
+        },
+        {
+          "type": "update",
+          "target": "result_display",
+          "props": {
+            "text": "'bab' (length 3)",
+            "fill": "$success"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Try to expand 'bab' further: check 'xbaby' - 'x' is out of bounds, can't expand",
+      "actions": [
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Status: Try to expand 'bab' - can't (boundary reached)"
+          }
+        },
+        {
+          "type": "update",
+          "target": "current",
+          "props": {
+            "text": "Current: Cannot expand beyond 'bab'"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Center at index 2 ('b'): single 'b' is palindrome. Expand: 'aba' is also palindrome (length 3).",
+      "actions": [
+        {
+          "type": "update",
+          "target": "c_a",
+          "props": {
+            "fill": "$default",
+            "stroke": "$muted",
+            "textColor": "$text"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c_b2",
+          "props": {
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Status: Center at index 2, 'aba' is palindrome (length 3)"
+          }
+        },
+        {
+          "type": "update",
+          "target": "current",
+          "props": {
+            "text": "Current: 'aba' (length 3) - same as 'bab'"
+          }
+        },
+        {
+          "type": "update",
+          "target": "exp_region",
+          "props": {
+            "x": 210,
+            "y": 110,
+            "width": 220,
+            "height": 100
+          }
+        }
+      ]
+    },
+    {
+      "description": "Try to expand 'aba' to 'babad' - chars are 'b' and 'd', not equal, stop expanding",
+      "actions": [
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Status: Can't expand 'aba' - 'b' != 'd'"
+          }
+        },
+        {
+          "type": "update",
+          "target": "current",
+          "props": {
+            "text": "Current: Cannot expand 'aba' further"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Center at index 3 ('a'): single 'a' is palindrome. Expand: 'bab'... wait, check 'dabad' - 'd' != 'b', can't expand",
+      "actions": [
+        {
+          "type": "update",
+          "target": "c_b2",
+          "props": {
+            "fill": "$default",
+            "stroke": "$muted",
+            "textColor": "$text"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c_a2",
+          "props": {
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Status: Center at index 3 - can't expand to 'babad'"
+          }
+        },
+        {
+          "type": "update",
+          "target": "current",
+          "props": {
+            "text": "Current: 'a' (length 1)"
+          }
+        },
+        {
+          "type": "update",
+          "target": "exp_region",
+          "props": {
+            "x": 350,
+            "y": 110,
+            "width": 80,
+            "height": 100
+          }
+        }
+      ]
+    },
+    {
+      "description": "Center at index 4 ('d'): single 'd' is palindrome. Can't expand (at boundary)",
+      "actions": [
+        {
+          "type": "update",
+          "target": "c_a2",
+          "props": {
+            "fill": "$default",
+            "stroke": "$muted",
+            "textColor": "$text"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c_d",
+          "props": {
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Status: Center at index 4 - at boundary, can't expand"
+          }
+        },
+        {
+          "type": "update",
+          "target": "current",
+          "props": {
+            "text": "Current: 'd' (length 1)"
+          }
+        },
+        {
+          "type": "update",
+          "target": "exp_region",
+          "props": {
+            "x": 420,
+            "y": 110,
+            "width": 80,
+            "height": 100
+          }
+        }
+      ]
+    },
+    {
+      "description": "Final result: longest palindromic substring is 'bab' (or 'aba') with length 3",
+      "actions": [
+        {
+          "type": "update",
+          "target": "c_d",
+          "props": {
+            "fill": "$default",
+            "stroke": "$muted",
+            "textColor": "$text"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Status: Complete! Checked all centers."
+          }
+        },
+        {
+          "type": "update",
+          "target": "current",
+          "props": {
+            "text": "Final: Found 'bab' (length 3) at indices 0-2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "result_display",
+          "props": {
+            "text": "'bab' (length 3) - or 'aba'",
+            "fill": "$success"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,352 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "Inorder Traversal",
+    "title": "Binary Search Tree Inorder Traversal",
+    "description": "Traverse a binary search tree in inorder (Left, Root, Right) sequence. The result should be sorted in ascending order.",
+    "category": "tree",
+    "complexity": {
+      "time": "O(n)",
+      "space": "O(h)"
+    },
+    "difficulty": "beginner",
+    "inputDescription": "A binary search tree with 7 nodes"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 500
+    },
+    "playback": {
+      "stepDuration": 800
+    }
+  },
+  "actors": [
+    {
+      "id": "node-4",
+      "type": "node",
+      "x": 500,
+      "y": 100,
+      "value": 4,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-2",
+      "type": "node",
+      "x": 300,
+      "y": 230,
+      "value": 2,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-6",
+      "type": "node",
+      "x": 700,
+      "y": 230,
+      "value": 6,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-1",
+      "type": "node",
+      "x": 200,
+      "y": 360,
+      "value": 1,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-3",
+      "type": "node",
+      "x": 400,
+      "y": 360,
+      "value": 3,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-5",
+      "type": "node",
+      "x": 600,
+      "y": 360,
+      "value": 5,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "edge-4-2",
+      "type": "edge",
+      "source": "node-4",
+      "target": "node-2",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "edge-4-6",
+      "type": "edge",
+      "source": "node-4",
+      "target": "node-6",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "edge-2-1",
+      "type": "edge",
+      "source": "node-2",
+      "target": "node-1",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "edge-2-3",
+      "type": "edge",
+      "source": "node-2",
+      "target": "node-3",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "edge-6-5",
+      "type": "edge",
+      "source": "node-6",
+      "target": "node-5",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "label-result",
+      "type": "label",
+      "x": 50,
+      "y": 450,
+      "text": "Result: ",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$text",
+      "anchor": "start"
+    },
+    {
+      "id": "label-current",
+      "type": "label",
+      "x": 50,
+      "y": 420,
+      "text": "Current: ",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$primary",
+      "anchor": "start"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Start inorder traversal. Visit left subtree of 4.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "label-current",
+          "props": {
+            "text": "Current: Visiting left subtree of 4"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit node 1 (leftmost node).",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-1",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-current",
+          "props": {
+            "text": "Current: Visit node 1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-result",
+          "props": {
+            "text": "Result: [1]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Backtrack. Visit node 2.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-2",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-current",
+          "props": {
+            "text": "Current: Visit node 2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-result",
+          "props": {
+            "text": "Result: [1, 2]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit right subtree of 2. Node 3.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-3",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-current",
+          "props": {
+            "text": "Current: Visit node 3"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-result",
+          "props": {
+            "text": "Result: [1, 2, 3]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Backtrack to root. Visit node 4.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-4",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-current",
+          "props": {
+            "text": "Current: Visit node 4 (root)"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-result",
+          "props": {
+            "text": "Result: [1, 2, 3, 4]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit right subtree of 4. Node 5.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-5",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-current",
+          "props": {
+            "text": "Current: Visit node 5"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-result",
+          "props": {
+            "text": "Result: [1, 2, 3, 4, 5]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit right subtree of 6. Node 6.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-6",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-current",
+          "props": {
+            "text": "Current: Visit node 6"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-result",
+          "props": {
+            "text": "Result: [1, 2, 3, 4, 5, 6]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Traversal complete. All nodes visited in sorted order.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "label-current",
+          "props": {
+            "text": "Current: Complete"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,308 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "DFS Cycle Detection (Directed Graph)",
+    "title": "Detect Cycle in Directed Graph",
+    "description": "Use DFS with node coloring to detect cycles in a directed graph",
+    "category": "graph",
+    "complexity": {
+      "time": "O(V+E)",
+      "space": "O(V)"
+    },
+    "difficulty": "advanced",
+    "inputDescription": "Directed graph with cycle: A→B→C→D→B"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 500
+    },
+    "playback": {
+      "stepDuration": 1200
+    }
+  },
+  "actors": [
+    {
+      "id": "nodeA",
+      "type": "node",
+      "x": 200,
+      "y": 250,
+      "value": "A",
+      "radius": 30,
+      "sublabel": "white",
+      "fill": "$muted",
+      "textColor": "$text"
+    },
+    {
+      "id": "nodeB",
+      "type": "node",
+      "x": 450,
+      "y": 150,
+      "value": "B",
+      "radius": 30,
+      "sublabel": "white",
+      "fill": "$muted",
+      "textColor": "$text"
+    },
+    {
+      "id": "nodeC",
+      "type": "node",
+      "x": 700,
+      "y": 250,
+      "value": "C",
+      "radius": 30,
+      "sublabel": "white",
+      "fill": "$muted",
+      "textColor": "$text"
+    },
+    {
+      "id": "nodeD",
+      "type": "node",
+      "x": 450,
+      "y": 400,
+      "value": "D",
+      "radius": 30,
+      "sublabel": "white",
+      "fill": "$muted",
+      "textColor": "$text"
+    },
+    {
+      "id": "edgeAB",
+      "type": "edge",
+      "source": "nodeA",
+      "target": "nodeB",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "edgeBC",
+      "type": "edge",
+      "source": "nodeB",
+      "target": "nodeC",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "edgeCD",
+      "type": "edge",
+      "source": "nodeC",
+      "target": "nodeD",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "edgeDB",
+      "type": "edge",
+      "source": "nodeD",
+      "target": "nodeB",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "status_label",
+      "type": "label",
+      "x": 100,
+      "y": 50,
+      "text": "Status: DFS from A",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$text"
+    },
+    {
+      "id": "stack_label",
+      "type": "label",
+      "x": 100,
+      "y": 100,
+      "text": "Stack: [A]",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$text"
+    },
+    {
+      "id": "cycle_label",
+      "type": "label",
+      "x": 100,
+      "y": 150,
+      "text": "Cycle: None",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$muted"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Start DFS from A. Mark A as gray (in-progress).",
+      "actions": [
+        {
+          "type": "update",
+          "target": "nodeA",
+          "props": {
+            "sublabel": "gray",
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "stack_label",
+          "props": {
+            "text": "Stack: [A]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit A's neighbor B. Mark B as gray (in-progress).",
+      "actions": [
+        {
+          "type": "update",
+          "target": "nodeB",
+          "props": {
+            "sublabel": "gray",
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "edgeAB",
+          "props": {
+            "stroke": "$warning",
+            "strokeWidth": 3
+          }
+        },
+        {
+          "type": "update",
+          "target": "stack_label",
+          "props": {
+            "text": "Stack: [A, B]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit B's neighbor C. Mark C as gray (in-progress).",
+      "actions": [
+        {
+          "type": "update",
+          "target": "nodeC",
+          "props": {
+            "sublabel": "gray",
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "edgeBC",
+          "props": {
+            "stroke": "$warning",
+            "strokeWidth": 3
+          }
+        },
+        {
+          "type": "update",
+          "target": "stack_label",
+          "props": {
+            "text": "Stack: [A, B, C]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit C's neighbor D. Mark D as gray (in-progress).",
+      "actions": [
+        {
+          "type": "update",
+          "target": "nodeD",
+          "props": {
+            "sublabel": "gray",
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "edgeCD",
+          "props": {
+            "stroke": "$warning",
+            "strokeWidth": 3
+          }
+        },
+        {
+          "type": "update",
+          "target": "stack_label",
+          "props": {
+            "text": "Stack: [A, B, C, D]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "D has edge to B. B is gray (in stack). Cycle detected!",
+      "actions": [
+        {
+          "type": "update",
+          "target": "edgeDB",
+          "props": {
+            "stroke": "$danger",
+            "strokeWidth": 3,
+            "dashArray": "5,5"
+          }
+        },
+        {
+          "type": "update",
+          "target": "cycle_label",
+          "props": {
+            "text": "Cycle: B→C→D→B detected!",
+            "fill": "$danger"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status_label",
+          "props": {
+            "text": "Status: CYCLE FOUND"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Highlight cycle nodes: B, C, D form the cycle.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "nodeB",
+          "props": {
+            "sublabel": "gray",
+            "fill": "$danger"
+          }
+        },
+        {
+          "type": "update",
+          "target": "nodeC",
+          "props": {
+            "sublabel": "gray",
+            "fill": "$danger"
+          }
+        },
+        {
+          "type": "update",
+          "target": "nodeD",
+          "props": {
+            "sublabel": "gray",
+            "fill": "$danger"
+          }
+        },
+        {
+          "type": "update",
+          "target": "nodeA",
+          "props": {
+            "sublabel": "black",
+            "fill": "$success"
+          }
+        }
+      ]
+    }
+  ]
+}

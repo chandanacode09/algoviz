@@ -1,0 +1,634 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "daily_temperatures",
+    "title": "Daily Temperatures - Monotonic Stack",
+    "description": "Find the next warmer temperature for each day using a monotonic decreasing stack. Input: [73, 74, 75, 71, 69, 72, 76, 73]",
+    "category": "other",
+    "complexity": {
+      "time": "O(n)",
+      "space": "O(n)"
+    },
+    "difficulty": "intermediate",
+    "inputDescription": "Temperatures: [73, 74, 75, 71, 69, 72, 76, 73]"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 600
+    },
+    "playback": {
+      "stepDuration": 1000
+    }
+  },
+  "actors": [
+    {
+      "id": "title",
+      "type": "label",
+      "x": 50,
+      "y": 30,
+      "text": "Daily Temperatures - Monotonic Stack",
+      "fontSize": 22,
+      "fontWeight": "bold",
+      "fill": "$text"
+    },
+    {
+      "id": "input_label",
+      "type": "label",
+      "x": 50,
+      "y": 70,
+      "text": "Input Temperatures:",
+      "fontSize": 14,
+      "fill": "$muted"
+    },
+    {
+      "id": "t0",
+      "type": "cell",
+      "x": 50,
+      "y": 110,
+      "value": 73,
+      "width": 60,
+      "height": 60,
+      "sublabel": "0",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "t1",
+      "type": "cell",
+      "x": 120,
+      "y": 110,
+      "value": 74,
+      "width": 60,
+      "height": 60,
+      "sublabel": "1",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "t2",
+      "type": "cell",
+      "x": 190,
+      "y": 110,
+      "value": 75,
+      "width": 60,
+      "height": 60,
+      "sublabel": "2",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "t3",
+      "type": "cell",
+      "x": 260,
+      "y": 110,
+      "value": 71,
+      "width": 60,
+      "height": 60,
+      "sublabel": "3",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "t4",
+      "type": "cell",
+      "x": 330,
+      "y": 110,
+      "value": 69,
+      "width": 60,
+      "height": 60,
+      "sublabel": "4",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "t5",
+      "type": "cell",
+      "x": 400,
+      "y": 110,
+      "value": 72,
+      "width": 60,
+      "height": 60,
+      "sublabel": "5",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "t6",
+      "type": "cell",
+      "x": 470,
+      "y": 110,
+      "value": 76,
+      "width": 60,
+      "height": 60,
+      "sublabel": "6",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "t7",
+      "type": "cell",
+      "x": 540,
+      "y": 110,
+      "value": 73,
+      "width": 60,
+      "height": 60,
+      "sublabel": "7",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "stack_label",
+      "type": "label",
+      "x": 50,
+      "y": 220,
+      "text": "Monotonic Stack (indices):",
+      "fontSize": 14,
+      "fill": "$muted"
+    },
+    {
+      "id": "stack_region",
+      "type": "region",
+      "x": 40,
+      "y": 250,
+      "width": 300,
+      "height": 120,
+      "fill": "$warning",
+      "stroke": "$warning",
+      "opacity": 0.1,
+      "label": "Stack"
+    },
+    {
+      "id": "result_label",
+      "type": "label",
+      "x": 50,
+      "y": 420,
+      "text": "Result (days until warmer):",
+      "fontSize": 14,
+      "fill": "$muted"
+    },
+    {
+      "id": "r0",
+      "type": "cell",
+      "x": 50,
+      "y": 460,
+      "value": 0,
+      "width": 60,
+      "height": 60,
+      "sublabel": "0",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "r1",
+      "type": "cell",
+      "x": 120,
+      "y": 460,
+      "value": 0,
+      "width": 60,
+      "height": 60,
+      "sublabel": "1",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "r2",
+      "type": "cell",
+      "x": 190,
+      "y": 460,
+      "value": 0,
+      "width": 60,
+      "height": 60,
+      "sublabel": "2",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "r3",
+      "type": "cell",
+      "x": 260,
+      "y": 460,
+      "value": 0,
+      "width": 60,
+      "height": 60,
+      "sublabel": "3",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "r4",
+      "type": "cell",
+      "x": 330,
+      "y": 460,
+      "value": 0,
+      "width": 60,
+      "height": 60,
+      "sublabel": "4",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "r5",
+      "type": "cell",
+      "x": 400,
+      "y": 460,
+      "value": 0,
+      "width": 60,
+      "height": 60,
+      "sublabel": "5",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "r6",
+      "type": "cell",
+      "x": 470,
+      "y": 460,
+      "value": 0,
+      "width": 60,
+      "height": 60,
+      "sublabel": "6",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "r7",
+      "type": "cell",
+      "x": 540,
+      "y": 460,
+      "value": 0,
+      "width": 60,
+      "height": 60,
+      "sublabel": "7",
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "current_label",
+      "type": "label",
+      "x": 700,
+      "y": 120,
+      "text": "Current index: -",
+      "fontSize": 12,
+      "fill": "$muted"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Start: push index 0 onto stack",
+      "actions": [
+        {
+          "type": "create",
+          "actor": {
+            "id": "s0",
+            "type": "cell",
+            "x": 70,
+            "y": 280,
+            "value": 0,
+            "width": 50,
+            "height": 50,
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff",
+            "fontSize": 14
+          }
+        },
+        {
+          "type": "update",
+          "target": "current_label",
+          "props": {
+            "text": "Current index: 0 (temp=73), stack=[0]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Index 1 (74°) is warmer than 0 (73°): pop 0, result[0]=1, push 1",
+      "actions": [
+        {
+          "type": "remove",
+          "target": "s0"
+        },
+        {
+          "type": "update",
+          "target": "r0",
+          "props": {
+            "value": 1,
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "s1",
+            "type": "cell",
+            "x": 70,
+            "y": 280,
+            "value": 1,
+            "width": 50,
+            "height": 50,
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff",
+            "fontSize": 14
+          }
+        },
+        {
+          "type": "update",
+          "target": "current_label",
+          "props": {
+            "text": "Current index: 1 (temp=74), stack=[1]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Index 2 (75°) is warmer than 1 (74°): pop 1, result[1]=1, push 2",
+      "actions": [
+        {
+          "type": "remove",
+          "target": "s1"
+        },
+        {
+          "type": "update",
+          "target": "r1",
+          "props": {
+            "value": 1,
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "s2",
+            "type": "cell",
+            "x": 70,
+            "y": 280,
+            "value": 2,
+            "width": 50,
+            "height": 50,
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff",
+            "fontSize": 14
+          }
+        },
+        {
+          "type": "update",
+          "target": "current_label",
+          "props": {
+            "text": "Current index: 2 (temp=75), stack=[2]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Index 3 (71°) is cooler: push 3 to stack",
+      "actions": [
+        {
+          "type": "create",
+          "actor": {
+            "id": "s3",
+            "type": "cell",
+            "x": 130,
+            "y": 280,
+            "value": 3,
+            "width": 50,
+            "height": 50,
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff",
+            "fontSize": 14
+          }
+        },
+        {
+          "type": "update",
+          "target": "current_label",
+          "props": {
+            "text": "Current index: 3 (temp=71), stack=[2,3]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Index 4 (69°) is cooler than 3: push 4",
+      "actions": [
+        {
+          "type": "create",
+          "actor": {
+            "id": "s4",
+            "type": "cell",
+            "x": 190,
+            "y": 280,
+            "value": 4,
+            "width": 50,
+            "height": 50,
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff",
+            "fontSize": 14
+          }
+        },
+        {
+          "type": "update",
+          "target": "current_label",
+          "props": {
+            "text": "Current index: 4 (temp=69), stack=[2,3,4]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Index 5 (72°) is warmer than 4 (69°): pop 4, result[4]=1, continue popping",
+      "actions": [
+        {
+          "type": "remove",
+          "target": "s4"
+        },
+        {
+          "type": "update",
+          "target": "r4",
+          "props": {
+            "value": 1,
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "current_label",
+          "props": {
+            "text": "Current index: 5 (temp=72), popping warmer..."
+          }
+        }
+      ]
+    },
+    {
+      "description": "Index 5 (72°) is also warmer than 3 (71°): pop 3, result[3]=2, push 5",
+      "actions": [
+        {
+          "type": "remove",
+          "target": "s3"
+        },
+        {
+          "type": "update",
+          "target": "r3",
+          "props": {
+            "value": 2,
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "s5",
+            "type": "cell",
+            "x": 130,
+            "y": 280,
+            "value": 5,
+            "width": 50,
+            "height": 50,
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff",
+            "fontSize": 14
+          }
+        },
+        {
+          "type": "update",
+          "target": "current_label",
+          "props": {
+            "text": "Current index: 5 (temp=72), stack=[2,5]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Index 6 (76°) is warmer than all in stack: pop 5, result[5]=1; pop 2, result[2]=4; push 6",
+      "actions": [
+        {
+          "type": "remove",
+          "target": "s5"
+        },
+        {
+          "type": "remove",
+          "target": "s2"
+        },
+        {
+          "type": "update",
+          "target": "r5",
+          "props": {
+            "value": 1,
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "r2",
+          "props": {
+            "value": 4,
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "s6",
+            "type": "cell",
+            "x": 70,
+            "y": 280,
+            "value": 6,
+            "width": 50,
+            "height": 50,
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff",
+            "fontSize": 14
+          }
+        },
+        {
+          "type": "update",
+          "target": "current_label",
+          "props": {
+            "text": "Current index: 6 (temp=76), stack=[6]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Index 7 (73°) is cooler than 6 (76°): push 7, result[7]=0 (no warmer after)",
+      "actions": [
+        {
+          "type": "create",
+          "actor": {
+            "id": "s7",
+            "type": "cell",
+            "x": 130,
+            "y": 280,
+            "value": 7,
+            "width": 50,
+            "height": 50,
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff",
+            "fontSize": 14
+          }
+        },
+        {
+          "type": "update",
+          "target": "r6",
+          "props": {
+            "value": 0,
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "r7",
+          "props": {
+            "value": 0,
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "current_label",
+          "props": {
+            "text": "Done! Result: [1,1,4,2,1,1,0,0]"
+          }
+        }
+      ]
+    }
+  ]
+}

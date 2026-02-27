@@ -1,0 +1,271 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "Floyd's Cycle Detection",
+    "title": "Detect Cycle in Linked List",
+    "description": "Use two pointers (slow and fast) to detect if a linked list contains a cycle",
+    "category": "linked-list",
+    "complexity": {
+      "time": "O(n)",
+      "space": "O(1)"
+    },
+    "difficulty": "intermediate",
+    "inputDescription": "Linked list with cycle: 1→2→3→4→5→3"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 550
+    },
+    "playback": {
+      "stepDuration": 1000
+    }
+  },
+  "actors": [
+    {
+      "id": "node1",
+      "type": "node",
+      "x": 150,
+      "y": 250,
+      "value": "1",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "node2",
+      "type": "node",
+      "x": 350,
+      "y": 250,
+      "value": "2",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "node3",
+      "type": "node",
+      "x": 550,
+      "y": 250,
+      "value": "3",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "node4",
+      "type": "node",
+      "x": 700,
+      "y": 400,
+      "value": "4",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "node5",
+      "type": "node",
+      "x": 500,
+      "y": 400,
+      "value": "5",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "edge1to2",
+      "type": "edge",
+      "source": "node1",
+      "target": "node2",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "edge2to3",
+      "type": "edge",
+      "source": "node2",
+      "target": "node3",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "edge3to4",
+      "type": "edge",
+      "source": "node3",
+      "target": "node4",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "edge4to5",
+      "type": "edge",
+      "source": "node4",
+      "target": "node5",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "edge5to3",
+      "type": "edge",
+      "source": "node5",
+      "target": "node3",
+      "directed": true,
+      "stroke": "$danger",
+      "strokeWidth": 2,
+      "dashArray": "5,5"
+    },
+    {
+      "id": "slow_ptr",
+      "type": "pointer",
+      "target": "node1",
+      "position": "above",
+      "label": "slow",
+      "fill": "$warning",
+      "textColor": "$text"
+    },
+    {
+      "id": "fast_ptr",
+      "type": "pointer",
+      "target": "node1",
+      "position": "below",
+      "label": "fast",
+      "fill": "$danger",
+      "textColor": "$text"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Initialize: both slow and fast at node1",
+      "actions": [
+        {
+          "type": "update",
+          "target": "slow_ptr",
+          "props": {
+            "target": "node1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "fast_ptr",
+          "props": {
+            "target": "node1"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Step 1: slow moves 1 step (→2), fast moves 2 steps (→3)",
+      "actions": [
+        {
+          "type": "update",
+          "target": "slow_ptr",
+          "props": {
+            "target": "node2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "fast_ptr",
+          "props": {
+            "target": "node3"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Step 2: slow moves 1 step (→3), fast moves 2 steps (→5)",
+      "actions": [
+        {
+          "type": "update",
+          "target": "slow_ptr",
+          "props": {
+            "target": "node3"
+          }
+        },
+        {
+          "type": "update",
+          "target": "fast_ptr",
+          "props": {
+            "target": "node5"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Step 3: slow moves 1 step (→4), fast moves 2 steps (→3, cycle)",
+      "actions": [
+        {
+          "type": "update",
+          "target": "slow_ptr",
+          "props": {
+            "target": "node4"
+          }
+        },
+        {
+          "type": "update",
+          "target": "fast_ptr",
+          "props": {
+            "target": "node3"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Step 4: slow moves 1 step (→5), fast moves 2 steps (→5)",
+      "actions": [
+        {
+          "type": "update",
+          "target": "slow_ptr",
+          "props": {
+            "target": "node5"
+          }
+        },
+        {
+          "type": "update",
+          "target": "fast_ptr",
+          "props": {
+            "target": "node5"
+          }
+        },
+        {
+          "type": "update",
+          "target": "node5",
+          "props": {
+            "fill": "$danger"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Cycle detected! slow==fast at node5. Cycle exists in the list.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "edge5to3",
+          "props": {
+            "stroke": "$success",
+            "strokeWidth": 3
+          }
+        },
+        {
+          "type": "update",
+          "target": "node3",
+          "props": {
+            "fill": "$danger"
+          }
+        },
+        {
+          "type": "update",
+          "target": "node4",
+          "props": {
+            "fill": "$danger"
+          }
+        }
+      ]
+    }
+  ]
+}

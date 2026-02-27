@@ -1,0 +1,310 @@
+{
+  "metadata": {
+    "title": "Two Sum with Hash Map",
+    "description": "Find two numbers in array [2, 7, 11, 15] that add up to target 9 using hash map",
+    "category": "hashing",
+    "difficulty": "beginner",
+    "complexity": {
+      "time": "O(n)",
+      "space": "O(n)"
+    },
+    "algorithm": "two_sum_hash"
+  },
+  "actors": [
+    {
+      "id": "title",
+      "type": "label",
+      "x": 500,
+      "y": 30,
+      "text": "Two Sum Problem: Hash Map Solution",
+      "fontSize": 20,
+      "fontWeight": "bold",
+      "anchor": "middle"
+    },
+    {
+      "id": "arr-label",
+      "type": "label",
+      "x": 100,
+      "y": 80,
+      "text": "Array:",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "anchor": "start"
+    },
+    {
+      "id": "arr-c0",
+      "type": "cell",
+      "x": 150,
+      "y": 80,
+      "width": 60,
+      "height": 60,
+      "value": "2",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 16
+    },
+    {
+      "id": "arr-c1",
+      "type": "cell",
+      "x": 220,
+      "y": 80,
+      "width": 60,
+      "height": 60,
+      "value": "7",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 16
+    },
+    {
+      "id": "arr-c2",
+      "type": "cell",
+      "x": 290,
+      "y": 80,
+      "width": 60,
+      "height": 60,
+      "value": "11",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 16
+    },
+    {
+      "id": "arr-c3",
+      "type": "cell",
+      "x": 360,
+      "y": 80,
+      "width": 60,
+      "height": 60,
+      "value": "15",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 16
+    },
+    {
+      "id": "target-label",
+      "type": "label",
+      "x": 100,
+      "y": 170,
+      "text": "Target: 9",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "anchor": "start"
+    },
+    {
+      "id": "hash-label",
+      "type": "label",
+      "x": 100,
+      "y": 230,
+      "text": "Hash Map:",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "anchor": "start"
+    },
+    {
+      "id": "hash-bg",
+      "type": "region",
+      "x": 100,
+      "y": 260,
+      "width": 300,
+      "height": 300,
+      "fill": "$muted",
+      "cornerRadius": 4
+    },
+    {
+      "id": "h0-key",
+      "type": "label",
+      "x": 120,
+      "y": 280,
+      "text": "Key",
+      "fontSize": 12,
+      "fontWeight": "bold",
+      "anchor": "start"
+    },
+    {
+      "id": "h0-val",
+      "type": "label",
+      "x": 200,
+      "y": 280,
+      "text": "Index",
+      "fontSize": 12,
+      "fontWeight": "bold",
+      "anchor": "start"
+    },
+    {
+      "id": "h-sep1",
+      "type": "label",
+      "x": 350,
+      "y": 280,
+      "text": "─────────────",
+      "fontSize": 10,
+      "anchor": "start"
+    },
+    {
+      "id": "status",
+      "type": "label",
+      "x": 450,
+      "y": 100,
+      "text": "Step 1: Initialize hash map, iterate through array",
+      "fontSize": 13,
+      "anchor": "start"
+    },
+    {
+      "id": "result",
+      "type": "label",
+      "x": 450,
+      "y": 500,
+      "text": "",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "anchor": "start",
+      "fill": "$success"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Initialize: Create empty hash map. Target sum is 9.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Initialize: Create empty hash map. Target = 9"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Iteration 1: Process arr[0]=2. Check if complement (9-2=7) in hash map. Not found. Add 2→0 to map.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "arr-c0",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "h1-key",
+            "type": "label",
+            "x": 120,
+            "y": 310,
+            "text": "2",
+            "fontSize": 11,
+            "anchor": "start"
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "h1-val",
+            "type": "label",
+            "x": 200,
+            "y": 310,
+            "text": "0",
+            "fontSize": 11,
+            "anchor": "start"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "i=0: arr[0]=2, need 7, not in map. Add 2→0"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Iteration 2: Process arr[1]=7. Check if complement (9-7=2) in hash map. Found at index 0! Solution: indices [0, 1].",
+      "actions": [
+        {
+          "type": "update",
+          "target": "arr-c0",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "arr-c1",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "h2-key",
+            "type": "label",
+            "x": 120,
+            "y": 340,
+            "text": "7",
+            "fontSize": 11,
+            "anchor": "start"
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "h2-val",
+            "type": "label",
+            "x": 200,
+            "y": 340,
+            "text": "1",
+            "fontSize": 11,
+            "anchor": "start"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "i=1: arr[1]=7, need 2, FOUND in map at index 0!"
+          }
+        },
+        {
+          "type": "update",
+          "target": "result",
+          "props": {
+            "text": "Result: [0, 1] → arr[0] + arr[1] = 2 + 7 = 9 ✓"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Complete: Two Sum solved! Hash map approach found the pair in O(n) time.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "arr-c0",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Complete: Hash map solution O(n) time, O(n) space"
+          }
+        }
+      ]
+    }
+  ],
+  "version": "1.0",
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 600,
+      "background": "$default"
+    },
+    "playback": {
+      "stepDuration": 1000
+    }
+  }
+}

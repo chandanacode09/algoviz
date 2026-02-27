@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlgoViz Player</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface2: #334155;
+  --border: #475569;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --success: #10b981;
+  --radius: 8px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Header ─────────────────────────────────────────── */
+.av-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.av-header h1 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+.av-header .av-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.av-badge {
+  background: var(--surface2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* ─── Main Canvas Area ───────────────────────────────── */
+.av-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.av-canvas-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  min-height: 0;
+}
+.av-canvas-wrap svg {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* SVG actor transitions */
+.av-actor { transition: all 0.45s cubic-bezier(0.4, 0, 0.2, 1); }
+.av-transition-instant .av-actor { transition: none !important; }
+.av-transition-swap .av-actor { transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+
+/* ─── Description Panel ──────────────────────────────── */
+.av-description {
+  padding: 12px 20px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.av-description-text {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.av-description-step {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-right: 12px;
+  white-space: nowrap;
+}
+
+/* ─── Controls ───────────────────────────────────────── */
+.av-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.av-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.av-btn:hover { background: var(--accent); border-color: var(--accent); }
+.av-btn:active { transform: scale(0.95); }
+.av-btn.av-btn-play {
+  width: 44px;
+  height: 44px;
+  background: var(--accent);
+  border-color: var(--accent);
+  border-radius: 50%;
+  font-size: 18px;
+}
+.av-btn.av-btn-play:hover { background: var(--accent-hover); }
+
+.av-timeline {
+  flex: 1;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--surface2);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+.av-timeline::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: grab;
+}
+.av-timeline::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: none;
+  cursor: grab;
+}
+
+.av-speed {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 4px 8px;
+  border-radius: var(--radius);
+  font-size: 12px;
+  cursor: pointer;
+  min-width: 52px;
+  text-align: center;
+}
+
+.av-step-count {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  min-width: 60px;
+  text-align: right;
+}
+
+/* ─── Drop Zone (no viz loaded) ──────────────────────── */
+.av-dropzone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+}
+.av-dropzone.av-dragover {
+  background: rgba(59, 130, 246, 0.1);
+}
+.av-dropzone-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+.av-dropzone h2 {
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.av-dropzone p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+.av-dropzone-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+.av-dropzone-btn:hover { background: var(--accent-hover); }
+.av-demo-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.av-demo-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  font-size: 12px;
+  cursor: pointer;
+}
+.av-demo-btn:hover { color: var(--text); border-color: var(--accent); }
+
+/* ─── Responsive ─────────────────────────────────────── */
+@media (max-width: 600px) {
+  .av-controls { gap: 4px; padding: 8px 12px; }
+  .av-description { padding: 8px 12px; }
+  .av-header { padding: 8px 12px; }
+  .av-header .av-meta { display: none; }
+}
+</style>
+</head>
+<body>
+<div id="algoviz-root"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// AlgoViz Player v1 — Standalone visualization player
+// Zero dependencies. SVG renderer. Deterministic state engine.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+(function() {
+"use strict";
+
+// ─── Default Config ─────────────────────────────────────────────────────────
+
+const DEFAULTS = {
+  canvas: { width: 1000, height: 600, padding: 40, background: "#ffffff" },
+  theme: {
+    default: "#e2e8f0", primary: "#3b82f6", secondary: "#8b5cf6",
+    success: "#10b981", warning: "#f59e0b", danger: "#ef4444",
+    text: "#1e293b", muted: "#94a3b8"
+  },
+  playback: { stepDuration: 800, autoPlay: false }
+};
+
+const SPEEDS = [0.25, 0.5, 1, 1.5, 2, 3];
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+// ─── State Engine ───────────────────────────────────────────────────────────
+
+class Engine {
+  constructor(viz) {
+    this.viz = viz;
+    this.config = this._mergeConfig(viz.config || {});
+    this.totalSteps = viz.steps.length;
+    this.currentStep = -1; // -1 = initial state
+    this.actorStates = new Map();
+    this._init();
+  }
+
+  _mergeConfig(cfg) {
+    return {
+      canvas: { ...DEFAULTS.canvas, ...(cfg.canvas || {}) },
+      theme: { ...DEFAULTS.theme, ...(cfg.theme || {}) },
+      playback: { ...DEFAULTS.playback, ...(cfg.playback || {}) }
+    };
+  }
+
+  _init() {
+    this.actorStates.clear();
+    for (const actor of this.viz.actors) {
+      this.actorStates.set(actor.id, { ...actor });
+    }
+    this.currentStep = -1;
+  }
+
+  resolveColor(color) {
+    if (!color) return null;
+    if (typeof color === "string" && color.startsWith("$")) {
+      return this.config.theme[color.slice(1)] || color;
+    }
+    return color;
+  }
+
+  _applyActions(actions) {
+    for (const action of actions) {
+      switch (action.type) {
+        case "update": {
+          const state = this.actorStates.get(action.target);
+          if (state) {
+            Object.assign(state, action.props);
+          }
+          break;
+        }
+        case "create": {
+          this.actorStates.set(action.actor.id, { ...action.actor });
+          break;
+        }
+        case "remove": {
+          this.actorStates.delete(action.target);
+          break;
+        }
+      }
+    }
+  }
+
+  goToStep(n) {
+    n = Math.max(-1, Math.min(n, this.totalSteps - 1));
+    // Recompute from scratch (simple, correct, fast for <1000 steps)
+    this._init();
+    for (let i = 0; i <= n; i++) {
+      this._applyActions(this.viz.steps[i].actions);
+    }
+    this.currentStep = n;
+    return this.getScene();
+  }
+
+  nextStep() {
+    if (this.currentStep < this.totalSteps - 1) {
+      return this.goToStep(this.currentStep + 1);
+    }
+    return null;
+  }
+
+  prevStep() {
+    if (this.currentStep >= 0) {
+      return this.goToStep(this.currentStep - 1);
+    }
+    return null;
+  }
+
+  getScene() {
+    return {
+      stepIndex: this.currentStep,
+      description: this.currentStep >= 0
+        ? this.viz.steps[this.currentStep].description
+        : (this.viz.metadata.description || "Initial state"),
+      transition: this.currentStep >= 0
+        ? (this.viz.steps[this.currentStep].transition || "smooth")
+        : "instant",
+      actors: new Map(this.actorStates)
+    };
+  }
+
+  get atEnd() { return this.currentStep >= this.totalSteps - 1; }
+  get atStart() { return this.currentStep <= -1; }
+}
+
+// ─── SVG Renderer ───────────────────────────────────────────────────────────
+
+class Renderer {
+  constructor(container, engine) {
+    this.container = container;
+    this.engine = engine;
+    this.svg = null;
+    this.actorLayer = null;
+    this.edgeLayer = null;
+    this.elements = new Map(); // id -> { group, ... }
+  }
+
+  init() {
+    const cfg = this.engine.config.canvas;
+    this.svg = this._el("svg", {
+      viewBox: `0 0 ${cfg.width} ${cfg.height}`,
+      preserveAspectRatio: "xMidYMid meet"
+    });
+
+    // Background
+    this.svg.appendChild(this._el("rect", {
+      x: 0, y: 0, width: cfg.width, height: cfg.height,
+      fill: cfg.background, class: "av-bg"
+    }));
+
+    // Arrow marker for directed edges
+    const defs = this._el("defs");
+    const marker = this._el("marker", {
+      id: "av-arrow", viewBox: "0 0 10 10",
+      refX: 9, refY: 5, markerWidth: 8, markerHeight: 8,
+      orient: "auto-start-reverse"
+    });
+    marker.appendChild(this._el("path", {
+      d: "M 0 0 L 10 5 L 0 10 z", fill: "currentColor"
+    }));
+    defs.appendChild(marker);
+    this.svg.appendChild(defs);
+
+    // Layers: regions -> edges -> actors on top
+    this.regionLayer = this._el("g", { class: "av-layer-regions" });
+    this.edgeLayer = this._el("g", { class: "av-layer-edges" });
+    this.actorLayer = this._el("g", { class: "av-layer-actors" });
+    this.svg.appendChild(this.regionLayer);
+    this.svg.appendChild(this.edgeLayer);
+    this.svg.appendChild(this.actorLayer);
+
+    this.container.appendChild(this.svg);
+    this.render(this.engine.getScene());
+  }
+
+  render(scene) {
+    // Set transition class on SVG
+    this.svg.classList.remove("av-transition-instant", "av-transition-swap", "av-transition-smooth");
+    if (scene.transition === "instant") {
+      this.svg.classList.add("av-transition-instant");
+    } else if (scene.transition === "swap") {
+      this.svg.classList.add("av-transition-swap");
+    }
+
+    const currentIds = new Set(scene.actors.keys());
+
+    // Remove actors no longer in scene
+    for (const [id, el] of this.elements) {
+      if (!currentIds.has(id)) {
+        el.group.remove();
+        this.elements.delete(id);
+      }
+    }
+
+    // Update or create actors
+    for (const [id, actor] of scene.actors) {
+      if (this.elements.has(id)) {
+        this._updateActor(id, actor, scene);
+      } else {
+        this._createActor(actor, scene);
+      }
+    }
+  }
+
+  _createActor(actor, scene) {
+    const g = this._el("g", { class: "av-actor", "data-id": actor.id });
+    const entry = { group: g, type: actor.type };
+    this.elements.set(actor.id, entry);
+
+    switch (actor.type) {
+      case "cell": this._buildCell(g, actor, entry); break;
+      case "node": this._buildNode(g, actor, entry); break;
+      case "edge": this._buildEdge(g, actor, entry, scene); break;
+      case "pointer": this._buildPointer(g, actor, entry, scene); break;
+      case "label": this._buildLabel(g, actor, entry); break;
+      case "region": this._buildRegion(g, actor, entry); break;
+    }
+
+    const layer = actor.type === "edge" ? this.edgeLayer
+                : actor.type === "region" ? this.regionLayer
+                : this.actorLayer;
+    layer.appendChild(g);
+  }
+
+  _updateActor(id, actor, scene) {
+    const entry = this.elements.get(id);
+    switch (actor.type) {
+      case "cell": this._updateCell(actor, entry); break;
+      case "node": this._updateNode(actor, entry); break;
+      case "edge": this._updateEdge(actor, entry, scene); break;
+      case "pointer": this._updatePointer(actor, entry, scene); break;
+      case "label": this._updateLabel(actor, entry); break;
+      case "region": this._updateRegion(actor, entry); break;
+    }
+  }
+
+  // ── Cell ──────────────────────────────────────
+
+  _buildCell(g, a, entry) {
+    const rc = this._resolve;
+    const rect = this._el("rect", {
+      x: a.x, y: a.y,
+      width: a.width || 60, height: a.height || 60,
+      rx: a.cornerRadius ?? 4,
+      fill: rc(a.fill, "$default"), stroke: rc(a.stroke, "$muted"),
+      "stroke-width": a.strokeWidth ?? 2,
+      opacity: a.opacity ?? 1
+    });
+    const label = this._el("text", {
+      x: a.x + (a.width || 60) / 2, y: a.y + (a.height || 60) / 2,
+      "text-anchor": "middle", "dominant-baseline": "central",
+      fill: rc(a.textColor, "$text"),
+      "font-size": a.fontSize || 16, "font-weight": "600",
+      "font-family": "inherit"
+    });
+    label.textContent = a.label ?? String(a.value);
+
+    g.appendChild(rect);
+    g.appendChild(label);
+    entry.rect = rect;
+    entry.label = label;
+
+    if (a.sublabel) {
+      const sub = this._el("text", {
+        x: a.x + (a.width || 60) / 2,
+        y: a.y + (a.height || 60) + 16,
+        "text-anchor": "middle", "dominant-baseline": "central",
+        fill: rc(null, "$muted"), "font-size": 12, "font-family": "inherit"
+      });
+      sub.textContent = a.sublabel;
+      g.appendChild(sub);
+      entry.sublabel = sub;
+    }
+  }
+
+  _updateCell(a, entry) {
+    const rc = this._resolve;
+    const w = a.width || 60, h = a.height || 60;
+    this._setAttrs(entry.rect, {
+      x: a.x, y: a.y, width: w, height: h,
+      rx: a.cornerRadius ?? 4,
+      fill: rc(a.fill, "$default"), stroke: rc(a.stroke, "$muted"),
+      "stroke-width": a.strokeWidth ?? 2,
+      opacity: a.opacity ?? 1
+    });
+    this._setAttrs(entry.label, {
+      x: a.x + w / 2, y: a.y + h / 2,
+      fill: rc(a.textColor, "$text"),
+      "font-size": a.fontSize || 16
+    });
+    entry.label.textContent = a.label ?? String(a.value);
+    if (entry.sublabel) {
+      this._setAttrs(entry.sublabel, {
+        x: a.x + w / 2, y: a.y + h + 16
+      });
+      if (a.sublabel !== undefined) entry.sublabel.textContent = a.sublabel;
+    }
+  }
+
+  // ── Node ──────────────────────────────────────
+
+  _buildNode(g, a, entry) {
+    const rc = this._resolve;
+    const r = a.radius || 25;
+    const circle = this._el("circle", {
+      cx: a.x, cy: a.y, r: r,
+      fill: rc(a.fill, "$default"), stroke: rc(a.stroke, "$muted"),
+      "stroke-width": a.strokeWidth ?? 2,
+      opacity: a.opacity ?? 1
+    });
+    const label = this._el("text", {
+      x: a.x, y: a.y,
+      "text-anchor": "middle", "dominant-baseline": "central",
+      fill: rc(a.textColor, "$text"),
+      "font-size": a.fontSize || 14, "font-weight": "600",
+      "font-family": "inherit"
+    });
+    label.textContent = a.label ?? String(a.value);
+    g.appendChild(circle);
+    g.appendChild(label);
+    entry.circle = circle;
+    entry.label = label;
+
+    if (a.sublabel) {
+      const sub = this._el("text", {
+        x: a.x, y: a.y + r + 18,
+        "text-anchor": "middle", "dominant-baseline": "central",
+        fill: rc(null, "$muted"), "font-size": 12, "font-family": "inherit"
+      });
+      sub.textContent = a.sublabel;
+      g.appendChild(sub);
+      entry.sublabel = sub;
+    }
+  }
+
+  _updateNode(a, entry) {
+    const rc = this._resolve;
+    const r = a.radius || 25;
+    this._setAttrs(entry.circle, {
+      cx: a.x, cy: a.y, r: r,
+      fill: rc(a.fill, "$default"), stroke: rc(a.stroke, "$muted"),
+      "stroke-width": a.strokeWidth ?? 2,
+      opacity: a.opacity ?? 1
+    });
+    this._setAttrs(entry.label, {
+      x: a.x, y: a.y,
+      fill: rc(a.textColor, "$text"),
+      "font-size": a.fontSize || 14
+    });
+    entry.label.textContent = a.label ?? String(a.value);
+    if (entry.sublabel) {
+      this._setAttrs(entry.sublabel, { x: a.x, y: a.y + r + 18 });
+      if (a.sublabel !== undefined) entry.sublabel.textContent = a.sublabel;
+    }
+  }
+
+  // ── Edge ──────────────────────────────────────
+
+  _buildEdge(g, a, entry, scene) {
+    const rc = this._resolve;
+    const { x1, y1, x2, y2 } = this._edgeCoords(a, scene);
+    const line = this._el("line", {
+      x1, y1, x2, y2,
+      stroke: rc(a.stroke, "$muted"),
+      "stroke-width": a.strokeWidth ?? 2,
+      "stroke-dasharray": a.dashArray || "",
+      opacity: a.opacity ?? 1,
+      "marker-end": a.directed ? "url(#av-arrow)" : ""
+    });
+    // Set color on group for marker inheritance
+    g.style.color = rc(a.stroke, "$muted");
+    g.appendChild(line);
+    entry.line = line;
+
+    // Weight/label
+    const text = a.label || (a.weight != null ? String(a.weight) : "");
+    if (text) {
+      const mid = this._el("text", {
+        x: (x1 + x2) / 2, y: (y1 + y2) / 2 - 10,
+        "text-anchor": "middle", "dominant-baseline": "central",
+        fill: rc(a.stroke, "$muted"),
+        "font-size": 12, "font-weight": "600", "font-family": "inherit"
+      });
+      mid.textContent = text;
+      g.appendChild(mid);
+      entry.midLabel = mid;
+    }
+  }
+
+  _updateEdge(a, entry, scene) {
+    const rc = this._resolve;
+    const { x1, y1, x2, y2 } = this._edgeCoords(a, scene);
+    this._setAttrs(entry.line, {
+      x1, y1, x2, y2,
+      stroke: rc(a.stroke, "$muted"),
+      "stroke-width": a.strokeWidth ?? 2,
+      "stroke-dasharray": a.dashArray || "",
+      opacity: a.opacity ?? 1,
+      "marker-end": a.directed ? "url(#av-arrow)" : ""
+    });
+    entry.group.style.color = rc(a.stroke, "$muted");
+    if (entry.midLabel) {
+      this._setAttrs(entry.midLabel, {
+        x: (x1 + x2) / 2, y: (y1 + y2) / 2 - 10,
+        fill: rc(a.stroke, "$muted")
+      });
+    }
+  }
+
+  _edgeCoords(a, scene) {
+    const src = scene.actors.get(a.source);
+    const tgt = scene.actors.get(a.target);
+    if (!src || !tgt) return { x1: 0, y1: 0, x2: 0, y2: 0 };
+
+    let x1, y1, x2, y2;
+    if (src.type === "node") { x1 = src.x; y1 = src.y; }
+    else { x1 = src.x + (src.width || 60) / 2; y1 = src.y + (src.height || 60) / 2; }
+    if (tgt.type === "node") { x2 = tgt.x; y2 = tgt.y; }
+    else { x2 = tgt.x + (tgt.width || 60) / 2; y2 = tgt.y + (tgt.height || 60) / 2; }
+
+    // Shorten directed edges to stop at node boundary
+    if (a.directed && tgt.type === "node") {
+      const r = tgt.radius || 25;
+      const dx = x2 - x1, dy = y2 - y1;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > 0) { x2 -= (dx / dist) * r; y2 -= (dy / dist) * r; }
+    }
+    return { x1, y1, x2, y2 };
+  }
+
+  // ── Pointer ───────────────────────────────────
+
+  _buildPointer(g, a, entry, scene) {
+    const rc = this._resolve;
+    const { px, py, tx, ty } = this._pointerCoords(a, scene);
+    const tri = this._el("polygon", {
+      points: this._trianglePoints(a.position, tx, ty),
+      fill: rc(a.fill, "$primary")
+    });
+    const label = this._el("text", {
+      x: px, y: py,
+      "text-anchor": "middle", "dominant-baseline": "central",
+      fill: rc(a.textColor, "$primary"),
+      "font-size": a.fontSize || 14, "font-weight": "700",
+      "font-family": "inherit"
+    });
+    label.textContent = a.label || "";
+    g.setAttribute("opacity", a.opacity ?? 1);
+    g.appendChild(tri);
+    g.appendChild(label);
+    entry.tri = tri;
+    entry.label = label;
+  }
+
+  _updatePointer(a, entry, scene) {
+    const rc = this._resolve;
+    const { px, py, tx, ty } = this._pointerCoords(a, scene);
+    this._setAttrs(entry.tri, {
+      points: this._trianglePoints(a.position, tx, ty),
+      fill: rc(a.fill, "$primary")
+    });
+    this._setAttrs(entry.label, {
+      x: px, y: py,
+      fill: rc(a.textColor, "$primary"),
+      "font-size": a.fontSize || 14
+    });
+    entry.label.textContent = a.label || "";
+    entry.group.setAttribute("opacity", a.opacity ?? 1);
+  }
+
+  _pointerCoords(a, scene) {
+    const tgt = scene.actors.get(a.target);
+    if (!tgt) return { px: 0, py: 0, tx: 0, ty: 0 };
+
+    let cx, cy, offy;
+    if (tgt.type === "node") {
+      cx = tgt.x; cy = tgt.y;
+      offy = (tgt.radius || 25) + 10;
+    } else if (tgt.type === "cell") {
+      cx = tgt.x + (tgt.width || 60) / 2;
+      cy = tgt.y + (tgt.height || 60) / 2;
+      offy = (tgt.height || 60) / 2 + 10;
+    } else {
+      cx = tgt.x || 0; cy = tgt.y || 0; offy = 20;
+    }
+
+    const pos = a.position;
+    let px, py, tx, ty;
+    if (pos === "above") { tx = cx; ty = cy - offy; px = cx; py = ty - 16; }
+    else if (pos === "below") { tx = cx; ty = cy + offy; px = cx; py = ty + 16; }
+    else if (pos === "left") { tx = cx - offy; ty = cy; px = tx - 16; py = cy; }
+    else { tx = cx + offy; ty = cy; px = tx + 16; py = cy; }
+    return { px, py, tx, ty };
+  }
+
+  _trianglePoints(pos, tx, ty) {
+    const s = 7;
+    if (pos === "above") return `${tx},${ty + s} ${tx - s},${ty - s} ${tx + s},${ty - s}`;
+    if (pos === "below") return `${tx},${ty - s} ${tx - s},${ty + s} ${tx + s},${ty + s}`;
+    if (pos === "left") return `${tx + s},${ty} ${tx - s},${ty - s} ${tx - s},${ty + s}`;
+    return `${tx - s},${ty} ${tx + s},${ty - s} ${tx + s},${ty + s}`;
+  }
+
+  // ── Label ─────────────────────────────────────
+
+  _buildLabel(g, a, entry) {
+    const rc = this._resolve;
+    const text = this._el("text", {
+      x: a.x, y: a.y,
+      "text-anchor": a.anchor || "start",
+      "dominant-baseline": "central",
+      fill: rc(a.fill, "$text"),
+      "font-size": a.fontSize || 16,
+      "font-weight": a.fontWeight || "normal",
+      "font-family": "inherit",
+      opacity: a.opacity ?? 1
+    });
+    text.textContent = a.text;
+    g.appendChild(text);
+    entry.text = text;
+  }
+
+  _updateLabel(a, entry) {
+    const rc = this._resolve;
+    this._setAttrs(entry.text, {
+      x: a.x, y: a.y,
+      "text-anchor": a.anchor || "start",
+      fill: rc(a.fill, "$text"),
+      "font-size": a.fontSize || 16,
+      "font-weight": a.fontWeight || "normal",
+      opacity: a.opacity ?? 1
+    });
+    entry.text.textContent = a.text;
+  }
+
+  // ── Region ────────────────────────────────────
+
+  _buildRegion(g, a, entry) {
+    const rc = this._resolve;
+    const rect = this._el("rect", {
+      x: a.x, y: a.y, width: a.width, height: a.height,
+      rx: a.cornerRadius ?? 8,
+      fill: rc(a.fill, "$success"), stroke: rc(a.stroke, "$success"),
+      "stroke-width": a.strokeWidth ?? 2,
+      opacity: a.opacity ?? 0.15
+    });
+    g.appendChild(rect);
+    entry.rect = rect;
+
+    if (a.label) {
+      const text = this._el("text", {
+        x: a.x + a.width / 2, y: a.y + a.height / 2,
+        "text-anchor": "middle", "dominant-baseline": "central",
+        fill: rc(a.stroke, "$success"),
+        "font-size": 13, "font-weight": "600", "font-family": "inherit",
+        opacity: 0.8
+      });
+      text.textContent = a.label;
+      g.appendChild(text);
+      entry.label = text;
+    }
+  }
+
+  _updateRegion(a, entry) {
+    const rc = this._resolve;
+    this._setAttrs(entry.rect, {
+      x: a.x, y: a.y, width: a.width, height: a.height,
+      rx: a.cornerRadius ?? 8,
+      fill: rc(a.fill, "$success"), stroke: rc(a.stroke, "$success"),
+      "stroke-width": a.strokeWidth ?? 2,
+      opacity: a.opacity ?? 0.15
+    });
+    if (entry.label) {
+      this._setAttrs(entry.label, {
+        x: a.x + a.width / 2, y: a.y + a.height / 2,
+        fill: rc(a.stroke, "$success")
+      });
+      if (a.label !== undefined) entry.label.textContent = a.label;
+    }
+  }
+
+  // ── Helpers ───────────────────────────────────
+
+  get _resolve() {
+    return (val, fallback) => {
+      const v = val ?? fallback;
+      return this.engine.resolveColor(v);
+    };
+  }
+
+  _el(tag, attrs) {
+    const el = document.createElementNS(SVG_NS, tag);
+    if (attrs) this._setAttrs(el, attrs);
+    return el;
+  }
+
+  _setAttrs(el, attrs) {
+    for (const [k, v] of Object.entries(attrs)) {
+      if (v === undefined || v === null) continue;
+      el.setAttribute(k, String(v));
+    }
+  }
+}
+
+// ─── Player (UI) ────────────────────────────────────────────────────────────
+
+class Player {
+  constructor(container, viz) {
+    this.root = typeof container === "string"
+      ? document.querySelector(container) : container;
+    this.engine = new Engine(viz);
+    this.renderer = null;
+    this.playing = false;
+    this.timer = null;
+    this.speed = 1;
+    this._build();
+    this._bind();
+    if (this.engine.config.playback.autoPlay) this.play();
+  }
+
+  _build() {
+    this.root.innerHTML = "";
+    const viz = this.engine.viz;
+    const meta = viz.metadata;
+
+    // Header
+    const header = this._div("av-header");
+    const h1 = document.createElement("h1");
+    h1.textContent = meta.title;
+    header.appendChild(h1);
+    const metaDiv = this._div("av-meta");
+    if (meta.category) {
+      const b = document.createElement("span");
+      b.className = "av-badge";
+      b.textContent = meta.category;
+      metaDiv.appendChild(b);
+    }
+    if (meta.complexity?.time) {
+      const b = document.createElement("span");
+      b.className = "av-badge";
+      b.textContent = meta.complexity.time;
+      metaDiv.appendChild(b);
+    }
+    if (meta.difficulty) {
+      const b = document.createElement("span");
+      b.className = "av-badge";
+      b.textContent = meta.difficulty;
+      metaDiv.appendChild(b);
+    }
+    header.appendChild(metaDiv);
+    this.root.appendChild(header);
+
+    // Main area
+    const main = this._div("av-main");
+    const canvasWrap = this._div("av-canvas-wrap");
+    main.appendChild(canvasWrap);
+    this.root.appendChild(main);
+
+    // Description
+    const desc = this._div("av-description");
+    this.descStep = document.createElement("span");
+    this.descStep.className = "av-description-step";
+    this.descText = document.createElement("span");
+    this.descText.className = "av-description-text";
+    desc.appendChild(this.descStep);
+    desc.appendChild(this.descText);
+    this.root.appendChild(desc);
+
+    // Controls
+    const ctrl = this._div("av-controls");
+
+    this.btnPrev = this._btn("◀", "av-btn", "Previous step (←)");
+    this.btnPlay = this._btn("▶", "av-btn av-btn-play", "Play/Pause (Space)");
+    this.btnNext = this._btn("▶", "av-btn", "Next step (→)");
+
+    this.timeline = document.createElement("input");
+    this.timeline.type = "range";
+    this.timeline.className = "av-timeline";
+    this.timeline.min = -1;
+    this.timeline.max = this.engine.totalSteps - 1;
+    this.timeline.value = -1;
+
+    this.speedBtn = document.createElement("button");
+    this.speedBtn.className = "av-speed";
+    this.speedBtn.textContent = "1×";
+    this.speedBtn.title = "Change speed";
+
+    this.stepCount = document.createElement("span");
+    this.stepCount.className = "av-step-count";
+
+    ctrl.appendChild(this.btnPrev);
+    ctrl.appendChild(this.btnPlay);
+    ctrl.appendChild(this.btnNext);
+    ctrl.appendChild(this.timeline);
+    ctrl.appendChild(this.speedBtn);
+    ctrl.appendChild(this.stepCount);
+    this.root.appendChild(ctrl);
+
+    // Init renderer
+    this.renderer = new Renderer(canvasWrap, this.engine);
+    this.renderer.init();
+    this._updateUI();
+  }
+
+  _bind() {
+    this.btnPlay.addEventListener("click", () => this.togglePlay());
+    this.btnPrev.addEventListener("click", () => { this.pause(); this._step(-1); });
+    this.btnNext.addEventListener("click", () => { this.pause(); this._step(1); });
+    this.timeline.addEventListener("input", () => {
+      this.pause();
+      const scene = this.engine.goToStep(parseInt(this.timeline.value));
+      this.renderer.render(scene);
+      this._updateUI();
+    });
+    this.speedBtn.addEventListener("click", () => {
+      const i = SPEEDS.indexOf(this.speed);
+      this.speed = SPEEDS[(i + 1) % SPEEDS.length];
+      this.speedBtn.textContent = this.speed + "×";
+    });
+
+    // Keyboard
+    document.addEventListener("keydown", (e) => {
+      if (e.target.tagName === "INPUT" && e.target.type !== "range") return;
+      switch (e.key) {
+        case " ": e.preventDefault(); this.togglePlay(); break;
+        case "ArrowRight": e.preventDefault(); this.pause(); this._step(1); break;
+        case "ArrowLeft": e.preventDefault(); this.pause(); this._step(-1); break;
+        case "Home": e.preventDefault(); this.pause(); this.engine.goToStep(-1); this._render(); break;
+        case "End": e.preventDefault(); this.pause(); this.engine.goToStep(this.engine.totalSteps - 1); this._render(); break;
+      }
+    });
+  }
+
+  togglePlay() {
+    this.playing ? this.pause() : this.play();
+  }
+
+  play() {
+    if (this.engine.atEnd) {
+      this.engine.goToStep(-1);
+      this._render();
+    }
+    this.playing = true;
+    this.btnPlay.textContent = "⏸";
+    this._tick();
+  }
+
+  pause() {
+    this.playing = false;
+    this.btnPlay.textContent = "▶";
+    clearTimeout(this.timer);
+  }
+
+  _tick() {
+    if (!this.playing) return;
+    const scene = this.engine.nextStep();
+    if (scene) {
+      this.renderer.render(scene);
+      this._updateUI();
+      const dur = this.engine.config.playback.stepDuration / this.speed;
+      this.timer = setTimeout(() => this._tick(), dur);
+    } else {
+      this.pause();
+    }
+  }
+
+  _step(dir) {
+    const scene = dir > 0 ? this.engine.nextStep() : this.engine.prevStep();
+    if (scene) {
+      this.renderer.render(scene);
+      this._updateUI();
+    }
+  }
+
+  _render() {
+    this.renderer.render(this.engine.getScene());
+    this._updateUI();
+  }
+
+  _updateUI() {
+    const s = this.engine.currentStep;
+    const total = this.engine.totalSteps;
+    this.timeline.value = s;
+    this.stepCount.textContent = `${s + 1} / ${total}`;
+    const scene = this.engine.getScene();
+    this.descText.textContent = scene.description;
+    this.descStep.textContent = s >= 0 ? `Step ${s + 1}:` : "";
+  }
+
+  _div(cls) {
+    const d = document.createElement("div");
+    d.className = cls;
+    return d;
+  }
+
+  _btn(text, cls, title) {
+    const b = document.createElement("button");
+    b.className = cls;
+    b.textContent = text;
+    if (title) b.title = title;
+    return b;
+  }
+}
+
+// ─── Drop Zone (landing screen) ─────────────────────────────────────────────
+
+class DropZone {
+  constructor(root, onLoad) {
+    this.root = root;
+    this.onLoad = onLoad;
+    this._build();
+  }
+
+  _build() {
+    this.root.innerHTML = "";
+    const zone = document.createElement("div");
+    zone.className = "av-dropzone";
+
+    zone.innerHTML = `
+      <div class="av-dropzone-icon">📊</div>
+      <h2>AlgoViz Player</h2>
+      <p>Drop an AlgoViz JSON file here, or load a demo</p>
+      <button class="av-dropzone-btn" id="av-file-btn">Open JSON File</button>
+      <input type="file" id="av-file-input" accept=".json" style="display:none">
+      <div class="av-demo-btns">
+        <button class="av-demo-btn" data-demo="bubble-sort">Bubble Sort</button>
+        <button class="av-demo-btn" data-demo="bfs-graph">BFS Graph</button>
+        <button class="av-demo-btn" data-demo="binary-search">Binary Search</button>
+      </div>
+    `;
+    this.root.appendChild(zone);
+
+    // File picker
+    const fileInput = zone.querySelector("#av-file-input");
+    zone.querySelector("#av-file-btn").addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) this._readFile(file);
+    });
+
+    // Drag and drop
+    zone.addEventListener("dragover", (e) => { e.preventDefault(); zone.classList.add("av-dragover"); });
+    zone.addEventListener("dragleave", () => zone.classList.remove("av-dragover"));
+    zone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      zone.classList.remove("av-dragover");
+      const file = e.dataTransfer.files[0];
+      if (file) this._readFile(file);
+    });
+
+    // Demo buttons
+    zone.querySelectorAll("[data-demo]").forEach((btn) => {
+      btn.addEventListener("click", () => this._loadDemo(btn.dataset.demo));
+    });
+  }
+
+  _readFile(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        this.onLoad(data);
+      } catch (err) {
+        alert("Invalid JSON: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  async _loadDemo(name) {
+    try {
+      const resp = await fetch(`examples/${name}.json`);
+      const data = await resp.json();
+      this.onLoad(data);
+    } catch (err) {
+      alert("Could not load demo: " + err.message);
+    }
+  }
+}
+
+// ─── Public API ─────────────────────────────────────────────────────────────
+
+window.AlgoViz = {
+  /**
+   * Load and play a visualization.
+   * @param {string|Element} container - CSS selector or DOM element
+   * @param {object} data - AlgoViz v1 JSON object
+   * @returns {Player} Player instance
+   */
+  play(container, data) {
+    const el = typeof container === "string"
+      ? document.querySelector(container) : container;
+    if (!el) throw new Error("AlgoViz: container not found");
+    if (!data || data.version !== "1.0") throw new Error("AlgoViz: invalid visualization (expected version 1.0)");
+    return new Player(el, data);
+  }
+};
+
+// ─── Auto-init ──────────────────────────────────────────────────────────────
+
+document.addEventListener("DOMContentLoaded", () => {
+  const root = document.getElementById("algoviz-root");
+  if (!root) return;
+
+  // Check for inline JSON
+  const inlineScript = document.querySelector('script[type="application/algoviz"]');
+  if (inlineScript) {
+    try {
+      const data = JSON.parse(inlineScript.textContent);
+      AlgoViz.play(root, data);
+      return;
+    } catch (e) { /* fall through to dropzone */ }
+  }
+
+  // Check URL param
+  const params = new URLSearchParams(window.location.search);
+  const b64 = params.get("data");
+  if (b64) {
+    try {
+      const data = JSON.parse(atob(b64));
+      AlgoViz.play(root, data);
+      return;
+    } catch (e) { /* fall through */ }
+  }
+
+  // Show drop zone
+  new DropZone(root, (data) => {
+    root.style.display = "flex";
+    root.style.flexDirection = "column";
+    root.style.height = "100vh";
+    AlgoViz.play(root, data);
+  });
+});
+
+})();
+</script>
+</body>
+</html>

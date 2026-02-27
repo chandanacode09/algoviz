@@ -1,0 +1,171 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "bfs",
+    "title": "Breadth-First Search",
+    "description": "Explores a graph level by level, visiting all neighbors of a node before moving to the next level. Uses a queue to track nodes to visit.",
+    "category": "graph",
+    "complexity": {
+      "time": "O(V + E)",
+      "space": "O(V)",
+      "worst": "O(V + E)"
+    },
+    "difficulty": "intermediate",
+    "inputDescription": "Undirected graph with 6 nodes (A-F), starting from node A",
+    "author": "claude",
+    "tags": ["graph", "traversal", "queue", "shortest-path", "level-order"]
+  },
+  "config": {
+    "canvas": { "width": 1000, "height": 700 },
+    "playback": { "stepDuration": 1200 }
+  },
+  "actors": [
+    { "id": "nA", "type": "node", "x": 500, "y": 100, "value": "A", "radius": 30 },
+    { "id": "nB", "type": "node", "x": 300, "y": 250, "value": "B", "radius": 30 },
+    { "id": "nC", "type": "node", "x": 700, "y": 250, "value": "C", "radius": 30 },
+    { "id": "nD", "type": "node", "x": 200, "y": 420, "value": "D", "radius": 30 },
+    { "id": "nE", "type": "node", "x": 500, "y": 420, "value": "E", "radius": 30 },
+    { "id": "nF", "type": "node", "x": 700, "y": 420, "value": "F", "radius": 30 },
+
+    { "id": "eAB", "type": "edge", "source": "nA", "target": "nB" },
+    { "id": "eAC", "type": "edge", "source": "nA", "target": "nC" },
+    { "id": "eBD", "type": "edge", "source": "nB", "target": "nD" },
+    { "id": "eBE", "type": "edge", "source": "nB", "target": "nE" },
+    { "id": "eCE", "type": "edge", "source": "nC", "target": "nE" },
+    { "id": "eCF", "type": "edge", "source": "nC", "target": "nF" },
+
+    { "id": "title", "type": "label", "x": 500, "y": 35, "text": "Breadth-First Search", "fontSize": 24, "fontWeight": "bold", "anchor": "middle" },
+    { "id": "queue_label", "type": "label", "x": 100, "y": 560, "text": "Queue: []", "fontSize": 16, "fontWeight": "bold" },
+    { "id": "visited_label", "type": "label", "x": 100, "y": 595, "text": "Visited: {}", "fontSize": 16, "fontWeight": "bold" },
+    { "id": "status", "type": "label", "x": 500, "y": 650, "text": "Starting BFS from node A", "fontSize": 16, "anchor": "middle", "fill": "$muted" }
+  ],
+  "steps": [
+    {
+      "description": "Start BFS: Visit node A (the source), add it to the queue and mark as visited",
+      "actions": [
+        { "type": "update", "target": "nA", "props": { "fill": "$primary", "stroke": "$primary", "textColor": "#ffffff" } },
+        { "type": "update", "target": "queue_label", "props": { "text": "Queue: [A]" } },
+        { "type": "update", "target": "visited_label", "props": { "text": "Visited: {A}" } },
+        { "type": "update", "target": "status", "props": { "text": "Enqueue starting node A" } }
+      ],
+      "transition": "highlight"
+    },
+    {
+      "description": "Dequeue A. Process its neighbors: B and C",
+      "actions": [
+        { "type": "update", "target": "nA", "props": { "fill": "$success", "stroke": "$success" } },
+        { "type": "update", "target": "queue_label", "props": { "text": "Queue: []  ← dequeued A" } },
+        { "type": "update", "target": "status", "props": { "text": "Dequeue A — explore its neighbors" } }
+      ]
+    },
+    {
+      "description": "Visit neighbor B (unvisited) — add to queue",
+      "actions": [
+        { "type": "update", "target": "nB", "props": { "fill": "$primary", "stroke": "$primary", "textColor": "#ffffff" } },
+        { "type": "update", "target": "eAB", "props": { "stroke": "$primary", "strokeWidth": 3 } },
+        { "type": "update", "target": "queue_label", "props": { "text": "Queue: [B]" } },
+        { "type": "update", "target": "visited_label", "props": { "text": "Visited: {A, B}" } },
+        { "type": "update", "target": "status", "props": { "text": "B is unvisited → enqueue B" } }
+      ],
+      "transition": "highlight"
+    },
+    {
+      "description": "Visit neighbor C (unvisited) — add to queue",
+      "actions": [
+        { "type": "update", "target": "nC", "props": { "fill": "$primary", "stroke": "$primary", "textColor": "#ffffff" } },
+        { "type": "update", "target": "eAC", "props": { "stroke": "$primary", "strokeWidth": 3 } },
+        { "type": "update", "target": "queue_label", "props": { "text": "Queue: [B, C]" } },
+        { "type": "update", "target": "visited_label", "props": { "text": "Visited: {A, B, C}" } },
+        { "type": "update", "target": "status", "props": { "text": "C is unvisited → enqueue C" } }
+      ],
+      "transition": "highlight"
+    },
+    {
+      "description": "Dequeue B. Process its neighbors: D and E",
+      "actions": [
+        { "type": "update", "target": "nB", "props": { "fill": "$success", "stroke": "$success" } },
+        { "type": "update", "target": "queue_label", "props": { "text": "Queue: [C]  ← dequeued B" } },
+        { "type": "update", "target": "status", "props": { "text": "Dequeue B — explore its neighbors" } }
+      ]
+    },
+    {
+      "description": "Visit neighbor D (unvisited) — add to queue",
+      "actions": [
+        { "type": "update", "target": "nD", "props": { "fill": "$primary", "stroke": "$primary", "textColor": "#ffffff" } },
+        { "type": "update", "target": "eBD", "props": { "stroke": "$primary", "strokeWidth": 3 } },
+        { "type": "update", "target": "queue_label", "props": { "text": "Queue: [C, D]" } },
+        { "type": "update", "target": "visited_label", "props": { "text": "Visited: {A, B, C, D}" } },
+        { "type": "update", "target": "status", "props": { "text": "D is unvisited → enqueue D" } }
+      ],
+      "transition": "highlight"
+    },
+    {
+      "description": "Visit neighbor E (unvisited) — add to queue",
+      "actions": [
+        { "type": "update", "target": "nE", "props": { "fill": "$primary", "stroke": "$primary", "textColor": "#ffffff" } },
+        { "type": "update", "target": "eBE", "props": { "stroke": "$primary", "strokeWidth": 3 } },
+        { "type": "update", "target": "queue_label", "props": { "text": "Queue: [C, D, E]" } },
+        { "type": "update", "target": "visited_label", "props": { "text": "Visited: {A, B, C, D, E}" } },
+        { "type": "update", "target": "status", "props": { "text": "E is unvisited → enqueue E" } }
+      ],
+      "transition": "highlight"
+    },
+    {
+      "description": "Dequeue C. Process its neighbors: E and F",
+      "actions": [
+        { "type": "update", "target": "nC", "props": { "fill": "$success", "stroke": "$success" } },
+        { "type": "update", "target": "queue_label", "props": { "text": "Queue: [D, E]  ← dequeued C" } },
+        { "type": "update", "target": "status", "props": { "text": "Dequeue C — explore its neighbors" } }
+      ]
+    },
+    {
+      "description": "Neighbor E is already visited — skip",
+      "actions": [
+        { "type": "update", "target": "eCE", "props": { "stroke": "$muted", "dashArray": "5,5" } },
+        { "type": "update", "target": "status", "props": { "text": "E is already visited → skip" } }
+      ]
+    },
+    {
+      "description": "Visit neighbor F (unvisited) — add to queue",
+      "actions": [
+        { "type": "update", "target": "nF", "props": { "fill": "$primary", "stroke": "$primary", "textColor": "#ffffff" } },
+        { "type": "update", "target": "eCF", "props": { "stroke": "$primary", "strokeWidth": 3 } },
+        { "type": "update", "target": "queue_label", "props": { "text": "Queue: [D, E, F]" } },
+        { "type": "update", "target": "visited_label", "props": { "text": "Visited: {A, B, C, D, E, F}" } },
+        { "type": "update", "target": "status", "props": { "text": "F is unvisited → enqueue F" } }
+      ],
+      "transition": "highlight"
+    },
+    {
+      "description": "Dequeue D. D has no unvisited neighbors",
+      "actions": [
+        { "type": "update", "target": "nD", "props": { "fill": "$success", "stroke": "$success" } },
+        { "type": "update", "target": "queue_label", "props": { "text": "Queue: [E, F]  ← dequeued D" } },
+        { "type": "update", "target": "status", "props": { "text": "Dequeue D — no unvisited neighbors" } }
+      ]
+    },
+    {
+      "description": "Dequeue E. E has no unvisited neighbors",
+      "actions": [
+        { "type": "update", "target": "nE", "props": { "fill": "$success", "stroke": "$success" } },
+        { "type": "update", "target": "queue_label", "props": { "text": "Queue: [F]  ← dequeued E" } },
+        { "type": "update", "target": "status", "props": { "text": "Dequeue E — no unvisited neighbors" } }
+      ]
+    },
+    {
+      "description": "Dequeue F. F has no unvisited neighbors",
+      "actions": [
+        { "type": "update", "target": "nF", "props": { "fill": "$success", "stroke": "$success" } },
+        { "type": "update", "target": "queue_label", "props": { "text": "Queue: []  ← dequeued F" } },
+        { "type": "update", "target": "status", "props": { "text": "Dequeue F — no unvisited neighbors" } }
+      ]
+    },
+    {
+      "description": "BFS complete. All 6 nodes visited in order: A → B → C → D → E → F",
+      "actions": [
+        { "type": "update", "target": "queue_label", "props": { "text": "Queue: [] (empty)" } },
+        { "type": "update", "target": "status", "props": { "text": "BFS complete! Traversal order: A → B → C → D → E → F", "fill": "$success" } }
+      ]
+    }
+  ]
+}

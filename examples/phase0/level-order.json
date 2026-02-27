@@ -1,0 +1,394 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "Level Order Traversal",
+    "title": "Binary Tree Level Order Traversal (BFS)",
+    "description": "Traverse a binary tree level by level from top to bottom using breadth-first search. Uses a queue data structure.",
+    "category": "tree",
+    "complexity": {
+      "time": "O(n)",
+      "space": "O(w)"
+    },
+    "difficulty": "beginner",
+    "inputDescription": "A binary tree with 7 nodes across 3 levels"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 500
+    },
+    "playback": {
+      "stepDuration": 900
+    }
+  },
+  "actors": [
+    {
+      "id": "node-4",
+      "type": "node",
+      "x": 500,
+      "y": 100,
+      "value": 4,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-2",
+      "type": "node",
+      "x": 300,
+      "y": 230,
+      "value": 2,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-6",
+      "type": "node",
+      "x": 700,
+      "y": 230,
+      "value": 6,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-1",
+      "type": "node",
+      "x": 200,
+      "y": 360,
+      "value": 1,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-3",
+      "type": "node",
+      "x": 400,
+      "y": 360,
+      "value": 3,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-5",
+      "type": "node",
+      "x": 600,
+      "y": 360,
+      "value": 5,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "edge-4-2",
+      "type": "edge",
+      "source": "node-4",
+      "target": "node-2",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "edge-4-6",
+      "type": "edge",
+      "source": "node-4",
+      "target": "node-6",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "edge-2-1",
+      "type": "edge",
+      "source": "node-2",
+      "target": "node-1",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "edge-2-3",
+      "type": "edge",
+      "source": "node-2",
+      "target": "node-3",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "edge-6-5",
+      "type": "edge",
+      "source": "node-6",
+      "target": "node-5",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "label-result",
+      "type": "label",
+      "x": 50,
+      "y": 450,
+      "text": "Result: ",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$text",
+      "anchor": "start"
+    },
+    {
+      "id": "label-queue",
+      "type": "label",
+      "x": 50,
+      "y": 420,
+      "text": "Queue: [4]",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$primary",
+      "anchor": "start"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Initialize queue with root node 4.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-4",
+          "props": {
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-queue",
+          "props": {
+            "text": "Queue: [4]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Dequeue 4, process it, enqueue its children (2, 6).",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-4",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "node-2",
+          "props": {
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "node-6",
+          "props": {
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-queue",
+          "props": {
+            "text": "Queue: [2, 6]"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-result",
+          "props": {
+            "text": "Result: [4]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Dequeue 2, process it, enqueue its children (1, 3).",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-2",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "node-1",
+          "props": {
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "node-3",
+          "props": {
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-queue",
+          "props": {
+            "text": "Queue: [6, 1, 3]"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-result",
+          "props": {
+            "text": "Result: [4, 2]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Dequeue 6, process it, enqueue its child (5).",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-6",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "node-5",
+          "props": {
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-queue",
+          "props": {
+            "text": "Queue: [1, 3, 5]"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-result",
+          "props": {
+            "text": "Result: [4, 2, 6]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Dequeue 1, process it. No children.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-1",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-queue",
+          "props": {
+            "text": "Queue: [3, 5]"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-result",
+          "props": {
+            "text": "Result: [4, 2, 6, 1]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Dequeue 3, process it. No children.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-3",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-queue",
+          "props": {
+            "text": "Queue: [5]"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-result",
+          "props": {
+            "text": "Result: [4, 2, 6, 1, 3]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Dequeue 5, process it. No children. Queue empty.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-5",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-queue",
+          "props": {
+            "text": "Queue: []"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-result",
+          "props": {
+            "text": "Result: [4, 2, 6, 1, 3, 5]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Traversal complete. All nodes visited in level order.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "label-queue",
+          "props": {
+            "text": "Queue: [] (Complete)"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,330 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "Reverse Linked List",
+    "title": "Reverse a Linked List",
+    "description": "Reverse the direction of a singly linked list by iterating through and flipping pointers",
+    "category": "linked-list",
+    "complexity": {
+      "time": "O(n)",
+      "space": "O(1)"
+    },
+    "difficulty": "beginner",
+    "inputDescription": "A singly linked list: 1→2→3→4"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 450
+    },
+    "playback": {
+      "stepDuration": 1000
+    }
+  },
+  "actors": [
+    {
+      "id": "node1",
+      "type": "node",
+      "x": 200,
+      "y": 250,
+      "value": "1",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "node2",
+      "type": "node",
+      "x": 400,
+      "y": 250,
+      "value": "2",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "node3",
+      "type": "node",
+      "x": 600,
+      "y": 250,
+      "value": "3",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "node4",
+      "type": "node",
+      "x": 800,
+      "y": 250,
+      "value": "4",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "edge1to2",
+      "type": "edge",
+      "source": "node1",
+      "target": "node2",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "edge2to3",
+      "type": "edge",
+      "source": "node2",
+      "target": "node3",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "edge3to4",
+      "type": "edge",
+      "source": "node3",
+      "target": "node4",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "prev_ptr",
+      "type": "pointer",
+      "target": "node1",
+      "position": "above",
+      "label": "prev",
+      "fill": "$warning",
+      "textColor": "$text",
+      "opacity": 0
+    },
+    {
+      "id": "curr_ptr",
+      "type": "pointer",
+      "target": "node1",
+      "position": "below",
+      "label": "curr",
+      "fill": "$danger",
+      "textColor": "$text"
+    },
+    {
+      "id": "next_ptr",
+      "type": "pointer",
+      "target": "node2",
+      "position": "above",
+      "label": "next",
+      "fill": "$muted",
+      "textColor": "$text"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Initialize: prev=null, curr=node1, next=node2",
+      "actions": [
+        {
+          "type": "update",
+          "target": "prev_ptr",
+          "props": {
+            "opacity": 0
+          }
+        },
+        {
+          "type": "update",
+          "target": "curr_ptr",
+          "props": {
+            "target": "node1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "next_ptr",
+          "props": {
+            "target": "node2"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Reverse edge: node1→node2 becomes node2→node1",
+      "actions": [
+        {
+          "type": "remove",
+          "target": "edge1to2"
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "edge1to2_rev",
+            "type": "edge",
+            "source": "node2",
+            "target": "node1",
+            "directed": true,
+            "stroke": "$success",
+            "strokeWidth": 2
+          }
+        },
+        {
+          "type": "update",
+          "target": "prev_ptr",
+          "props": {
+            "target": "node1",
+            "opacity": 1
+          }
+        },
+        {
+          "type": "update",
+          "target": "curr_ptr",
+          "props": {
+            "target": "node2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "next_ptr",
+          "props": {
+            "target": "node3"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Reverse edge: node2→node3 becomes node3→node2",
+      "actions": [
+        {
+          "type": "remove",
+          "target": "edge2to3"
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "edge2to3_rev",
+            "type": "edge",
+            "source": "node3",
+            "target": "node2",
+            "directed": true,
+            "stroke": "$success",
+            "strokeWidth": 2
+          }
+        },
+        {
+          "type": "update",
+          "target": "prev_ptr",
+          "props": {
+            "target": "node2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "curr_ptr",
+          "props": {
+            "target": "node3"
+          }
+        },
+        {
+          "type": "update",
+          "target": "next_ptr",
+          "props": {
+            "target": "node4"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Reverse edge: node3→node4 becomes node4→node3",
+      "actions": [
+        {
+          "type": "remove",
+          "target": "edge3to4"
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "edge3to4_rev",
+            "type": "edge",
+            "source": "node4",
+            "target": "node3",
+            "directed": true,
+            "stroke": "$success",
+            "strokeWidth": 2
+          }
+        },
+        {
+          "type": "update",
+          "target": "prev_ptr",
+          "props": {
+            "target": "node3"
+          }
+        },
+        {
+          "type": "update",
+          "target": "curr_ptr",
+          "props": {
+            "target": "node4"
+          }
+        },
+        {
+          "type": "update",
+          "target": "next_ptr",
+          "props": {
+            "opacity": 0
+          }
+        }
+      ]
+    },
+    {
+      "description": "Complete! List is now reversed: 4→3→2→1",
+      "actions": [
+        {
+          "type": "update",
+          "target": "prev_ptr",
+          "props": {
+            "opacity": 0
+          }
+        },
+        {
+          "type": "update",
+          "target": "curr_ptr",
+          "props": {
+            "opacity": 0
+          }
+        },
+        {
+          "type": "update",
+          "target": "next_ptr",
+          "props": {
+            "opacity": 0
+          }
+        },
+        {
+          "type": "update",
+          "target": "node1",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "node2",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "node3",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "node4",
+          "props": {
+            "fill": "$success"
+          }
+        }
+      ]
+    }
+  ]
+}

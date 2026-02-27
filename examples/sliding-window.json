@@ -1,0 +1,106 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "sliding_window_max_sum",
+    "title": "Sliding Window — Max Subarray Sum (k=3)",
+    "description": "Find the maximum sum of any contiguous subarray of size k using the sliding window technique. Slide a fixed window across the array, updating the sum incrementally.",
+    "category": "searching",
+    "complexity": { "time": "O(n)", "space": "O(1)" },
+    "difficulty": "beginner",
+    "inputDescription": "Array: [2, 1, 5, 1, 3, 2], k=3"
+  },
+  "config": {
+    "canvas": { "width": 1000, "height": 450 },
+    "playback": { "stepDuration": 1000 }
+  },
+  "actors": [
+    { "id": "c0", "type": "cell", "x": 195, "y": 140, "width": 70, "height": 65, "value": 2, "sublabel": "0" },
+    { "id": "c1", "type": "cell", "x": 280, "y": 140, "width": 70, "height": 65, "value": 1, "sublabel": "1" },
+    { "id": "c2", "type": "cell", "x": 365, "y": 140, "width": 70, "height": 65, "value": 5, "sublabel": "2" },
+    { "id": "c3", "type": "cell", "x": 450, "y": 140, "width": 70, "height": 65, "value": 1, "sublabel": "3" },
+    { "id": "c4", "type": "cell", "x": 535, "y": 140, "width": 70, "height": 65, "value": 3, "sublabel": "4" },
+    { "id": "c5", "type": "cell", "x": 620, "y": 140, "width": 70, "height": 65, "value": 2, "sublabel": "5" },
+
+    { "id": "window", "type": "region", "x": 190, "y": 132, "width": 250, "height": 82, "fill": "$primary", "stroke": "$primary", "label": "window", "opacity": 0.15 },
+
+    { "id": "title", "type": "label", "x": 500, "y": 35, "text": "Sliding Window — Max Sum (k=3)", "fontSize": 22, "fontWeight": "bold", "anchor": "middle" },
+    { "id": "subtitle", "type": "label", "x": 500, "y": 65, "text": "Array: [2, 1, 5, 1, 3, 2]  |  Window size k = 3", "fontSize": 14, "anchor": "middle", "fill": "$muted" },
+    { "id": "sum-label", "type": "label", "x": 500, "y": 280, "text": "Window Sum: —", "fontSize": 20, "fontWeight": "bold", "anchor": "middle", "fill": "$primary" },
+    { "id": "max-label", "type": "label", "x": 500, "y": 320, "text": "Max Sum: —", "fontSize": 20, "fontWeight": "bold", "anchor": "middle", "fill": "$success" },
+    { "id": "status", "type": "label", "x": 500, "y": 410, "text": "Initialize: compute sum of first k=3 elements.", "fontSize": 14, "anchor": "middle", "fill": "$muted" },
+    { "id": "calc", "type": "label", "x": 500, "y": 370, "text": "", "fontSize": 13, "anchor": "middle", "fill": "$muted" }
+  ],
+  "steps": [
+    {
+      "description": "Initialize window [0..2]: sum = 2 + 1 + 5 = 8. This is our first candidate.",
+      "actions": [
+        { "type": "update", "target": "c0", "props": { "fill": "$primary" } },
+        { "type": "update", "target": "c1", "props": { "fill": "$primary" } },
+        { "type": "update", "target": "c2", "props": { "fill": "$primary" } },
+        { "type": "update", "target": "sum-label", "props": { "text": "Window Sum: 8" } },
+        { "type": "update", "target": "max-label", "props": { "text": "Max Sum: 8" } },
+        { "type": "update", "target": "status", "props": { "text": "Window [0..2] = [2, 1, 5]. Sum = 2+1+5 = 8. Max = 8." } },
+        { "type": "update", "target": "calc", "props": { "text": "2 + 1 + 5 = 8" } }
+      ]
+    },
+    {
+      "description": "Slide window right: remove arr[0]=2, add arr[3]=1. New sum = 8 - 2 + 1 = 7.",
+      "actions": [
+        { "type": "update", "target": "window", "props": { "x": 275 } },
+        { "type": "update", "target": "c0", "props": { "fill": "$danger", "opacity": 0.4 } },
+        { "type": "update", "target": "c1", "props": { "fill": "$primary" } },
+        { "type": "update", "target": "c2", "props": { "fill": "$primary" } },
+        { "type": "update", "target": "c3", "props": { "fill": "$warning" } },
+        { "type": "update", "target": "sum-label", "props": { "text": "Window Sum: 7" } },
+        { "type": "update", "target": "status", "props": { "text": "Slide: remove 2 (left), add 1 (right). Sum = 8 - 2 + 1 = 7. 7 < 8, max unchanged." } },
+        { "type": "update", "target": "calc", "props": { "text": "8 − 2 + 1 = 7  (< 8, no update)" } }
+      ]
+    },
+    {
+      "description": "Slide window right: remove arr[1]=1, add arr[4]=3. New sum = 7 - 1 + 3 = 9. New max!",
+      "actions": [
+        { "type": "update", "target": "window", "props": { "x": 360 } },
+        { "type": "update", "target": "c0", "props": { "fill": "$default", "opacity": 0.3 } },
+        { "type": "update", "target": "c1", "props": { "fill": "$danger", "opacity": 0.4 } },
+        { "type": "update", "target": "c2", "props": { "fill": "$primary" } },
+        { "type": "update", "target": "c3", "props": { "fill": "$primary" } },
+        { "type": "update", "target": "c4", "props": { "fill": "$warning" } },
+        { "type": "update", "target": "sum-label", "props": { "text": "Window Sum: 9" } },
+        { "type": "update", "target": "max-label", "props": { "text": "Max Sum: 9 ★ new max!" } },
+        { "type": "update", "target": "status", "props": { "text": "Slide: remove 1, add 3. Sum = 7 - 1 + 3 = 9. 9 > 8 → new max!" } },
+        { "type": "update", "target": "calc", "props": { "text": "7 − 1 + 3 = 9  (> 8 ★ new max!)" } }
+      ]
+    },
+    {
+      "description": "Slide window right: remove arr[2]=5, add arr[5]=2. New sum = 9 - 5 + 2 = 6.",
+      "actions": [
+        { "type": "update", "target": "window", "props": { "x": 445 } },
+        { "type": "update", "target": "c1", "props": { "fill": "$default", "opacity": 0.3 } },
+        { "type": "update", "target": "c2", "props": { "fill": "$danger", "opacity": 0.4 } },
+        { "type": "update", "target": "c3", "props": { "fill": "$primary" } },
+        { "type": "update", "target": "c4", "props": { "fill": "$primary" } },
+        { "type": "update", "target": "c5", "props": { "fill": "$warning" } },
+        { "type": "update", "target": "sum-label", "props": { "text": "Window Sum: 6" } },
+        { "type": "update", "target": "max-label", "props": { "text": "Max Sum: 9" } },
+        { "type": "update", "target": "status", "props": { "text": "Slide: remove 5, add 2. Sum = 9 - 5 + 2 = 6. 6 < 9, max unchanged." } },
+        { "type": "update", "target": "calc", "props": { "text": "9 − 5 + 2 = 6  (< 9, no update)" } }
+      ]
+    },
+    {
+      "description": "Window has reached the end. Max subarray sum of size 3 is 9, at indices [2..4] = [5, 1, 3].",
+      "actions": [
+        { "type": "update", "target": "window", "props": { "x": 360, "fill": "$success", "stroke": "$success" } },
+        { "type": "update", "target": "c0", "props": { "fill": "$default", "opacity": 0.3 } },
+        { "type": "update", "target": "c1", "props": { "fill": "$default", "opacity": 0.3 } },
+        { "type": "update", "target": "c2", "props": { "fill": "$success", "opacity": 1 } },
+        { "type": "update", "target": "c3", "props": { "fill": "$success", "opacity": 1 } },
+        { "type": "update", "target": "c4", "props": { "fill": "$success", "opacity": 1 } },
+        { "type": "update", "target": "c5", "props": { "fill": "$default", "opacity": 0.3 } },
+        { "type": "update", "target": "sum-label", "props": { "text": "Window Sum: 9", "fill": "$success" } },
+        { "type": "update", "target": "max-label", "props": { "text": "✓ Max Sum: 9  →  [5, 1, 3] at indices [2..4]" } },
+        { "type": "update", "target": "status", "props": { "text": "Done! Maximum subarray sum of size k=3 is 9. Found in O(n) time, O(1) space." } },
+        { "type": "update", "target": "calc", "props": { "text": "" } }
+      ]
+    }
+  ]
+}

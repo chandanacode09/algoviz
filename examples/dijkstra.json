@@ -1,0 +1,131 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "dijkstra",
+    "title": "Dijkstra's Shortest Path",
+    "description": "Find shortest paths from source node A to all other nodes in a weighted directed graph using a priority queue.",
+    "category": "graph",
+    "complexity": { "time": "O((V+E) log V)", "space": "O(V)" },
+    "difficulty": "intermediate",
+    "inputDescription": "Weighted directed graph with 5 nodes, source = A"
+  },
+  "config": {
+    "canvas": { "width": 1000, "height": 550 },
+    "playback": { "stepDuration": 1200 }
+  },
+  "actors": [
+    { "id": "nA", "type": "node", "x": 200, "y": 200, "value": "A", "radius": 30, "fill": "$primary", "sublabel": "dist: 0" },
+    { "id": "nB", "type": "node", "x": 500, "y": 80, "value": "B", "radius": 30, "sublabel": "dist: ∞" },
+    { "id": "nC", "type": "node", "x": 500, "y": 320, "value": "C", "radius": 30, "sublabel": "dist: ∞" },
+    { "id": "nD", "type": "node", "x": 780, "y": 80, "value": "D", "radius": 30, "sublabel": "dist: ∞" },
+    { "id": "nE", "type": "node", "x": 780, "y": 320, "value": "E", "radius": 30, "sublabel": "dist: ∞" },
+
+    { "id": "eAB", "type": "edge", "source": "nA", "target": "nB", "directed": true, "weight": 4, "label": "4" },
+    { "id": "eAC", "type": "edge", "source": "nA", "target": "nC", "directed": true, "weight": 2, "label": "2" },
+    { "id": "eBC", "type": "edge", "source": "nB", "target": "nC", "directed": true, "weight": 1, "label": "1" },
+    { "id": "eBD", "type": "edge", "source": "nB", "target": "nD", "directed": true, "weight": 5, "label": "5" },
+    { "id": "eCB", "type": "edge", "source": "nC", "target": "nB", "directed": true, "weight": 1, "label": "1" },
+    { "id": "eCE", "type": "edge", "source": "nC", "target": "nE", "directed": true, "weight": 7, "label": "7" },
+    { "id": "eDE", "type": "edge", "source": "nD", "target": "nE", "directed": true, "weight": 1, "label": "1" },
+
+    { "id": "title", "type": "label", "x": 500, "y": 30, "text": "Dijkstra's Shortest Path from A", "fontSize": 22, "fontWeight": "bold", "anchor": "middle" },
+    { "id": "status", "type": "label", "x": 500, "y": 510, "text": "Priority Queue: [(A, 0)]", "fontSize": 14, "anchor": "middle", "fill": "$muted" },
+    { "id": "visited", "type": "label", "x": 500, "y": 475, "text": "Visited: { }", "fontSize": 14, "anchor": "middle", "fill": "$primary" }
+  ],
+  "steps": [
+    {
+      "description": "Start at source A (distance 0). Explore neighbors: B via edge weight 4, C via edge weight 2.",
+      "actions": [
+        { "type": "update", "target": "nA", "props": { "fill": "$warning", "stroke": "$warning" } },
+        { "type": "update", "target": "eAB", "props": { "stroke": "$warning", "strokeWidth": 3 } },
+        { "type": "update", "target": "eAC", "props": { "stroke": "$warning", "strokeWidth": 3 } },
+        { "type": "update", "target": "nB", "props": { "sublabel": "dist: 4" } },
+        { "type": "update", "target": "nC", "props": { "sublabel": "dist: 2" } },
+        { "type": "update", "target": "status", "props": { "text": "Priority Queue: [(C, 2), (B, 4)]" } },
+        { "type": "update", "target": "visited", "props": { "text": "Visited: { }" } }
+      ]
+    },
+    {
+      "description": "Mark A as visited. Dequeue C (dist=2). C is the closest unvisited node.",
+      "actions": [
+        { "type": "update", "target": "nA", "props": { "fill": "$success", "stroke": "$success" } },
+        { "type": "update", "target": "eAB", "props": { "stroke": "$muted", "strokeWidth": 2 } },
+        { "type": "update", "target": "eAC", "props": { "stroke": "$success", "strokeWidth": 3 } },
+        { "type": "update", "target": "nC", "props": { "fill": "$warning", "stroke": "$warning" } },
+        { "type": "update", "target": "status", "props": { "text": "Priority Queue: [(B, 4)] — Dequeued (C, 2)" } },
+        { "type": "update", "target": "visited", "props": { "text": "Visited: { A }" } }
+      ]
+    },
+    {
+      "description": "From C: check B via C→B (2+1=3 < 4, update!). Check E via C→E (2+7=9).",
+      "actions": [
+        { "type": "update", "target": "eCB", "props": { "stroke": "$warning", "strokeWidth": 3 } },
+        { "type": "update", "target": "eCE", "props": { "stroke": "$warning", "strokeWidth": 3 } },
+        { "type": "update", "target": "nB", "props": { "sublabel": "dist: 3 (was 4)", "stroke": "$warning" } },
+        { "type": "update", "target": "nE", "props": { "sublabel": "dist: 9" } },
+        { "type": "update", "target": "status", "props": { "text": "Priority Queue: [(B, 3), (E, 9)] — B updated: 2+1=3 < 4" } }
+      ]
+    },
+    {
+      "description": "Mark C as visited. Dequeue B (dist=3). B is the closest unvisited node.",
+      "actions": [
+        { "type": "update", "target": "nC", "props": { "fill": "$success", "stroke": "$success" } },
+        { "type": "update", "target": "eCB", "props": { "stroke": "$success", "strokeWidth": 3 } },
+        { "type": "update", "target": "eCE", "props": { "stroke": "$muted", "strokeWidth": 2 } },
+        { "type": "update", "target": "nB", "props": { "fill": "$warning", "stroke": "$warning" } },
+        { "type": "update", "target": "status", "props": { "text": "Priority Queue: [(E, 9)] — Dequeued (B, 3)" } },
+        { "type": "update", "target": "visited", "props": { "text": "Visited: { A, C }" } }
+      ]
+    },
+    {
+      "description": "From B: check C (visited, skip). Check D via B→D (3+5=8). D updated to 8.",
+      "actions": [
+        { "type": "update", "target": "eBC", "props": { "stroke": "$muted", "dashArray": "6,4" } },
+        { "type": "update", "target": "eBD", "props": { "stroke": "$warning", "strokeWidth": 3 } },
+        { "type": "update", "target": "nD", "props": { "sublabel": "dist: 8", "stroke": "$warning" } },
+        { "type": "update", "target": "status", "props": { "text": "Priority Queue: [(D, 8), (E, 9)] — C already visited, skip" } }
+      ]
+    },
+    {
+      "description": "Mark B as visited. Dequeue D (dist=8). Check D→E: 8+1=9, same as current 9, no update.",
+      "actions": [
+        { "type": "update", "target": "nB", "props": { "fill": "$success", "stroke": "$success" } },
+        { "type": "update", "target": "eBD", "props": { "stroke": "$success", "strokeWidth": 3 } },
+        { "type": "update", "target": "nD", "props": { "fill": "$warning", "stroke": "$warning" } },
+        { "type": "update", "target": "eDE", "props": { "stroke": "$warning", "strokeWidth": 3 } },
+        { "type": "update", "target": "status", "props": { "text": "Priority Queue: [(E, 9)] — D→E: 8+1=9, no improvement" } },
+        { "type": "update", "target": "visited", "props": { "text": "Visited: { A, C, B }" } }
+      ]
+    },
+    {
+      "description": "Mark D as visited. Dequeue E (dist=9). E has no outgoing edges. Mark E visited.",
+      "actions": [
+        { "type": "update", "target": "nD", "props": { "fill": "$success", "stroke": "$success" } },
+        { "type": "update", "target": "eDE", "props": { "stroke": "$muted", "strokeWidth": 2 } },
+        { "type": "update", "target": "nE", "props": { "fill": "$warning", "stroke": "$warning" } },
+        { "type": "update", "target": "status", "props": { "text": "Priority Queue: [] — Dequeued (E, 9), no outgoing edges" } },
+        { "type": "update", "target": "visited", "props": { "text": "Visited: { A, C, B, D }" } }
+      ]
+    },
+    {
+      "description": "All nodes visited! Shortest paths: A→A=0, A→C=2, A→B=3, A→D=8, A→E=9",
+      "actions": [
+        { "type": "update", "target": "nE", "props": { "fill": "$success", "stroke": "$success" } },
+        { "type": "update", "target": "nA", "props": { "sublabel": "0" } },
+        { "type": "update", "target": "nB", "props": { "sublabel": "3" } },
+        { "type": "update", "target": "nC", "props": { "sublabel": "2" } },
+        { "type": "update", "target": "nD", "props": { "sublabel": "8" } },
+        { "type": "update", "target": "nE", "props": { "sublabel": "9" } },
+        { "type": "update", "target": "eAC", "props": { "stroke": "$success", "strokeWidth": 4 } },
+        { "type": "update", "target": "eCB", "props": { "stroke": "$success", "strokeWidth": 4 } },
+        { "type": "update", "target": "eBD", "props": { "stroke": "$success", "strokeWidth": 4 } },
+        { "type": "update", "target": "eCE", "props": { "stroke": "$success", "strokeWidth": 3 } },
+        { "type": "update", "target": "eAB", "props": { "stroke": "$muted", "dashArray": "6,4", "opacity": 0.4 } },
+        { "type": "update", "target": "eBC", "props": { "stroke": "$muted", "dashArray": "6,4", "opacity": 0.4 } },
+        { "type": "update", "target": "eDE", "props": { "stroke": "$muted", "dashArray": "6,4", "opacity": 0.4 } },
+        { "type": "update", "target": "status", "props": { "text": "Shortest paths from A: B=3 (A→C→B), C=2 (A→C), D=8 (A→C→B→D), E=9 (A→C→E)" } },
+        { "type": "update", "target": "visited", "props": { "text": "✓ All nodes visited — shortest path tree shown in green", "fill": "$success" } }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,408 @@
+{
+  "metadata": {
+    "title": "N-Queens Problem (N=4)",
+    "description": "Backtracking algorithm to place 4 queens on a 4x4 chessboard such that no two queens attack each other",
+    "category": "backtracking",
+    "difficulty": "advanced",
+    "complexity": {
+      "time": "O(N!)",
+      "space": "O(N)"
+    },
+    "algorithm": "n_queens"
+  },
+  "actors": [
+    {
+      "id": "title",
+      "type": "label",
+      "x": 450,
+      "y": 30,
+      "text": "N-Queens: Backtracking Solution (N=4)",
+      "fontSize": 20,
+      "fontWeight": "bold",
+      "anchor": "middle"
+    },
+    {
+      "id": "grid-bg",
+      "type": "region",
+      "x": 100,
+      "y": 80,
+      "width": 400,
+      "height": 400,
+      "fill": "$muted",
+      "cornerRadius": 4
+    },
+    {
+      "id": "c0-0",
+      "type": "cell",
+      "x": 100,
+      "y": 80,
+      "width": 100,
+      "height": 100,
+      "value": "",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "c0-1",
+      "type": "cell",
+      "x": 200,
+      "y": 80,
+      "width": 100,
+      "height": 100,
+      "value": "",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "c0-2",
+      "type": "cell",
+      "x": 300,
+      "y": 80,
+      "width": 100,
+      "height": 100,
+      "value": "",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "c0-3",
+      "type": "cell",
+      "x": 400,
+      "y": 80,
+      "width": 100,
+      "height": 100,
+      "value": "",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "c1-0",
+      "type": "cell",
+      "x": 100,
+      "y": 180,
+      "width": 100,
+      "height": 100,
+      "value": "",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "c1-1",
+      "type": "cell",
+      "x": 200,
+      "y": 180,
+      "width": 100,
+      "height": 100,
+      "value": "",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "c1-2",
+      "type": "cell",
+      "x": 300,
+      "y": 180,
+      "width": 100,
+      "height": 100,
+      "value": "",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "c1-3",
+      "type": "cell",
+      "x": 400,
+      "y": 180,
+      "width": 100,
+      "height": 100,
+      "value": "",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "c2-0",
+      "type": "cell",
+      "x": 100,
+      "y": 280,
+      "width": 100,
+      "height": 100,
+      "value": "",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "c2-1",
+      "type": "cell",
+      "x": 200,
+      "y": 280,
+      "width": 100,
+      "height": 100,
+      "value": "",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "c2-2",
+      "type": "cell",
+      "x": 300,
+      "y": 280,
+      "width": 100,
+      "height": 100,
+      "value": "",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "c2-3",
+      "type": "cell",
+      "x": 400,
+      "y": 280,
+      "width": 100,
+      "height": 100,
+      "value": "",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "c3-0",
+      "type": "cell",
+      "x": 100,
+      "y": 380,
+      "width": 100,
+      "height": 100,
+      "value": "",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "c3-1",
+      "type": "cell",
+      "x": 200,
+      "y": 380,
+      "width": 100,
+      "height": 100,
+      "value": "",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "c3-2",
+      "type": "cell",
+      "x": 300,
+      "y": 380,
+      "width": 100,
+      "height": 100,
+      "value": "",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "c3-3",
+      "type": "cell",
+      "x": 400,
+      "y": 380,
+      "width": 100,
+      "height": 100,
+      "value": "",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "status",
+      "type": "label",
+      "x": 650,
+      "y": 100,
+      "text": "Row 0: Placing Queen",
+      "fontSize": 14,
+      "anchor": "start"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Start: Initialize 4x4 board. Begin backtracking from row 0.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "opacity": 1
+          }
+        }
+      ]
+    },
+    {
+      "description": "Row 0: Try placing queen at position (0,0). Check if valid.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "c0-0",
+          "props": {
+            "value": "Q",
+            "fill": "$warning",
+            "fontSize": 18
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Row 0: Queen placed at (0,0)"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Row 1: Position (1,0) conflicts with queen at (0,0). Try next.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "c1-0",
+          "props": {
+            "value": "X",
+            "fill": "$danger",
+            "fontSize": 14
+          }
+        }
+      ]
+    },
+    {
+      "description": "Row 1: Position (1,1) conflicts (diagonal). Try (1,2).",
+      "actions": [
+        {
+          "type": "update",
+          "target": "c1-0",
+          "props": {
+            "value": "",
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c1-2",
+          "props": {
+            "value": "Q",
+            "fill": "$warning",
+            "fontSize": 18
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Row 1: Queen placed at (1,2)"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Row 2: Try positions. (2,0) valid. Place queen at (2,0).",
+      "actions": [
+        {
+          "type": "update",
+          "target": "c2-0",
+          "props": {
+            "value": "Q",
+            "fill": "$warning",
+            "fontSize": 18
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Row 2: Queen placed at (2,0)"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Row 3: No valid position. Backtrack from row 2. Remove queen at (2,0).",
+      "actions": [
+        {
+          "type": "update",
+          "target": "c2-0",
+          "props": {
+            "value": "",
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Backtracking: Row 2 has no solution"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Row 2: Try position (2,3). Place queen. Continue to row 3.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "c2-3",
+          "props": {
+            "value": "Q",
+            "fill": "$warning",
+            "fontSize": 18
+          }
+        },
+        {
+          "type": "update",
+          "target": "c3-1",
+          "props": {
+            "value": "Q",
+            "fill": "$success",
+            "fontSize": 18
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Solution found! Queens at: (0,0), (1,2), (2,3), (3,1)"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Complete: Valid 4-Queens solution displayed. All queens placed without conflicts.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "opacity": 1
+          }
+        }
+      ]
+    }
+  ],
+  "version": "1.0",
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 600,
+      "background": "$default"
+    },
+    "playback": {
+      "stepDuration": 1000
+    }
+  }
+}

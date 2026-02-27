@@ -1,0 +1,109 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "binary_search",
+    "title": "Binary Search",
+    "description": "Efficiently finds a target value in a sorted array by repeatedly dividing the search space in half. Compares the target to the middle element and eliminates half the remaining elements each step.",
+    "category": "searching",
+    "complexity": {
+      "time": "O(log n)",
+      "space": "O(1)",
+      "best": "O(1)",
+      "worst": "O(log n)"
+    },
+    "difficulty": "beginner",
+    "inputDescription": "Sorted array: [2, 5, 8, 12, 16, 23, 38, 56, 72, 91], target: 23",
+    "author": "claude",
+    "tags": ["searching", "divide-and-conquer", "sorted-array"]
+  },
+  "config": {
+    "canvas": { "width": 1000, "height": 450 },
+    "playback": { "stepDuration": 1200 }
+  },
+  "actors": [
+    { "id": "c0", "type": "cell", "x": 100, "y": 180, "width": 70, "height": 60, "value": 2, "sublabel": "0" },
+    { "id": "c1", "type": "cell", "x": 180, "y": 180, "width": 70, "height": 60, "value": 5, "sublabel": "1" },
+    { "id": "c2", "type": "cell", "x": 260, "y": 180, "width": 70, "height": 60, "value": 8, "sublabel": "2" },
+    { "id": "c3", "type": "cell", "x": 340, "y": 180, "width": 70, "height": 60, "value": 12, "sublabel": "3" },
+    { "id": "c4", "type": "cell", "x": 420, "y": 180, "width": 70, "height": 60, "value": 16, "sublabel": "4" },
+    { "id": "c5", "type": "cell", "x": 500, "y": 180, "width": 70, "height": 60, "value": 23, "sublabel": "5" },
+    { "id": "c6", "type": "cell", "x": 580, "y": 180, "width": 70, "height": 60, "value": 38, "sublabel": "6" },
+    { "id": "c7", "type": "cell", "x": 660, "y": 180, "width": 70, "height": 60, "value": 56, "sublabel": "7" },
+    { "id": "c8", "type": "cell", "x": 740, "y": 180, "width": 70, "height": 60, "value": 72, "sublabel": "8" },
+    { "id": "c9", "type": "cell", "x": 820, "y": 180, "width": 70, "height": 60, "value": 91, "sublabel": "9" },
+
+    { "id": "pL", "type": "pointer", "target": "c0", "position": "below", "label": "low", "fill": "$primary" },
+    { "id": "pR", "type": "pointer", "target": "c9", "position": "below", "label": "high", "fill": "$danger" },
+    { "id": "pM", "type": "pointer", "target": "c4", "position": "above", "label": "mid", "fill": "$warning" },
+
+    { "id": "title", "type": "label", "x": 500, "y": 35, "text": "Binary Search — target: 23", "fontSize": 24, "fontWeight": "bold", "anchor": "middle" },
+    { "id": "status", "type": "label", "x": 500, "y": 400, "text": "Search for 23 in sorted array", "fontSize": 16, "anchor": "middle", "fill": "$muted" },
+    { "id": "range_label", "type": "label", "x": 500, "y": 80, "text": "Search range: indices 0–9", "fontSize": 14, "anchor": "middle", "fill": "$muted" }
+  ],
+  "steps": [
+    {
+      "description": "Iteration 1: low=0, high=9, mid=4. Compare arr[4]=16 with target 23",
+      "actions": [
+        { "type": "update", "target": "c4", "props": { "fill": "$warning", "stroke": "$warning" } },
+        { "type": "update", "target": "status", "props": { "text": "mid=4 → arr[4]=16. Is 16 == 23? No. 16 < 23." } },
+        { "type": "update", "target": "range_label", "props": { "text": "Iteration 1: low=0, high=9, mid=4" } }
+      ],
+      "transition": "highlight"
+    },
+    {
+      "description": "16 < 23: target is in the right half. Eliminate indices 0–4. Set low=5",
+      "actions": [
+        { "type": "update", "target": "c0", "props": { "fill": "$muted", "opacity": 0.3 } },
+        { "type": "update", "target": "c1", "props": { "fill": "$muted", "opacity": 0.3 } },
+        { "type": "update", "target": "c2", "props": { "fill": "$muted", "opacity": 0.3 } },
+        { "type": "update", "target": "c3", "props": { "fill": "$muted", "opacity": 0.3 } },
+        { "type": "update", "target": "c4", "props": { "fill": "$muted", "opacity": 0.3 } },
+        { "type": "update", "target": "pL", "props": { "target": "c5" } },
+        { "type": "update", "target": "pM", "props": { "target": "c7" } },
+        { "type": "update", "target": "status", "props": { "text": "16 < 23 → search right half. low = mid + 1 = 5" } },
+        { "type": "update", "target": "range_label", "props": { "text": "Eliminated left half (indices 0–4)" } }
+      ]
+    },
+    {
+      "description": "Iteration 2: low=5, high=9, mid=7. Compare arr[7]=56 with target 23",
+      "actions": [
+        { "type": "update", "target": "c7", "props": { "fill": "$warning", "stroke": "$warning" } },
+        { "type": "update", "target": "status", "props": { "text": "mid=7 → arr[7]=56. Is 56 == 23? No. 56 > 23." } },
+        { "type": "update", "target": "range_label", "props": { "text": "Iteration 2: low=5, high=9, mid=7" } }
+      ],
+      "transition": "highlight"
+    },
+    {
+      "description": "56 > 23: target is in the left half. Eliminate indices 7–9. Set high=6",
+      "actions": [
+        { "type": "update", "target": "c7", "props": { "fill": "$muted", "opacity": 0.3 } },
+        { "type": "update", "target": "c8", "props": { "fill": "$muted", "opacity": 0.3 } },
+        { "type": "update", "target": "c9", "props": { "fill": "$muted", "opacity": 0.3 } },
+        { "type": "update", "target": "pR", "props": { "target": "c6" } },
+        { "type": "update", "target": "pM", "props": { "target": "c5" } },
+        { "type": "update", "target": "status", "props": { "text": "56 > 23 → search left half. high = mid - 1 = 6" } },
+        { "type": "update", "target": "range_label", "props": { "text": "Eliminated right half (indices 7–9)" } }
+      ]
+    },
+    {
+      "description": "Iteration 3: low=5, high=6, mid=5. Compare arr[5]=23 with target 23",
+      "actions": [
+        { "type": "update", "target": "c5", "props": { "fill": "$warning", "stroke": "$warning" } },
+        { "type": "update", "target": "status", "props": { "text": "mid=5 → arr[5]=23. Is 23 == 23? YES!" } },
+        { "type": "update", "target": "range_label", "props": { "text": "Iteration 3: low=5, high=6, mid=5" } }
+      ],
+      "transition": "highlight"
+    },
+    {
+      "description": "Found! Target 23 is at index 5. Search complete in 3 iterations (log₂(10) ≈ 3.32)",
+      "actions": [
+        { "type": "update", "target": "c5", "props": { "fill": "$success", "stroke": "$success", "textColor": "#ffffff" } },
+        { "type": "update", "target": "status", "props": { "text": "Found 23 at index 5! (3 iterations — O(log n) confirmed)", "fill": "$success" } },
+        { "type": "update", "target": "range_label", "props": { "text": "Search complete" } },
+        { "type": "remove", "target": "pL" },
+        { "type": "remove", "target": "pR" },
+        { "type": "update", "target": "pM", "props": { "label": "found!" } }
+      ]
+    }
+  ]
+}

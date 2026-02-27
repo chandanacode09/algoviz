@@ -1,0 +1,483 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "insertion_sort",
+    "title": "Insertion Sort Visualization",
+    "description": "Insertion sort on array [5, 2, 4, 6, 1, 3] with step-by-step element insertion",
+    "category": "sorting",
+    "complexity": {
+      "time": "O(n²)",
+      "space": "O(1)"
+    },
+    "difficulty": "beginner",
+    "inputDescription": "Array of 6 integers: [5, 2, 4, 6, 1, 3]"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 600
+    },
+    "playback": {
+      "stepDuration": 1000
+    }
+  },
+  "actors": [
+    {
+      "id": "c0",
+      "type": "cell",
+      "x": 200,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": 5,
+      "sublabel": "0",
+      "fill": "$success"
+    },
+    {
+      "id": "c1",
+      "type": "cell",
+      "x": 280,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": 2,
+      "sublabel": "1"
+    },
+    {
+      "id": "c2",
+      "type": "cell",
+      "x": 360,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": 4,
+      "sublabel": "2"
+    },
+    {
+      "id": "c3",
+      "type": "cell",
+      "x": 440,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": 6,
+      "sublabel": "3"
+    },
+    {
+      "id": "c4",
+      "type": "cell",
+      "x": 520,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": 1,
+      "sublabel": "4"
+    },
+    {
+      "id": "c5",
+      "type": "cell",
+      "x": 600,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": 3,
+      "sublabel": "5"
+    },
+    {
+      "id": "sorted-region",
+      "type": "region",
+      "x": 190,
+      "y": 180,
+      "width": 80,
+      "height": 100,
+      "fill": "$success",
+      "opacity": 0.1,
+      "cornerRadius": 4,
+      "label": "Sorted"
+    },
+    {
+      "id": "current-ptr",
+      "type": "pointer",
+      "target": "c1",
+      "position": "above",
+      "label": "current"
+    },
+    {
+      "id": "title",
+      "type": "label",
+      "x": 500,
+      "y": 40,
+      "text": "Insertion Sort - Initial",
+      "fontSize": 24,
+      "fontWeight": "bold",
+      "anchor": "middle"
+    },
+    {
+      "id": "status",
+      "type": "label",
+      "x": 500,
+      "y": 350,
+      "text": "First element [5] is considered sorted.",
+      "fontSize": 14,
+      "anchor": "middle"
+    }
+  ],
+  "steps": [
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "Insertion Sort - Insert 2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "current-ptr",
+          "props": {
+            "target": "c1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c1",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Comparing 2 with 5. 2 < 5, so shift 5 right."
+          }
+        }
+      ],
+      "description": "Step 1 of Insertion Sort Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "c0",
+          "props": {
+            "value": 2
+          }
+        },
+        {
+          "type": "update",
+          "target": "c1",
+          "props": {
+            "value": 5,
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "sorted-region",
+          "props": {
+            "width": 160
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "2 inserted at position 0. Sorted portion: [2, 5]"
+          }
+        }
+      ],
+      "description": "Step 2 of Insertion Sort Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "Insertion Sort - Insert 4"
+          }
+        },
+        {
+          "type": "update",
+          "target": "current-ptr",
+          "props": {
+            "target": "c2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Comparing 4 with sorted portion. 2 < 4 < 5, insert at position 1."
+          }
+        }
+      ],
+      "description": "Step 3 of Insertion Sort Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "c1",
+          "props": {
+            "value": 4,
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "value": 5
+          }
+        },
+        {
+          "type": "update",
+          "target": "sorted-region",
+          "props": {
+            "width": 240
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "4 inserted. Sorted portion: [2, 4, 5]"
+          }
+        }
+      ],
+      "description": "Step 4 of Insertion Sort Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "Insertion Sort - Insert 6"
+          }
+        },
+        {
+          "type": "update",
+          "target": "current-ptr",
+          "props": {
+            "target": "c3"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c3",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Comparing 6 with sorted portion. 6 > 5, no shift needed."
+          }
+        }
+      ],
+      "description": "Step 5 of Insertion Sort Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "c3",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "sorted-region",
+          "props": {
+            "width": 320
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "6 is already in correct position. Sorted portion: [2, 4, 5, 6]"
+          }
+        }
+      ],
+      "description": "Step 6 of Insertion Sort Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "Insertion Sort - Insert 1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "current-ptr",
+          "props": {
+            "target": "c4"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c4",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "1 < all elements. Shift all right and insert 1 at position 0."
+          }
+        }
+      ],
+      "description": "Step 7 of Insertion Sort Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "c0",
+          "props": {
+            "value": 1
+          }
+        },
+        {
+          "type": "update",
+          "target": "c1",
+          "props": {
+            "value": 2
+          }
+        },
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "value": 4
+          }
+        },
+        {
+          "type": "update",
+          "target": "c3",
+          "props": {
+            "value": 5
+          }
+        },
+        {
+          "type": "update",
+          "target": "c4",
+          "props": {
+            "value": 6,
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "sorted-region",
+          "props": {
+            "width": 400
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "1 inserted at start. Sorted portion: [1, 2, 4, 5, 6]"
+          }
+        }
+      ],
+      "description": "Step 8 of Insertion Sort Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "Insertion Sort - Complete"
+          }
+        },
+        {
+          "type": "update",
+          "target": "current-ptr",
+          "props": {
+            "target": "c5"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c5",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c0",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c1",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c3",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c4",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "sorted-region",
+          "props": {
+            "width": 480
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Array sorted: [1, 2, 3, 4, 5, 6]"
+          }
+        }
+      ],
+      "description": "Step 9 of Insertion Sort Visualization"
+    }
+  ]
+}

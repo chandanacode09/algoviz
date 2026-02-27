@@ -1,0 +1,324 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "Lowest Common Ancestor (LCA)",
+    "title": "Find Lowest Common Ancestor of Two Nodes in BST",
+    "description": "Find the lowest common ancestor of nodes 6 and 2 in a binary search tree. LCA is the deepest node that is an ancestor of both target nodes.",
+    "category": "tree",
+    "complexity": {
+      "time": "O(h)",
+      "space": "O(h)"
+    },
+    "difficulty": "intermediate",
+    "inputDescription": "A binary tree with 8 nodes. Find LCA of nodes 6 and 2 (answer: 5)"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 550
+    },
+    "playback": {
+      "stepDuration": 900
+    }
+  },
+  "actors": [
+    {
+      "id": "node-3",
+      "type": "node",
+      "x": 500,
+      "y": 80,
+      "value": 3,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-5",
+      "type": "node",
+      "x": 300,
+      "y": 210,
+      "value": 5,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-1",
+      "type": "node",
+      "x": 700,
+      "y": 210,
+      "value": 1,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-6",
+      "type": "node",
+      "x": 150,
+      "y": 340,
+      "value": 6,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-2",
+      "type": "node",
+      "x": 380,
+      "y": 340,
+      "value": 2,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-0",
+      "type": "node",
+      "x": 620,
+      "y": 340,
+      "value": 0,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-8",
+      "type": "node",
+      "x": 800,
+      "y": 340,
+      "value": 8,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "edge-3-5",
+      "type": "edge",
+      "source": "node-3",
+      "target": "node-5",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "edge-3-1",
+      "type": "edge",
+      "source": "node-3",
+      "target": "node-1",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "edge-5-6",
+      "type": "edge",
+      "source": "node-5",
+      "target": "node-6",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "edge-5-2",
+      "type": "edge",
+      "source": "node-5",
+      "target": "node-2",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "edge-1-0",
+      "type": "edge",
+      "source": "node-1",
+      "target": "node-0",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "edge-1-8",
+      "type": "edge",
+      "source": "node-1",
+      "target": "node-8",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "label-targets",
+      "type": "label",
+      "x": 50,
+      "y": 500,
+      "text": "Target nodes: 6 and 2",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$text",
+      "anchor": "start"
+    },
+    {
+      "id": "label-current",
+      "type": "label",
+      "x": 50,
+      "y": 470,
+      "text": "Current: Node 3 (root)",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$primary",
+      "anchor": "start"
+    },
+    {
+      "id": "label-result",
+      "type": "label",
+      "x": 50,
+      "y": 440,
+      "text": "Result: Searching...",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$warning",
+      "anchor": "start"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Start LCA search. Begin at root node 3. Both targets (6 and 2) lie in different subtrees.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-3",
+          "props": {
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-current",
+          "props": {
+            "text": "Current: Node 3 (root)"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-result",
+          "props": {
+            "text": "Result: Check left and right subtrees"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Recursively search left subtree. Visit node 5. Node 6 is in left subtree, node 2 is in right subtree of 5.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-5",
+          "props": {
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-current",
+          "props": {
+            "text": "Current: Node 5 (left of 3)"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-result",
+          "props": {
+            "text": "Result: Both 6 and 2 found in subtrees of 5!"
+          }
+        }
+      ]
+    },
+    {
+      "description": "At node 5: Node 6 is in left subtree, node 2 is in right subtree. Both targets are in different subtrees of 5.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-5",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "node-6",
+          "props": {
+            "fill": "$danger"
+          }
+        },
+        {
+          "type": "update",
+          "target": "node-2",
+          "props": {
+            "fill": "$danger"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-current",
+          "props": {
+            "text": "Current: Node 5 (both subtrees contain targets)"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-result",
+          "props": {
+            "text": "Result: Node 5 is the LCA! ✓"
+          }
+        }
+      ]
+    },
+    {
+      "description": "LCA found: Node 5. This is the lowest (deepest) node that is an ancestor of both node 6 and node 2.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-5",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-current",
+          "props": {
+            "text": "Current: Complete"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-result",
+          "props": {
+            "fill": "$success",
+            "text": "LCA of nodes 6 and 2 is: 5 ✓"
+          }
+        }
+      ]
+    }
+  ]
+}

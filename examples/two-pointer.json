@@ -1,0 +1,91 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "two_pointer",
+    "title": "Two Pointers — Two Sum (Sorted)",
+    "description": "Find two numbers in a sorted array that add up to a target. Use two pointers starting at opposite ends, moving inward based on the current sum.",
+    "category": "searching",
+    "complexity": { "time": "O(n)", "space": "O(1)" },
+    "difficulty": "beginner",
+    "inputDescription": "Sorted array: [1, 3, 5, 7, 9, 11], target sum: 8",
+    "tags": ["two-pointers", "sorted-array", "leetcode"]
+  },
+  "config": {
+    "canvas": { "width": 1000, "height": 420 },
+    "playback": { "stepDuration": 1200 }
+  },
+  "actors": [
+    { "id": "c0", "type": "cell", "x": 200, "y": 150, "width": 80, "height": 70, "value": 1, "sublabel": "0" },
+    { "id": "c1", "type": "cell", "x": 290, "y": 150, "width": 80, "height": 70, "value": 3, "sublabel": "1" },
+    { "id": "c2", "type": "cell", "x": 380, "y": 150, "width": 80, "height": 70, "value": 5, "sublabel": "2" },
+    { "id": "c3", "type": "cell", "x": 470, "y": 150, "width": 80, "height": 70, "value": 7, "sublabel": "3" },
+    { "id": "c4", "type": "cell", "x": 560, "y": 150, "width": 80, "height": 70, "value": 9, "sublabel": "4" },
+    { "id": "c5", "type": "cell", "x": 650, "y": 150, "width": 80, "height": 70, "value": 11, "sublabel": "5" },
+
+    { "id": "pL", "type": "pointer", "target": "c0", "position": "below", "label": "left", "fill": "$primary" },
+    { "id": "pR", "type": "pointer", "target": "c5", "position": "below", "label": "right", "fill": "$danger" },
+
+    { "id": "title", "type": "label", "x": 500, "y": 35, "text": "Two Pointers — find pair summing to 8", "fontSize": 22, "fontWeight": "bold", "anchor": "middle" },
+    { "id": "sum_label", "type": "label", "x": 500, "y": 90, "text": "", "fontSize": 18, "fontWeight": "bold", "anchor": "middle" },
+    { "id": "status", "type": "label", "x": 500, "y": 380, "text": "Target: 8. Left at index 0, right at index 5.", "fontSize": 15, "anchor": "middle", "fill": "$muted" }
+  ],
+  "steps": [
+    {
+      "description": "Check: arr[0] + arr[5] = 1 + 11 = 12. Compare with target 8.",
+      "actions": [
+        { "type": "update", "target": "c0", "props": { "fill": "$primary" } },
+        { "type": "update", "target": "c5", "props": { "fill": "$danger" } },
+        { "type": "update", "target": "sum_label", "props": { "text": "1 + 11 = 12" } },
+        { "type": "update", "target": "status", "props": { "text": "Sum 12 > target 8. Too large → move right pointer left." } }
+      ],
+      "transition": "highlight"
+    },
+    {
+      "description": "12 > 8: move right pointer from index 5 to 4 to reduce the sum",
+      "actions": [
+        { "type": "update", "target": "c5", "props": { "fill": "$muted", "opacity": 0.3 } },
+        { "type": "update", "target": "pR", "props": { "target": "c4" } },
+        { "type": "update", "target": "sum_label", "props": { "text": "" } },
+        { "type": "update", "target": "status", "props": { "text": "Right pointer moves to index 4 (value 9)" } }
+      ]
+    },
+    {
+      "description": "Check: arr[0] + arr[4] = 1 + 9 = 10. Compare with target 8.",
+      "actions": [
+        { "type": "update", "target": "c4", "props": { "fill": "$danger" } },
+        { "type": "update", "target": "sum_label", "props": { "text": "1 + 9 = 10" } },
+        { "type": "update", "target": "status", "props": { "text": "Sum 10 > target 8. Still too large → move right pointer left." } }
+      ],
+      "transition": "highlight"
+    },
+    {
+      "description": "10 > 8: move right pointer from index 4 to 3",
+      "actions": [
+        { "type": "update", "target": "c4", "props": { "fill": "$muted", "opacity": 0.3 } },
+        { "type": "update", "target": "pR", "props": { "target": "c3" } },
+        { "type": "update", "target": "sum_label", "props": { "text": "" } },
+        { "type": "update", "target": "status", "props": { "text": "Right pointer moves to index 3 (value 7)" } }
+      ]
+    },
+    {
+      "description": "Check: arr[0] + arr[3] = 1 + 7 = 8. Compare with target 8.",
+      "actions": [
+        { "type": "update", "target": "c3", "props": { "fill": "$warning" } },
+        { "type": "update", "target": "c0", "props": { "fill": "$warning" } },
+        { "type": "update", "target": "sum_label", "props": { "text": "1 + 7 = 8 ✓", "fill": "$success" } },
+        { "type": "update", "target": "status", "props": { "text": "Sum 8 == target 8. Found the pair!" } }
+      ],
+      "transition": "highlight"
+    },
+    {
+      "description": "Found! arr[0]=1 and arr[3]=7 sum to 8. Return indices [0, 3].",
+      "actions": [
+        { "type": "update", "target": "c0", "props": { "fill": "$success", "stroke": "$success" } },
+        { "type": "update", "target": "c3", "props": { "fill": "$success", "stroke": "$success" } },
+        { "type": "update", "target": "status", "props": { "text": "Answer: indices [0, 3]. O(n) time, O(1) space.", "fill": "$success" } },
+        { "type": "update", "target": "pL", "props": { "label": "✓" } },
+        { "type": "update", "target": "pR", "props": { "label": "✓" } }
+      ]
+    }
+  ]
+}

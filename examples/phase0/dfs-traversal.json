@@ -1,0 +1,337 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "Depth-First Search (DFS)",
+    "title": "DFS Traversal on Undirected Graph",
+    "description": "Traverse a graph in depth-first order, exploring as far as possible along each branch",
+    "category": "graph",
+    "complexity": {
+      "time": "O(V+E)",
+      "space": "O(V)"
+    },
+    "difficulty": "intermediate",
+    "inputDescription": "5-node undirected graph with edges: A-B, A-C, B-D, C-E, B-C"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 500
+    },
+    "playback": {
+      "stepDuration": 1200
+    }
+  },
+  "actors": [
+    {
+      "id": "nodeA",
+      "type": "node",
+      "x": 200,
+      "y": 250,
+      "value": "A",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "nodeB",
+      "type": "node",
+      "x": 500,
+      "y": 100,
+      "value": "B",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "nodeC",
+      "type": "node",
+      "x": 500,
+      "y": 350,
+      "value": "C",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "nodeD",
+      "type": "node",
+      "x": 800,
+      "y": 100,
+      "value": "D",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "nodeE",
+      "type": "node",
+      "x": 800,
+      "y": 350,
+      "value": "E",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "edgeAB",
+      "type": "edge",
+      "source": "nodeA",
+      "target": "nodeB",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "edgeAC",
+      "type": "edge",
+      "source": "nodeA",
+      "target": "nodeC",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "edgeBD",
+      "type": "edge",
+      "source": "nodeB",
+      "target": "nodeD",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "edgeBC",
+      "type": "edge",
+      "source": "nodeB",
+      "target": "nodeC",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "edgeCE",
+      "type": "edge",
+      "source": "nodeC",
+      "target": "nodeE",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "stack_label",
+      "type": "label",
+      "x": 100,
+      "y": 50,
+      "text": "Stack: [A]",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$text"
+    },
+    {
+      "id": "visited_label",
+      "type": "label",
+      "x": 100,
+      "y": 100,
+      "text": "Visited: []",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$text"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Start DFS from node A. Push A to stack.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "nodeA",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "stack_label",
+          "props": {
+            "text": "Stack: [A]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Pop A from stack. Mark A as visited. Push unvisited neighbors B, C.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "nodeA",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "stack_label",
+          "props": {
+            "text": "Stack: [B, C]"
+          }
+        },
+        {
+          "type": "update",
+          "target": "visited_label",
+          "props": {
+            "text": "Visited: [A]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Pop C from stack. Mark C as visited. Push unvisited neighbor E.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "nodeC",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "edgeAC",
+          "props": {
+            "stroke": "$success",
+            "strokeWidth": 3
+          }
+        },
+        {
+          "type": "update",
+          "target": "stack_label",
+          "props": {
+            "text": "Stack: [B, E]"
+          }
+        },
+        {
+          "type": "update",
+          "target": "visited_label",
+          "props": {
+            "text": "Visited: [A, C]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Pop E from stack. Mark E as visited. No unvisited neighbors.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "nodeE",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "edgeCE",
+          "props": {
+            "stroke": "$success",
+            "strokeWidth": 3
+          }
+        },
+        {
+          "type": "update",
+          "target": "stack_label",
+          "props": {
+            "text": "Stack: [B]"
+          }
+        },
+        {
+          "type": "update",
+          "target": "visited_label",
+          "props": {
+            "text": "Visited: [A, C, E]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Pop B from stack. Mark B as visited. Push unvisited neighbor D.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "nodeB",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "edgeAB",
+          "props": {
+            "stroke": "$success",
+            "strokeWidth": 3
+          }
+        },
+        {
+          "type": "update",
+          "target": "stack_label",
+          "props": {
+            "text": "Stack: [D]"
+          }
+        },
+        {
+          "type": "update",
+          "target": "visited_label",
+          "props": {
+            "text": "Visited: [A, C, E, B]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Pop D from stack. Mark D as visited. No unvisited neighbors.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "nodeD",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "edgeBD",
+          "props": {
+            "stroke": "$success",
+            "strokeWidth": 3
+          }
+        },
+        {
+          "type": "update",
+          "target": "stack_label",
+          "props": {
+            "text": "Stack: []"
+          }
+        },
+        {
+          "type": "update",
+          "target": "visited_label",
+          "props": {
+            "text": "Visited: [A, C, E, B, D]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "DFS complete! All nodes visited in order: A, C, E, B, D",
+      "actions": [
+        {
+          "type": "update",
+          "target": "edgeBC",
+          "props": {
+            "stroke": "$muted",
+            "opacity": 0.5
+          }
+        }
+      ]
+    }
+  ]
+}

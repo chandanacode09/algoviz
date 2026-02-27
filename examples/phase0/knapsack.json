@@ -1,0 +1,719 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "0/1 Knapsack",
+    "title": "0/1 Knapsack DP (2D Table)",
+    "description": "Solve the 0/1 knapsack problem using a 2D DP table. Items: [{weight:2, value:3}, {weight:3, value:4}], capacity=5. Table: 3 rows (empty, item1, item2) × 6 cols (capacity 0-5).",
+    "category": "dynamic-programming",
+    "complexity": {
+      "time": "O(n*W)",
+      "space": "O(n*W)"
+    },
+    "difficulty": "intermediate",
+    "inputDescription": "2 items, capacity=5: item1(w=2,v=3), item2(w=3,v=4)"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 550
+    },
+    "playback": {
+      "stepDuration": 800
+    }
+  },
+  "actors": [
+    {
+      "id": "title",
+      "type": "label",
+      "x": 50,
+      "y": 30,
+      "text": "0/1 Knapsack DP (2D Table)",
+      "fontSize": 24,
+      "fontWeight": "bold",
+      "fill": "$text"
+    },
+    {
+      "id": "subtitle",
+      "type": "label",
+      "x": 50,
+      "y": 60,
+      "text": "Items: item1(w=2,v=3), item2(w=3,v=4) | Capacity=5",
+      "fontSize": 12,
+      "fill": "$muted"
+    },
+    {
+      "id": "status",
+      "type": "label",
+      "x": 50,
+      "y": 85,
+      "text": "Initializing table...",
+      "fontSize": 12,
+      "fill": "$muted"
+    },
+    {
+      "id": "row_label_0",
+      "type": "label",
+      "x": 220,
+      "y": 125,
+      "text": "empty",
+      "fontSize": 11,
+      "fill": "$muted",
+      "anchor": "end"
+    },
+    {
+      "id": "row_label_1",
+      "type": "label",
+      "x": 220,
+      "y": 195,
+      "text": "item1(2,3)",
+      "fontSize": 11,
+      "fill": "$muted",
+      "anchor": "end"
+    },
+    {
+      "id": "row_label_2",
+      "type": "label",
+      "x": 220,
+      "y": 265,
+      "text": "item2(3,4)",
+      "fontSize": 11,
+      "fill": "$muted",
+      "anchor": "end"
+    },
+    {
+      "id": "col_label_0",
+      "type": "label",
+      "x": 250,
+      "y": 110,
+      "text": "w=0",
+      "fontSize": 11,
+      "fill": "$muted"
+    },
+    {
+      "id": "col_label_1",
+      "type": "label",
+      "x": 315,
+      "y": 110,
+      "text": "w=1",
+      "fontSize": 11,
+      "fill": "$muted"
+    },
+    {
+      "id": "col_label_2",
+      "type": "label",
+      "x": 380,
+      "y": 110,
+      "text": "w=2",
+      "fontSize": 11,
+      "fill": "$muted"
+    },
+    {
+      "id": "col_label_3",
+      "type": "label",
+      "x": 445,
+      "y": 110,
+      "text": "w=3",
+      "fontSize": 11,
+      "fill": "$muted"
+    },
+    {
+      "id": "col_label_4",
+      "type": "label",
+      "x": 510,
+      "y": 110,
+      "text": "w=4",
+      "fontSize": 11,
+      "fill": "$muted"
+    },
+    {
+      "id": "col_label_5",
+      "type": "label",
+      "x": 575,
+      "y": 110,
+      "text": "w=5",
+      "fontSize": 11,
+      "fill": "$muted"
+    },
+    {
+      "id": "cell_0_0",
+      "type": "cell",
+      "x": 235,
+      "y": 120,
+      "value": 0,
+      "width": 65,
+      "height": 50,
+      "fill": "$success",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 14
+    },
+    {
+      "id": "cell_0_1",
+      "type": "cell",
+      "x": 300,
+      "y": 120,
+      "value": 0,
+      "width": 65,
+      "height": 50,
+      "fill": "$success",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 14
+    },
+    {
+      "id": "cell_0_2",
+      "type": "cell",
+      "x": 365,
+      "y": 120,
+      "value": 0,
+      "width": 65,
+      "height": 50,
+      "fill": "$success",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 14
+    },
+    {
+      "id": "cell_0_3",
+      "type": "cell",
+      "x": 430,
+      "y": 120,
+      "value": 0,
+      "width": 65,
+      "height": 50,
+      "fill": "$success",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 14
+    },
+    {
+      "id": "cell_0_4",
+      "type": "cell",
+      "x": 495,
+      "y": 120,
+      "value": 0,
+      "width": 65,
+      "height": 50,
+      "fill": "$success",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 14
+    },
+    {
+      "id": "cell_0_5",
+      "type": "cell",
+      "x": 560,
+      "y": 120,
+      "value": 0,
+      "width": 65,
+      "height": 50,
+      "fill": "$success",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 14
+    },
+    {
+      "id": "cell_1_0",
+      "type": "cell",
+      "x": 235,
+      "y": 190,
+      "value": 0,
+      "width": 65,
+      "height": 50,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 14
+    },
+    {
+      "id": "cell_1_1",
+      "type": "cell",
+      "x": 300,
+      "y": 190,
+      "value": 0,
+      "width": 65,
+      "height": 50,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 14
+    },
+    {
+      "id": "cell_1_2",
+      "type": "cell",
+      "x": 365,
+      "y": 190,
+      "value": 0,
+      "width": 65,
+      "height": 50,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 14
+    },
+    {
+      "id": "cell_1_3",
+      "type": "cell",
+      "x": 430,
+      "y": 190,
+      "value": 0,
+      "width": 65,
+      "height": 50,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 14
+    },
+    {
+      "id": "cell_1_4",
+      "type": "cell",
+      "x": 495,
+      "y": 190,
+      "value": 0,
+      "width": 65,
+      "height": 50,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 14
+    },
+    {
+      "id": "cell_1_5",
+      "type": "cell",
+      "x": 560,
+      "y": 190,
+      "value": 0,
+      "width": 65,
+      "height": 50,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 14
+    },
+    {
+      "id": "cell_2_0",
+      "type": "cell",
+      "x": 235,
+      "y": 260,
+      "value": 0,
+      "width": 65,
+      "height": 50,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 14
+    },
+    {
+      "id": "cell_2_1",
+      "type": "cell",
+      "x": 300,
+      "y": 260,
+      "value": 0,
+      "width": 65,
+      "height": 50,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 14
+    },
+    {
+      "id": "cell_2_2",
+      "type": "cell",
+      "x": 365,
+      "y": 260,
+      "value": 0,
+      "width": 65,
+      "height": 50,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 14
+    },
+    {
+      "id": "cell_2_3",
+      "type": "cell",
+      "x": 430,
+      "y": 260,
+      "value": 0,
+      "width": 65,
+      "height": 50,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 14
+    },
+    {
+      "id": "cell_2_4",
+      "type": "cell",
+      "x": 495,
+      "y": 260,
+      "value": 0,
+      "width": 65,
+      "height": 50,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 14
+    },
+    {
+      "id": "cell_2_5",
+      "type": "cell",
+      "x": 560,
+      "y": 260,
+      "value": 0,
+      "width": 65,
+      "height": 50,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 14
+    },
+    {
+      "id": "pointer",
+      "type": "pointer",
+      "target": "cell_1_0",
+      "position": "above",
+      "label": "current",
+      "fill": "$primary",
+      "textColor": "$text"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Row 0 initialized: empty knapsack gives 0 value for all capacities",
+      "actions": [
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Row 0 (empty): all capacities give value=0"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Item 1 (w=2, v=3): dp[1][0]=0 (capacity 0, cannot take item)",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_1_0",
+          "props": {
+            "value": 0,
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_1_0"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Item 1 row: capacity=0, cannot fit (weight=2)"
+          }
+        }
+      ]
+    },
+    {
+      "description": "dp[1][1]=0 (capacity 1, item weight 2, cannot take)",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_1_1",
+          "props": {
+            "value": 0,
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_1_1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Item 1 row: capacity=1, cannot fit (weight=2)"
+          }
+        }
+      ]
+    },
+    {
+      "description": "dp[1][2]=3 (capacity 2, can take item: value=3)",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_1_2",
+          "props": {
+            "value": 3,
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_1_2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Item 1 row: capacity=2, take item1: max(0, 0+3)=3"
+          }
+        }
+      ]
+    },
+    {
+      "description": "dp[1][3]=3 (capacity 3, still take only item1)",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_1_3",
+          "props": {
+            "value": 3,
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_1_3"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Item 1 row: capacity=3, take item1: max(0, 0+3)=3"
+          }
+        }
+      ]
+    },
+    {
+      "description": "dp[1][4]=3 (capacity 4, still take only item1)",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_1_4",
+          "props": {
+            "value": 3,
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_1_4"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Item 1 row: capacity=4, take item1: max(0, 0+3)=3"
+          }
+        }
+      ]
+    },
+    {
+      "description": "dp[1][5]=3 (capacity 5, still take only item1)",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_1_5",
+          "props": {
+            "value": 3,
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_1_5"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Item 1 row complete"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Item 2 (w=3, v=4): dp[2][0]=0 (capacity 0, cannot take)",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_2_0",
+          "props": {
+            "value": 0,
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_2_0"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Item 2 row: capacity=0, cannot fit"
+          }
+        }
+      ]
+    },
+    {
+      "description": "dp[2][1]=0 (capacity 1, item2 weight 3, cannot take)",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_2_1",
+          "props": {
+            "value": 0,
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_2_1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Item 2 row: capacity=1, cannot fit (weight=3)"
+          }
+        }
+      ]
+    },
+    {
+      "description": "dp[2][2]=3 (capacity 2, cannot take item2, use item1)",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_2_2",
+          "props": {
+            "value": 3,
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_2_2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Item 2 row: capacity=2, cannot fit item2: max(3, skip)=3"
+          }
+        }
+      ]
+    },
+    {
+      "description": "dp[2][3]=4 (capacity 3, take item2 only: value=4)",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_2_3",
+          "props": {
+            "value": 4,
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_2_3"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Item 2 row: capacity=3, take item2: max(3, 0+4)=4"
+          }
+        }
+      ]
+    },
+    {
+      "description": "dp[2][4]=7 (capacity 4, take both items: item1+item2=3+4=7)",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_2_4",
+          "props": {
+            "value": 7,
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_2_4"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Item 2 row: capacity=4, take both: max(3, dp[1][1]+4)=max(3,4)=4"
+          }
+        }
+      ]
+    },
+    {
+      "description": "dp[2][5]=7 (capacity 5, optimal: take both items: 3+4=7)",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_2_5",
+          "props": {
+            "value": 7,
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_2_5"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Final result: max value = 7 (both items fit in capacity 5)"
+          }
+        }
+      ]
+    }
+  ]
+}

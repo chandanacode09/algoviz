@@ -1,0 +1,478 @@
+{
+  "metadata": {
+    "title": "Heap Sort Algorithm",
+    "description": "Heap sort on array [4, 10, 3, 5, 1]. Build max heap then extract elements.",
+    "category": "heap",
+    "difficulty": "intermediate",
+    "complexity": {
+      "time": "O(n log n)",
+      "space": "O(1)"
+    },
+    "algorithm": "heap_sort"
+  },
+  "actors": [
+    {
+      "id": "title",
+      "type": "label",
+      "x": 500,
+      "y": 20,
+      "text": "Heap Sort: [4, 10, 3, 5, 1]",
+      "fontSize": 20,
+      "fontWeight": "bold",
+      "anchor": "middle"
+    },
+    {
+      "id": "array-label",
+      "type": "label",
+      "x": 80,
+      "y": 60,
+      "text": "Array:",
+      "fontSize": 13,
+      "fontWeight": "bold",
+      "anchor": "start"
+    },
+    {
+      "id": "a0",
+      "type": "cell",
+      "x": 140,
+      "y": 60,
+      "width": 50,
+      "height": 50,
+      "value": "4",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 14
+    },
+    {
+      "id": "a1",
+      "type": "cell",
+      "x": 200,
+      "y": 60,
+      "width": 50,
+      "height": 50,
+      "value": "10",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 14
+    },
+    {
+      "id": "a2",
+      "type": "cell",
+      "x": 260,
+      "y": 60,
+      "width": 50,
+      "height": 50,
+      "value": "3",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 14
+    },
+    {
+      "id": "a3",
+      "type": "cell",
+      "x": 320,
+      "y": 60,
+      "width": 50,
+      "height": 50,
+      "value": "5",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 14
+    },
+    {
+      "id": "a4",
+      "type": "cell",
+      "x": 380,
+      "y": 60,
+      "width": 50,
+      "height": 50,
+      "value": "1",
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 14
+    },
+    {
+      "id": "heap-label",
+      "type": "label",
+      "x": 80,
+      "y": 140,
+      "text": "Max Heap Tree:",
+      "fontSize": 13,
+      "fontWeight": "bold",
+      "anchor": "start"
+    },
+    {
+      "id": "n0",
+      "type": "node",
+      "x": 250,
+      "y": 180,
+      "value": "10",
+      "radius": 25,
+      "fill": "$warning",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 14
+    },
+    {
+      "id": "n1",
+      "type": "node",
+      "x": 150,
+      "y": 260,
+      "value": "4",
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 14
+    },
+    {
+      "id": "n2",
+      "type": "node",
+      "x": 350,
+      "y": 260,
+      "value": "5",
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 14
+    },
+    {
+      "id": "n3",
+      "type": "node",
+      "x": 100,
+      "y": 340,
+      "value": "3",
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 14
+    },
+    {
+      "id": "n4",
+      "type": "node",
+      "x": 200,
+      "y": 340,
+      "value": "1",
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 14
+    },
+    {
+      "id": "e0-1",
+      "type": "edge",
+      "source": "n0",
+      "target": "n1",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "e0-2",
+      "type": "edge",
+      "source": "n0",
+      "target": "n2",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "e1-3",
+      "type": "edge",
+      "source": "n1",
+      "target": "n3",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "e1-4",
+      "type": "edge",
+      "source": "n1",
+      "target": "n4",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "status",
+      "type": "label",
+      "x": 500,
+      "y": 100,
+      "text": "Step 1: Build max heap",
+      "fontSize": 12,
+      "anchor": "start"
+    },
+    {
+      "id": "sorted",
+      "type": "label",
+      "x": 500,
+      "y": 200,
+      "text": "Sorted result:",
+      "fontSize": 12,
+      "fontWeight": "bold",
+      "anchor": "start"
+    },
+    {
+      "id": "sorted-cells-bg",
+      "type": "region",
+      "x": 500,
+      "y": 230,
+      "width": 400,
+      "height": 60,
+      "fill": "$muted",
+      "cornerRadius": 4
+    }
+  ],
+  "steps": [
+    {
+      "description": "Initial array: [4, 10, 3, 5, 1]. Start building max heap using heapify.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Step 1: Build max heap via heapify process"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Heapify: Compare parent 4 with children 10. Swap to maintain max heap property.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "a0",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "a1",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Heapify: Swap 4 and 10 (parent-child violation)"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Heapify completed: Max heap structure built. Root is 10 (maximum).",
+      "actions": [
+        {
+          "type": "update",
+          "target": "a0",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "a1",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Max heap built: root=10"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Extract step 1: Remove root 10, move last element 1 to root, heapify down.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "n0",
+          "props": {
+            "value": "1",
+            "fill": "$danger"
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "sorted-c0",
+            "type": "cell",
+            "x": 520,
+            "y": 240,
+            "width": 50,
+            "height": 50,
+            "value": "10",
+            "fill": "$success",
+            "stroke": "$text",
+            "strokeWidth": 2,
+            "fontSize": 14
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Extract 10 (max). Heapify new root."
+          }
+        }
+      ]
+    },
+    {
+      "description": "Heapify: 1 < 5 (right child). Swap. Now 5 is root. Heap: [5, 4, 3, 1].",
+      "actions": [
+        {
+          "type": "update",
+          "target": "n0",
+          "props": {
+            "value": "5"
+          }
+        },
+        {
+          "type": "update",
+          "target": "n2",
+          "props": {
+            "value": "1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Heapify: 1 sinks down, 5 becomes root"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Extract step 2: Remove 5, place 1 at root, heapify.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "n0",
+          "props": {
+            "value": "1",
+            "fill": "$danger"
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "sorted-c1",
+            "type": "cell",
+            "x": 580,
+            "y": 240,
+            "width": 50,
+            "height": 50,
+            "value": "5",
+            "fill": "$success",
+            "stroke": "$text",
+            "strokeWidth": 2,
+            "fontSize": 14
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Extract 5. Remaining: [4, 1, 3]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Continue extraction: Extract 4, then 3, then 1. Final sorted array.",
+      "actions": [
+        {
+          "type": "create",
+          "actor": {
+            "id": "sorted-c2",
+            "type": "cell",
+            "x": 640,
+            "y": 240,
+            "width": 50,
+            "height": 50,
+            "value": "4",
+            "fill": "$success",
+            "stroke": "$text",
+            "strokeWidth": 2,
+            "fontSize": 14
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "sorted-c3",
+            "type": "cell",
+            "x": 700,
+            "y": 240,
+            "width": 50,
+            "height": 50,
+            "value": "3",
+            "fill": "$success",
+            "stroke": "$text",
+            "strokeWidth": 2,
+            "fontSize": 14
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "sorted-c4",
+            "type": "cell",
+            "x": 760,
+            "y": 240,
+            "width": 50,
+            "height": 50,
+            "value": "1",
+            "fill": "$success",
+            "stroke": "$text",
+            "strokeWidth": 2,
+            "fontSize": 14
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Complete: Sorted array [10, 5, 4, 3, 1]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Heap sort complete: Array sorted in O(n log n) time using in-place sorting.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "opacity": 1
+          }
+        }
+      ]
+    }
+  ],
+  "version": "1.0",
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 600,
+      "background": "$default"
+    },
+    "playback": {
+      "stepDuration": 1000
+    }
+  }
+}

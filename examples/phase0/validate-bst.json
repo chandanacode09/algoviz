@@ -1,0 +1,353 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "Validate Binary Search Tree",
+    "title": "BST Validation via Inorder Traversal",
+    "description": "Validate whether a binary tree is a valid binary search tree by performing inorder traversal and checking if values are in strictly increasing order.",
+    "category": "tree",
+    "complexity": {
+      "time": "O(n)",
+      "space": "O(h)"
+    },
+    "difficulty": "intermediate",
+    "inputDescription": "A binary tree with 8 nodes (valid BST: 5, 3, 1, 4, 8, 7, 9)"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 500
+    },
+    "playback": {
+      "stepDuration": 850
+    }
+  },
+  "actors": [
+    {
+      "id": "node-5",
+      "type": "node",
+      "x": 500,
+      "y": 80,
+      "value": 5,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-3",
+      "type": "node",
+      "x": 300,
+      "y": 200,
+      "value": 3,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-8",
+      "type": "node",
+      "x": 700,
+      "y": 200,
+      "value": 8,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-1",
+      "type": "node",
+      "x": 180,
+      "y": 330,
+      "value": 1,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-4",
+      "type": "node",
+      "x": 380,
+      "y": 330,
+      "value": 4,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-7",
+      "type": "node",
+      "x": 580,
+      "y": 330,
+      "value": 7,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "node-9",
+      "type": "node",
+      "x": 800,
+      "y": 330,
+      "value": 9,
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "edge-5-3",
+      "type": "edge",
+      "source": "node-5",
+      "target": "node-3",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "edge-5-8",
+      "type": "edge",
+      "source": "node-5",
+      "target": "node-8",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "edge-3-1",
+      "type": "edge",
+      "source": "node-3",
+      "target": "node-1",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "edge-3-4",
+      "type": "edge",
+      "source": "node-3",
+      "target": "node-4",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "edge-8-7",
+      "type": "edge",
+      "source": "node-8",
+      "target": "node-7",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "edge-8-9",
+      "type": "edge",
+      "source": "node-8",
+      "target": "node-9",
+      "directed": false,
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "opacity": 0.6
+    },
+    {
+      "id": "label-status",
+      "type": "label",
+      "x": 50,
+      "y": 450,
+      "text": "Status: Validating",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$text",
+      "anchor": "start"
+    },
+    {
+      "id": "label-check",
+      "type": "label",
+      "x": 50,
+      "y": 420,
+      "text": "Current: 1, Previous: -∞, Valid: Yes",
+      "fontSize": 13,
+      "fontWeight": "normal",
+      "fill": "$primary",
+      "anchor": "start"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Start validation. Inorder traversal checks ascending order.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "label-status",
+          "props": {
+            "text": "Status: Starting validation"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-check",
+          "props": {
+            "text": "Previous: -∞ (initialized)"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit node 1. Check 1 > -∞. Valid.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-1",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-check",
+          "props": {
+            "text": "Current: 1, Previous: -∞, Valid: ✓ Yes"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit node 3. Check 3 > 1. Valid.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-3",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-check",
+          "props": {
+            "text": "Current: 3, Previous: 1, Valid: ✓ Yes"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit node 4. Check 4 > 3. Valid.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-4",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-check",
+          "props": {
+            "text": "Current: 4, Previous: 3, Valid: ✓ Yes"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit node 5 (root). Check 5 > 4. Valid.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-5",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-check",
+          "props": {
+            "text": "Current: 5, Previous: 4, Valid: ✓ Yes"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit node 7. Check 7 > 5. Valid.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-7",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-check",
+          "props": {
+            "text": "Current: 7, Previous: 5, Valid: ✓ Yes"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit node 8. Check 8 > 7. Valid.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-8",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-check",
+          "props": {
+            "text": "Current: 8, Previous: 7, Valid: ✓ Yes"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit node 9. Check 9 > 8. Valid. All nodes verified.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "node-9",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-check",
+          "props": {
+            "text": "Current: 9, Previous: 8, Valid: ✓ Yes"
+          }
+        },
+        {
+          "type": "update",
+          "target": "label-status",
+          "props": {
+            "text": "Status: Valid BST ✓"
+          }
+        }
+      ]
+    }
+  ]
+}

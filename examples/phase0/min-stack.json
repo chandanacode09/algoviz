@@ -1,0 +1,343 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "min_stack",
+    "title": "MinStack Implementation",
+    "description": "Implement a stack that supports push, pop, and getMin in O(1) time. Uses two stacks: one for values and one for minimum values.",
+    "category": "other",
+    "complexity": {
+      "time": "O(1) per operation",
+      "space": "O(n)"
+    },
+    "difficulty": "beginner",
+    "inputDescription": "Operations: push(5), push(1), push(3), push(1), getMin(), pop(), getMin(), pop()"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 600
+    },
+    "playback": {
+      "stepDuration": 1000
+    }
+  },
+  "actors": [
+    {
+      "id": "title",
+      "type": "label",
+      "x": 50,
+      "y": 30,
+      "text": "MinStack - O(1) Min Queries",
+      "fontSize": 22,
+      "fontWeight": "bold",
+      "fill": "$text"
+    },
+    {
+      "id": "main_label",
+      "type": "label",
+      "x": 100,
+      "y": 80,
+      "text": "Main Stack",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$primary"
+    },
+    {
+      "id": "min_label",
+      "type": "label",
+      "x": 550,
+      "y": 80,
+      "text": "Min Stack (tracking minimum)",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$success"
+    },
+    {
+      "id": "status",
+      "type": "label",
+      "x": 50,
+      "y": 520,
+      "text": "Operation: -",
+      "fontSize": 12,
+      "fill": "$muted"
+    },
+    {
+      "id": "main_region",
+      "type": "region",
+      "x": 40,
+      "y": 110,
+      "width": 280,
+      "height": 380,
+      "fill": "$primary",
+      "stroke": "$primary",
+      "opacity": 0.1,
+      "label": "Main Stack"
+    },
+    {
+      "id": "min_region",
+      "type": "region",
+      "x": 490,
+      "y": 110,
+      "width": 280,
+      "height": 380,
+      "fill": "$success",
+      "stroke": "$success",
+      "opacity": 0.1,
+      "label": "Min Stack"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Push 5 onto both stacks (5 is the first element and current minimum)",
+      "actions": [
+        {
+          "type": "create",
+          "actor": {
+            "id": "m5",
+            "type": "cell",
+            "x": 120,
+            "y": 420,
+            "value": 5,
+            "width": 60,
+            "height": 60,
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff",
+            "fontSize": 16
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "min5",
+            "type": "cell",
+            "x": 570,
+            "y": 420,
+            "value": 5,
+            "width": 60,
+            "height": 60,
+            "fill": "$success",
+            "stroke": "$success",
+            "textColor": "#fff",
+            "fontSize": 16
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Operation: push(5) - First element, min=5"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Push 1 onto both stacks (1 is less than 5, becomes new minimum)",
+      "actions": [
+        {
+          "type": "create",
+          "actor": {
+            "id": "m1a",
+            "type": "cell",
+            "x": 120,
+            "y": 350,
+            "value": 1,
+            "width": 60,
+            "height": 60,
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff",
+            "fontSize": 16
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "min1a",
+            "type": "cell",
+            "x": 570,
+            "y": 350,
+            "value": 1,
+            "width": 60,
+            "height": 60,
+            "fill": "$success",
+            "stroke": "$success",
+            "textColor": "#fff",
+            "fontSize": 16
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Operation: push(1) - 1 < 5, new min=1"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Push 3 onto main stack. Min stack: only push if 3 <= current min (1)",
+      "actions": [
+        {
+          "type": "create",
+          "actor": {
+            "id": "m3",
+            "type": "cell",
+            "x": 120,
+            "y": 280,
+            "value": 3,
+            "width": 60,
+            "height": 60,
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff",
+            "fontSize": 16
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Operation: push(3) - 3 > min(1), don't push to min stack"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Push 1 onto both stacks (1 equals current minimum, still push to min stack)",
+      "actions": [
+        {
+          "type": "create",
+          "actor": {
+            "id": "m1b",
+            "type": "cell",
+            "x": 120,
+            "y": 210,
+            "value": 1,
+            "width": 60,
+            "height": 60,
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff",
+            "fontSize": 16
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "min1b",
+            "type": "cell",
+            "x": 570,
+            "y": 280,
+            "value": 1,
+            "width": 60,
+            "height": 60,
+            "fill": "$success",
+            "stroke": "$success",
+            "textColor": "#fff",
+            "fontSize": 16
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Operation: push(1) - 1 = min(1), push to min stack"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Query getMin(): Top of min stack is 1",
+      "actions": [
+        {
+          "type": "update",
+          "target": "min1b",
+          "props": {
+            "fill": "$warning",
+            "stroke": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Operation: getMin() -> returns 1 (top of min stack)"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Pop: remove 1 from main stack. Min stack top is 1, so pop it too",
+      "actions": [
+        {
+          "type": "remove",
+          "target": "m1b"
+        },
+        {
+          "type": "remove",
+          "target": "min1b"
+        },
+        {
+          "type": "update",
+          "target": "min1a",
+          "props": {
+            "fill": "$success",
+            "stroke": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Operation: pop() - removed 1 from both stacks"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Query getMin(): Top of min stack is 1 (from first push(1))",
+      "actions": [
+        {
+          "type": "update",
+          "target": "min1a",
+          "props": {
+            "fill": "$warning",
+            "stroke": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Operation: getMin() -> returns 1 (unchanged, still min)"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Pop: remove 3 from main stack. Min stack top is 1, don't pop (3 was never in min stack)",
+      "actions": [
+        {
+          "type": "remove",
+          "target": "m3"
+        },
+        {
+          "type": "update",
+          "target": "min1a",
+          "props": {
+            "fill": "$success",
+            "stroke": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Operation: pop() - removed 3 from main, min unchanged"
+          }
+        }
+      ]
+    }
+  ]
+}

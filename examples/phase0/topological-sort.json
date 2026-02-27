@@ -1,0 +1,377 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "Topological Sort (Kahn's Algorithm)",
+    "title": "Topological Sort on DAG",
+    "description": "Sort nodes of a directed acyclic graph in topological order by removing nodes with in-degree 0",
+    "category": "graph",
+    "complexity": {
+      "time": "O(V+E)",
+      "space": "O(V)"
+    },
+    "difficulty": "intermediate",
+    "inputDescription": "DAG with 5 nodes: A→B, A→C, B→D, C→D, D→E"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 500
+    },
+    "playback": {
+      "stepDuration": 1200
+    }
+  },
+  "actors": [
+    {
+      "id": "nodeA",
+      "type": "node",
+      "x": 200,
+      "y": 250,
+      "value": "A",
+      "radius": 30,
+      "sublabel": "in:0",
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "nodeB",
+      "type": "node",
+      "x": 400,
+      "y": 120,
+      "value": "B",
+      "radius": 30,
+      "sublabel": "in:1",
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "nodeC",
+      "type": "node",
+      "x": 400,
+      "y": 380,
+      "value": "C",
+      "radius": 30,
+      "sublabel": "in:1",
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "nodeD",
+      "type": "node",
+      "x": 600,
+      "y": 250,
+      "value": "D",
+      "radius": 30,
+      "sublabel": "in:2",
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "nodeE",
+      "type": "node",
+      "x": 850,
+      "y": 250,
+      "value": "E",
+      "radius": 30,
+      "sublabel": "in:1",
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "edgeAB",
+      "type": "edge",
+      "source": "nodeA",
+      "target": "nodeB",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "edgeAC",
+      "type": "edge",
+      "source": "nodeA",
+      "target": "nodeC",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "edgeBD",
+      "type": "edge",
+      "source": "nodeB",
+      "target": "nodeD",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "edgeCD",
+      "type": "edge",
+      "source": "nodeC",
+      "target": "nodeD",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "edgeDE",
+      "type": "edge",
+      "source": "nodeD",
+      "target": "nodeE",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "queue_label",
+      "type": "label",
+      "x": 100,
+      "y": 50,
+      "text": "Queue: [A]",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$text"
+    },
+    {
+      "id": "result_label",
+      "type": "label",
+      "x": 100,
+      "y": 100,
+      "text": "Result: []",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$text"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Initialize: identify nodes with in-degree 0. Queue = [A]",
+      "actions": [
+        {
+          "type": "update",
+          "target": "nodeA",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "queue_label",
+          "props": {
+            "text": "Queue: [A]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Remove A from queue. Add to result. Decrement in-degree of B,C.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "nodeA",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "nodeB",
+          "props": {
+            "sublabel": "in:0"
+          }
+        },
+        {
+          "type": "update",
+          "target": "nodeC",
+          "props": {
+            "sublabel": "in:0"
+          }
+        },
+        {
+          "type": "update",
+          "target": "queue_label",
+          "props": {
+            "text": "Queue: [B, C]"
+          }
+        },
+        {
+          "type": "update",
+          "target": "result_label",
+          "props": {
+            "text": "Result: [A]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Remove B from queue. Add to result. Decrement in-degree of D.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "nodeB",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "nodeD",
+          "props": {
+            "sublabel": "in:1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "queue_label",
+          "props": {
+            "text": "Queue: [C]"
+          }
+        },
+        {
+          "type": "update",
+          "target": "result_label",
+          "props": {
+            "text": "Result: [A, B]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Remove C from queue. Add to result. Decrement in-degree of D.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "nodeC",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "nodeD",
+          "props": {
+            "sublabel": "in:0"
+          }
+        },
+        {
+          "type": "update",
+          "target": "queue_label",
+          "props": {
+            "text": "Queue: [D]"
+          }
+        },
+        {
+          "type": "update",
+          "target": "result_label",
+          "props": {
+            "text": "Result: [A, B, C]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Remove D from queue. Add to result. Decrement in-degree of E.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "nodeD",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "nodeE",
+          "props": {
+            "sublabel": "in:0"
+          }
+        },
+        {
+          "type": "update",
+          "target": "queue_label",
+          "props": {
+            "text": "Queue: [E]"
+          }
+        },
+        {
+          "type": "update",
+          "target": "result_label",
+          "props": {
+            "text": "Result: [A, B, C, D]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Remove E from queue. Add to result. Queue empty.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "nodeE",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "queue_label",
+          "props": {
+            "text": "Queue: []"
+          }
+        },
+        {
+          "type": "update",
+          "target": "result_label",
+          "props": {
+            "text": "Result: [A, B, C, D, E]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Topological sort complete! All nodes processed in valid topological order.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "edgeAB",
+          "props": {
+            "stroke": "$success",
+            "strokeWidth": 3
+          }
+        },
+        {
+          "type": "update",
+          "target": "edgeAC",
+          "props": {
+            "stroke": "$success",
+            "strokeWidth": 3
+          }
+        },
+        {
+          "type": "update",
+          "target": "edgeBD",
+          "props": {
+            "stroke": "$success",
+            "strokeWidth": 3
+          }
+        },
+        {
+          "type": "update",
+          "target": "edgeCD",
+          "props": {
+            "stroke": "$success",
+            "strokeWidth": 3
+          }
+        },
+        {
+          "type": "update",
+          "target": "edgeDE",
+          "props": {
+            "stroke": "$success",
+            "strokeWidth": 3
+          }
+        }
+      ]
+    }
+  ]
+}

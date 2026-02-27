@@ -1,0 +1,519 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "container_with_most_water",
+    "title": "Container With Most Water Visualization",
+    "description": "Two-pointer approach to find the container holding maximum water area on heights [1, 8, 6, 2, 5, 4, 8, 3, 7]",
+    "category": "other",
+    "complexity": {
+      "time": "O(n)",
+      "space": "O(1)"
+    },
+    "difficulty": "intermediate",
+    "inputDescription": "Array of 9 integers (heights): [1, 8, 6, 2, 5, 4, 8, 3, 7]"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 600
+    },
+    "playback": {
+      "stepDuration": 1000
+    }
+  },
+  "actors": [
+    {
+      "id": "c0",
+      "type": "cell",
+      "x": 110,
+      "y": 340,
+      "width": 50,
+      "height": 50,
+      "value": 1,
+      "sublabel": "0"
+    },
+    {
+      "id": "c1",
+      "type": "cell",
+      "x": 170,
+      "y": 200,
+      "width": 50,
+      "height": 190,
+      "value": 8,
+      "sublabel": "1",
+      "fill": "$primary"
+    },
+    {
+      "id": "c2",
+      "type": "cell",
+      "x": 230,
+      "y": 230,
+      "width": 50,
+      "height": 160,
+      "value": 6,
+      "sublabel": "2"
+    },
+    {
+      "id": "c3",
+      "type": "cell",
+      "x": 290,
+      "y": 300,
+      "width": 50,
+      "height": 90,
+      "value": 2,
+      "sublabel": "3"
+    },
+    {
+      "id": "c4",
+      "type": "cell",
+      "x": 350,
+      "y": 270,
+      "width": 50,
+      "height": 120,
+      "value": 5,
+      "sublabel": "4"
+    },
+    {
+      "id": "c5",
+      "type": "cell",
+      "x": 410,
+      "y": 280,
+      "width": 50,
+      "height": 110,
+      "value": 4,
+      "sublabel": "5"
+    },
+    {
+      "id": "c6",
+      "type": "cell",
+      "x": 470,
+      "y": 200,
+      "width": 50,
+      "height": 190,
+      "value": 8,
+      "sublabel": "6",
+      "fill": "$success"
+    },
+    {
+      "id": "c7",
+      "type": "cell",
+      "x": 530,
+      "y": 290,
+      "width": 50,
+      "height": 100,
+      "value": 3,
+      "sublabel": "7"
+    },
+    {
+      "id": "c8",
+      "type": "cell",
+      "x": 590,
+      "y": 230,
+      "width": 50,
+      "height": 160,
+      "value": 7,
+      "sublabel": "8"
+    },
+    {
+      "id": "left-ptr",
+      "type": "pointer",
+      "target": "c0",
+      "position": "above",
+      "label": "left",
+      "fill": "$primary"
+    },
+    {
+      "id": "right-ptr",
+      "type": "pointer",
+      "target": "c8",
+      "position": "above",
+      "label": "right",
+      "fill": "$success"
+    },
+    {
+      "id": "water-region",
+      "type": "region",
+      "x": 100,
+      "y": 200,
+      "width": 530,
+      "height": 190,
+      "fill": "$warning",
+      "opacity": 0.2,
+      "cornerRadius": 2
+    },
+    {
+      "id": "title",
+      "type": "label",
+      "x": 500,
+      "y": 40,
+      "text": "Container With Most Water - Initial",
+      "fontSize": 24,
+      "fontWeight": "bold",
+      "anchor": "middle"
+    },
+    {
+      "id": "status",
+      "type": "label",
+      "x": 500,
+      "y": 500,
+      "text": "Two pointers at start and end. Width=8, Height=min(1,7)=1, Area=8",
+      "fontSize": 13,
+      "anchor": "middle"
+    },
+    {
+      "id": "max-area",
+      "type": "label",
+      "x": 500,
+      "y": 530,
+      "text": "Max Area: 8",
+      "fontSize": 14,
+      "anchor": "middle",
+      "fill": "$success",
+      "fontWeight": "bold"
+    }
+  ],
+  "steps": [
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "Container With Most Water - Step 1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Width=8, Height=min(1,7)=1, Area=8. Left=1 < Right=7, move left."
+          }
+        }
+      ],
+      "description": "Step 1 of Container With Most Water Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "left-ptr",
+          "props": {
+            "target": "c1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c0",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c1",
+          "props": {
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "water-region",
+          "props": {
+            "x": 160,
+            "y": 200,
+            "width": 470,
+            "height": 190
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Width=7, Height=min(8,7)=7, Area=49. New max! Left=8 > Right=7, move right."
+          }
+        },
+        {
+          "type": "update",
+          "target": "max-area",
+          "props": {
+            "text": "Max Area: 49"
+          }
+        }
+      ],
+      "description": "Step 2 of Container With Most Water Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "right-ptr",
+          "props": {
+            "target": "c7"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c8",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c7",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "water-region",
+          "props": {
+            "x": 160,
+            "y": 290,
+            "width": 410,
+            "height": 100
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Width=6, Height=min(8,3)=3, Area=18. Left=8 > Right=3, move right."
+          }
+        }
+      ],
+      "description": "Step 3 of Container With Most Water Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "right-ptr",
+          "props": {
+            "target": "c6"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c7",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c6",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "water-region",
+          "props": {
+            "x": 160,
+            "y": 200,
+            "width": 350,
+            "height": 190
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Width=5, Height=min(8,8)=8, Area=40. Left=8 = Right=8, move left."
+          }
+        }
+      ],
+      "description": "Step 4 of Container With Most Water Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "left-ptr",
+          "props": {
+            "target": "c2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c1",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "water-region",
+          "props": {
+            "x": 220,
+            "y": 230,
+            "width": 290,
+            "height": 160
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Width=4, Height=min(6,8)=6, Area=24. Left=6 < Right=8, move left."
+          }
+        }
+      ],
+      "description": "Step 5 of Container With Most Water Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "left-ptr",
+          "props": {
+            "target": "c3"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c3",
+          "props": {
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "water-region",
+          "props": {
+            "x": 280,
+            "y": 200,
+            "width": 230,
+            "height": 190
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Width=3, Height=min(2,8)=2, Area=6. Left=2 < Right=8, move left."
+          }
+        }
+      ],
+      "description": "Step 6 of Container With Most Water Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "left-ptr",
+          "props": {
+            "target": "c4"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c3",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c4",
+          "props": {
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "water-region",
+          "props": {
+            "x": 340,
+            "y": 200,
+            "width": 170,
+            "height": 190
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Width=2, Height=min(5,8)=5, Area=10. Pointers converge. Algorithm complete."
+          }
+        }
+      ],
+      "description": "Step 7 of Container With Most Water Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "Container With Most Water - Maximum Found"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c4",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c6",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c1",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c6",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "water-region",
+          "props": {
+            "x": 160,
+            "y": 200,
+            "width": 350,
+            "height": 190,
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Maximum water area found between indices 1 and 6 with area 49."
+          }
+        }
+      ],
+      "description": "Step 8 of Container With Most Water Visualization"
+    }
+  ]
+}

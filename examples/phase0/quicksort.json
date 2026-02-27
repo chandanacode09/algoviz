@@ -1,0 +1,592 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "quicksort",
+    "title": "Quicksort Visualization",
+    "description": "Quicksort partitioning and recursive sorting on array [6, 3, 8, 1, 5, 2, 7, 4]",
+    "category": "sorting",
+    "complexity": {
+      "time": "O(n log n) average, O(n²) worst",
+      "space": "O(1)"
+    },
+    "difficulty": "intermediate",
+    "inputDescription": "Array of 8 integers: [6, 3, 8, 1, 5, 2, 7, 4]"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 600
+    },
+    "playback": {
+      "stepDuration": 1000
+    }
+  },
+  "actors": [
+    {
+      "id": "c0",
+      "type": "cell",
+      "x": 150,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": 6,
+      "sublabel": "0"
+    },
+    {
+      "id": "c1",
+      "type": "cell",
+      "x": 220,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": 3,
+      "sublabel": "1"
+    },
+    {
+      "id": "c2",
+      "type": "cell",
+      "x": 290,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": 8,
+      "sublabel": "2"
+    },
+    {
+      "id": "c3",
+      "type": "cell",
+      "x": 360,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": 1,
+      "sublabel": "3"
+    },
+    {
+      "id": "c4",
+      "type": "cell",
+      "x": 430,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": 5,
+      "sublabel": "4"
+    },
+    {
+      "id": "c5",
+      "type": "cell",
+      "x": 500,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": 2,
+      "sublabel": "5"
+    },
+    {
+      "id": "c6",
+      "type": "cell",
+      "x": 570,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": 7,
+      "sublabel": "6"
+    },
+    {
+      "id": "c7",
+      "type": "cell",
+      "x": 640,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": 4,
+      "sublabel": "7"
+    },
+    {
+      "id": "pivot-ptr",
+      "type": "pointer",
+      "target": "c0",
+      "position": "above",
+      "label": "pivot"
+    },
+    {
+      "id": "left-ptr",
+      "type": "pointer",
+      "target": "c1",
+      "position": "below",
+      "label": "left"
+    },
+    {
+      "id": "right-ptr",
+      "type": "pointer",
+      "target": "c7",
+      "position": "below",
+      "label": "right"
+    },
+    {
+      "id": "partition-region",
+      "type": "region",
+      "x": 140,
+      "y": 180,
+      "width": 570,
+      "height": 100,
+      "fill": "$primary",
+      "opacity": 0.1,
+      "cornerRadius": 4
+    },
+    {
+      "id": "title",
+      "type": "label",
+      "x": 500,
+      "y": 40,
+      "text": "Quicksort - Initial Pivot Selection",
+      "fontSize": 24,
+      "fontWeight": "bold",
+      "anchor": "middle"
+    },
+    {
+      "id": "status",
+      "type": "label",
+      "x": 500,
+      "y": 350,
+      "text": "Pivot: 6 at index 0. Scanning for elements to swap.",
+      "fontSize": 14,
+      "anchor": "middle"
+    }
+  ],
+  "steps": [
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "Quicksort - Partition Pass 1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "left-ptr",
+          "props": {
+            "target": "c1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "right-ptr",
+          "props": {
+            "target": "c7"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c1",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Moving left pointer: 3 < 6 (pivot), move right"
+          }
+        }
+      ],
+      "description": "Step 1 of Quicksort Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "left-ptr",
+          "props": {
+            "target": "c2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c1",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Moving left pointer: 8 > 6 (pivot), found swap candidate"
+          }
+        }
+      ],
+      "description": "Step 2 of Quicksort Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "c7",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Moving right pointer: 4 < 6 (pivot), found swap candidate"
+          }
+        }
+      ],
+      "description": "Step 3 of Quicksort Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "value": 4,
+            "sublabel": "2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c7",
+          "props": {
+            "value": 8,
+            "sublabel": "7"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c7",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Swapped 8 and 4. Continue partitioning."
+          }
+        }
+      ],
+      "description": "Step 4 of Quicksort Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "left-ptr",
+          "props": {
+            "target": "c3"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c3",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Moving left pointer: 1 < 6, continue right"
+          }
+        }
+      ],
+      "description": "Step 5 of Quicksort Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "left-ptr",
+          "props": {
+            "target": "c4"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c3",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c4",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Moving left pointer: 5 < 6, continue right"
+          }
+        }
+      ],
+      "description": "Step 6 of Quicksort Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "left-ptr",
+          "props": {
+            "target": "c5"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c4",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c5",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "right-ptr",
+          "props": {
+            "target": "c5"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c5",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Pointers converged. Partition complete."
+          }
+        }
+      ],
+      "description": "Step 7 of Quicksort Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "c0",
+          "props": {
+            "value": 2,
+            "sublabel": "0"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c5",
+          "props": {
+            "value": 6,
+            "sublabel": "5"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c5",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pivot-ptr",
+          "props": {
+            "target": "c5"
+          }
+        },
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "Quicksort - Pivot Placed at Final Position"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Pivot 6 placed correctly. Recursively sort left and right subarrays."
+          }
+        }
+      ],
+      "description": "Step 8 of Quicksort Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "partition-region",
+          "props": {
+            "x": 140,
+            "y": 180,
+            "width": 280,
+            "height": 100,
+            "fill": "$success",
+            "opacity": 0.15
+          }
+        },
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "Quicksort - Sorting Left Subarray"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Recursively sorting left partition [2, 3, 1, 4, 5]"
+          }
+        }
+      ],
+      "description": "Step 9 of Quicksort Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "partition-region",
+          "props": {
+            "x": 500,
+            "y": 180,
+            "width": 210,
+            "height": 100,
+            "fill": "$warning",
+            "opacity": 0.15
+          }
+        },
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "Quicksort - Sorting Right Subarray"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Recursively sorting right partition [7, 8]"
+          }
+        }
+      ],
+      "description": "Step 10 of Quicksort Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "c0",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c1",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c3",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c4",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c5",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c6",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c7",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "partition-region",
+          "props": {
+            "opacity": 0
+          }
+        },
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "Quicksort - Complete"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Array sorted: [1, 2, 3, 4, 5, 6, 7, 8]"
+          }
+        }
+      ],
+      "description": "Step 11 of Quicksort Visualization"
+    }
+  ]
+}

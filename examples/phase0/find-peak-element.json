@@ -1,0 +1,329 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "find_peak_element",
+    "title": "Find Peak Element Binary Search Visualization",
+    "description": "Binary search to find a peak element in array [1, 2, 3, 1]. A peak is greater than its neighbors.",
+    "category": "searching",
+    "complexity": {
+      "time": "O(log n)",
+      "space": "O(1)"
+    },
+    "difficulty": "beginner",
+    "inputDescription": "Array of 4 integers: [1, 2, 3, 1]. A peak element is greater than its neighbors."
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 600
+    },
+    "playback": {
+      "stepDuration": 1000
+    }
+  },
+  "actors": [
+    {
+      "id": "c0",
+      "type": "cell",
+      "x": 250,
+      "y": 280,
+      "width": 80,
+      "height": 80,
+      "value": 1,
+      "sublabel": "0"
+    },
+    {
+      "id": "c1",
+      "type": "cell",
+      "x": 360,
+      "y": 200,
+      "width": 80,
+      "height": 160,
+      "value": 2,
+      "sublabel": "1"
+    },
+    {
+      "id": "c2",
+      "type": "cell",
+      "x": 470,
+      "y": 140,
+      "width": 80,
+      "height": 220,
+      "value": 3,
+      "sublabel": "2"
+    },
+    {
+      "id": "c3",
+      "type": "cell",
+      "x": 580,
+      "y": 280,
+      "width": 80,
+      "height": 80,
+      "value": 1,
+      "sublabel": "3"
+    },
+    {
+      "id": "left-ptr",
+      "type": "pointer",
+      "target": "c0",
+      "position": "above",
+      "label": "left",
+      "fill": "$primary"
+    },
+    {
+      "id": "right-ptr",
+      "type": "pointer",
+      "target": "c3",
+      "position": "above",
+      "label": "right",
+      "fill": "$success"
+    },
+    {
+      "id": "mid-ptr",
+      "type": "pointer",
+      "target": "c1",
+      "position": "below",
+      "label": "mid",
+      "fill": "$warning"
+    },
+    {
+      "id": "search-region",
+      "type": "region",
+      "x": 240,
+      "y": 120,
+      "width": 440,
+      "height": 260,
+      "fill": "$primary",
+      "opacity": 0.15,
+      "cornerRadius": 4
+    },
+    {
+      "id": "title",
+      "type": "label",
+      "x": 500,
+      "y": 40,
+      "text": "Find Peak Element - Initial Search",
+      "fontSize": 24,
+      "fontWeight": "bold",
+      "anchor": "middle"
+    },
+    {
+      "id": "status",
+      "type": "label",
+      "x": 500,
+      "y": 420,
+      "text": "Binary search for peak. Mid=1 (value=2). Compare with neighbors.",
+      "fontSize": 14,
+      "anchor": "middle"
+    },
+    {
+      "id": "result",
+      "type": "label",
+      "x": 500,
+      "y": 460,
+      "text": "Peak found: -",
+      "fontSize": 13,
+      "anchor": "middle",
+      "fill": "$danger"
+    }
+  ],
+  "steps": [
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "Find Peak Element - Iteration 1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "left-ptr",
+          "props": {
+            "target": "c0"
+          }
+        },
+        {
+          "type": "update",
+          "target": "right-ptr",
+          "props": {
+            "target": "c3"
+          }
+        },
+        {
+          "type": "update",
+          "target": "mid-ptr",
+          "props": {
+            "target": "c1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c1",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Left=0, Right=3, Mid=1. Value[mid]=2. Compare 2 with neighbors: 1 < 2 and 2 < 3."
+          }
+        }
+      ],
+      "description": "Step 1 of Find Peak Element Binary Search Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Since value[mid] < value[mid+1], peak is on right side. Move left=mid+1."
+          }
+        },
+        {
+          "type": "update",
+          "target": "c1",
+          "props": {
+            "fill": "$default"
+          }
+        }
+      ],
+      "description": "Step 2 of Find Peak Element Binary Search Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "Find Peak Element - Iteration 2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "left-ptr",
+          "props": {
+            "target": "c2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "right-ptr",
+          "props": {
+            "target": "c3"
+          }
+        },
+        {
+          "type": "update",
+          "target": "mid-ptr",
+          "props": {
+            "target": "c2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "search-region",
+          "props": {
+            "x": 460,
+            "y": 120,
+            "width": 220,
+            "height": 260
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Left=2, Right=3, Mid=2. Value[mid]=3. Compare 3 with neighbors: 2 < 3 and 3 > 1."
+          }
+        }
+      ],
+      "description": "Step 3 of Find Peak Element Binary Search Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Peak found! Value[2]=3 is greater than both neighbors (2 and 1)."
+          }
+        },
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "result",
+          "props": {
+            "text": "Peak found: Index 2, Value 3",
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "search-region",
+          "props": {
+            "opacity": 0
+          }
+        }
+      ],
+      "description": "Step 4 of Find Peak Element Binary Search Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "Find Peak Element - Complete"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c0",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c1",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c3",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Binary search completed in 2 iterations. Time complexity: O(log n)."
+          }
+        }
+      ],
+      "description": "Step 5 of Find Peak Element Binary Search Visualization"
+    }
+  ]
+}

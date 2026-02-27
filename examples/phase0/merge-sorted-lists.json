@@ -1,0 +1,406 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "Merge Sorted Lists",
+    "title": "Merge Two Sorted Linked Lists",
+    "description": "Merge two sorted singly linked lists into a single sorted linked list",
+    "category": "linked-list",
+    "complexity": {
+      "time": "O(n+m)",
+      "space": "O(1)"
+    },
+    "difficulty": "beginner",
+    "inputDescription": "Two sorted linked lists: [1,3,5] and [2,4,6]"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 600
+    },
+    "playback": {
+      "stepDuration": 1000
+    }
+  },
+  "actors": [
+    {
+      "id": "list1_node1",
+      "type": "node",
+      "x": 200,
+      "y": 150,
+      "value": "1",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "list1_node2",
+      "type": "node",
+      "x": 400,
+      "y": 150,
+      "value": "3",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "list1_node3",
+      "type": "node",
+      "x": 600,
+      "y": 150,
+      "value": "5",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "list2_node1",
+      "type": "node",
+      "x": 200,
+      "y": 350,
+      "value": "2",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "list2_node2",
+      "type": "node",
+      "x": 400,
+      "y": 350,
+      "value": "4",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "list2_node3",
+      "type": "node",
+      "x": 600,
+      "y": 350,
+      "value": "6",
+      "radius": 30,
+      "fill": "$primary",
+      "textColor": "$text"
+    },
+    {
+      "id": "merged_node1",
+      "type": "node",
+      "x": 200,
+      "y": 500,
+      "value": "1",
+      "radius": 30,
+      "fill": "$success",
+      "textColor": "$text",
+      "opacity": 0
+    },
+    {
+      "id": "merged_node2",
+      "type": "node",
+      "x": 350,
+      "y": 500,
+      "value": "2",
+      "radius": 30,
+      "fill": "$success",
+      "textColor": "$text",
+      "opacity": 0
+    },
+    {
+      "id": "merged_node3",
+      "type": "node",
+      "x": 500,
+      "y": 500,
+      "value": "3",
+      "radius": 30,
+      "fill": "$success",
+      "textColor": "$text",
+      "opacity": 0
+    },
+    {
+      "id": "merged_node4",
+      "type": "node",
+      "x": 650,
+      "y": 500,
+      "value": "4",
+      "radius": 30,
+      "fill": "$success",
+      "textColor": "$text",
+      "opacity": 0
+    },
+    {
+      "id": "merged_node5",
+      "type": "node",
+      "x": 800,
+      "y": 500,
+      "value": "5",
+      "radius": 30,
+      "fill": "$success",
+      "textColor": "$text",
+      "opacity": 0
+    },
+    {
+      "id": "merged_node6",
+      "type": "node",
+      "x": 950,
+      "y": 500,
+      "value": "6",
+      "radius": 30,
+      "fill": "$success",
+      "textColor": "$text",
+      "opacity": 0
+    },
+    {
+      "id": "list1_edge1",
+      "type": "edge",
+      "source": "list1_node1",
+      "target": "list1_node2",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "list1_edge2",
+      "type": "edge",
+      "source": "list1_node2",
+      "target": "list1_node3",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "list2_edge1",
+      "type": "edge",
+      "source": "list2_node1",
+      "target": "list2_node2",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "list2_edge2",
+      "type": "edge",
+      "source": "list2_node2",
+      "target": "list2_node3",
+      "directed": true,
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "ptr1",
+      "type": "pointer",
+      "target": "list1_node1",
+      "position": "above",
+      "label": "p1",
+      "fill": "$danger",
+      "textColor": "$text"
+    },
+    {
+      "id": "ptr2",
+      "type": "pointer",
+      "target": "list2_node1",
+      "position": "below",
+      "label": "p2",
+      "fill": "$warning",
+      "textColor": "$text"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Initialize: pointers at heads of both lists",
+      "actions": [
+        {
+          "type": "update",
+          "target": "ptr1",
+          "props": {
+            "target": "list1_node1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "ptr2",
+          "props": {
+            "target": "list2_node1"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Compare 1 < 2: take 1, add to result, advance p1",
+      "actions": [
+        {
+          "type": "update",
+          "target": "merged_node1",
+          "props": {
+            "opacity": 1
+          }
+        },
+        {
+          "type": "update",
+          "target": "ptr1",
+          "props": {
+            "target": "list1_node2"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Compare 2 < 3: take 2, add to result, advance p2",
+      "actions": [
+        {
+          "type": "update",
+          "target": "merged_node2",
+          "props": {
+            "opacity": 1
+          }
+        },
+        {
+          "type": "update",
+          "target": "ptr2",
+          "props": {
+            "target": "list2_node2"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Compare 3 < 4: take 3, add to result, advance p1",
+      "actions": [
+        {
+          "type": "update",
+          "target": "merged_node3",
+          "props": {
+            "opacity": 1
+          }
+        },
+        {
+          "type": "update",
+          "target": "ptr1",
+          "props": {
+            "target": "list1_node3"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Compare 4 < 5: take 4, add to result, advance p2",
+      "actions": [
+        {
+          "type": "update",
+          "target": "merged_node4",
+          "props": {
+            "opacity": 1
+          }
+        },
+        {
+          "type": "update",
+          "target": "ptr2",
+          "props": {
+            "target": "list2_node3"
+          }
+        }
+      ]
+    },
+    {
+      "description": "p1 not exhausted: take 5, add to result, advance p1",
+      "actions": [
+        {
+          "type": "update",
+          "target": "merged_node5",
+          "props": {
+            "opacity": 1
+          }
+        },
+        {
+          "type": "update",
+          "target": "ptr1",
+          "props": {
+            "opacity": 0
+          }
+        }
+      ]
+    },
+    {
+      "description": "p2 not exhausted: take 6, add to result, advance p2",
+      "actions": [
+        {
+          "type": "update",
+          "target": "merged_node6",
+          "props": {
+            "opacity": 1
+          }
+        },
+        {
+          "type": "update",
+          "target": "ptr2",
+          "props": {
+            "opacity": 0
+          }
+        }
+      ]
+    },
+    {
+      "description": "Complete! Merged list created: [1,2,3,4,5,6]",
+      "actions": [
+        {
+          "type": "create",
+          "actor": {
+            "id": "merged_edge1",
+            "type": "edge",
+            "source": "merged_node1",
+            "target": "merged_node2",
+            "directed": true,
+            "stroke": "$success",
+            "strokeWidth": 2
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "merged_edge2",
+            "type": "edge",
+            "source": "merged_node2",
+            "target": "merged_node3",
+            "directed": true,
+            "stroke": "$success",
+            "strokeWidth": 2
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "merged_edge3",
+            "type": "edge",
+            "source": "merged_node3",
+            "target": "merged_node4",
+            "directed": true,
+            "stroke": "$success",
+            "strokeWidth": 2
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "merged_edge4",
+            "type": "edge",
+            "source": "merged_node4",
+            "target": "merged_node5",
+            "directed": true,
+            "stroke": "$success",
+            "strokeWidth": 2
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "merged_edge5",
+            "type": "edge",
+            "source": "merged_node5",
+            "target": "merged_node6",
+            "directed": true,
+            "stroke": "$success",
+            "strokeWidth": 2
+          }
+        }
+      ]
+    }
+  ]
+}

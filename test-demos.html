@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlgoViz Player — Test Demos</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0f172a; --surface: #1e293b; --surface2: #334155;
+  --border: #475569; --text: #f1f5f9; --text-muted: #94a3b8;
+  --accent: #3b82f6; --accent-hover: #2563eb; --success: #10b981; --radius: 8px;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+.av-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.av-header h1 { font-size: 16px; font-weight: 600; }
+.av-header .av-meta { display: flex; gap: 12px; font-size: 12px; color: var(--text-muted); }
+.av-badge { background: var(--surface2); padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+.av-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.av-canvas-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px; min-height: 0; }
+.av-canvas-wrap svg { width: 100%; height: 100%; max-width: 100%; max-height: 100%; }
+.av-actor { transition: all 0.45s cubic-bezier(0.4, 0, 0.2, 1); }
+.av-transition-instant .av-actor { transition: none !important; }
+.av-transition-swap .av-actor { transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+.av-description { padding: 12px 20px; background: var(--surface); border-top: 1px solid var(--border); min-height: 52px; display: flex; align-items: center; flex-shrink: 0; }
+.av-description-text { font-size: 15px; line-height: 1.5; }
+.av-description-step { font-size: 12px; color: var(--text-muted); margin-right: 12px; white-space: nowrap; }
+.av-controls { display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: var(--surface); border-top: 1px solid var(--border); flex-shrink: 0; }
+.av-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text); width: 36px; height: 36px; border-radius: var(--radius); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: background 0.15s; flex-shrink: 0; }
+.av-btn:hover { background: var(--accent); border-color: var(--accent); }
+.av-btn:active { transform: scale(0.95); }
+.av-btn.av-btn-play { width: 44px; height: 44px; background: var(--accent); border-color: var(--accent); border-radius: 50%; font-size: 18px; }
+.av-btn.av-btn-play:hover { background: var(--accent-hover); }
+.av-timeline { flex: 1; height: 6px; -webkit-appearance: none; appearance: none; background: var(--surface2); border-radius: 3px; outline: none; cursor: pointer; }
+.av-timeline::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; cursor: grab; }
+.av-speed { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 4px 8px; border-radius: var(--radius); font-size: 12px; cursor: pointer; min-width: 52px; text-align: center; }
+.av-step-count { font-size: 12px; color: var(--text-muted); white-space: nowrap; min-width: 60px; text-align: right; }
+.av-demo-nav { display: flex; gap: 8px; padding: 10px 20px; background: var(--bg); border-bottom: 1px solid var(--border); }
+.av-demo-nav button { background: var(--surface2); border: 1px solid var(--border); color: var(--text-muted); padding: 6px 16px; border-radius: var(--radius); font-size: 13px; cursor: pointer; transition: all 0.15s; }
+.av-demo-nav button:hover { color: var(--text); border-color: var(--accent); }
+.av-demo-nav button.active { background: var(--accent); border-color: var(--accent); color: white; }
+</style>
+</head>
+<body>
+<div class="av-demo-nav" id="demo-nav">
+  <button data-demo="bubble" class="active">Bubble Sort</button>
+  <button data-demo="bfs">BFS Graph</button>
+  <button data-demo="binary">Binary Search</button>
+</div>
+<div id="algoviz-root" style="flex:1;display:flex;flex-direction:column;"></div>
+
+<script>
+(function() {
+"use strict";
+
+const DEFAULTS = {
+  canvas: { width: 1000, height: 600, padding: 40, background: "#ffffff" },
+  theme: { default: "#e2e8f0", primary: "#3b82f6", secondary: "#8b5cf6", success: "#10b981", warning: "#f59e0b", danger: "#ef4444", text: "#1e293b", muted: "#94a3b8" },
+  playback: { stepDuration: 800, autoPlay: false }
+};
+const SPEEDS = [0.25, 0.5, 1, 1.5, 2, 3];
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+class Engine {
+  constructor(viz) { this.viz = viz; this.config = this._mc(viz.config || {}); this.totalSteps = viz.steps.length; this.currentStep = -1; this.actorStates = new Map(); this._init(); }
+  _mc(c) { return { canvas: { ...DEFAULTS.canvas, ...(c.canvas||{}) }, theme: { ...DEFAULTS.theme, ...(c.theme||{}) }, playback: { ...DEFAULTS.playback, ...(c.playback||{}) } }; }
+  _init() { this.actorStates.clear(); for (const a of this.viz.actors) this.actorStates.set(a.id, { ...a }); this.currentStep = -1; }
+  resolveColor(c) { if (!c) return null; if (typeof c === "string" && c.startsWith("$")) return this.config.theme[c.slice(1)] || c; return c; }
+  _apply(actions) { for (const a of actions) { if (a.type === "update") { const s = this.actorStates.get(a.target); if (s) Object.assign(s, a.props); } else if (a.type === "create") { this.actorStates.set(a.actor.id, { ...a.actor }); } else if (a.type === "remove") { this.actorStates.delete(a.target); } } }
+  goToStep(n) { n = Math.max(-1, Math.min(n, this.totalSteps - 1)); this._init(); for (let i = 0; i <= n; i++) this._apply(this.viz.steps[i].actions); this.currentStep = n; return this.getScene(); }
+  nextStep() { return this.currentStep < this.totalSteps - 1 ? this.goToStep(this.currentStep + 1) : null; }
+  prevStep() { return this.currentStep >= 0 ? this.goToStep(this.currentStep - 1) : null; }
+  getScene() { return { stepIndex: this.currentStep, description: this.currentStep >= 0 ? this.viz.steps[this.currentStep].description : (this.viz.metadata.description || "Initial state"), transition: this.currentStep >= 0 ? (this.viz.steps[this.currentStep].transition || "smooth") : "instant", actors: new Map(this.actorStates) }; }
+  get atEnd() { return this.currentStep >= this.totalSteps - 1; }
+}
+
+class Renderer {
+  constructor(container, engine) { this.container = container; this.engine = engine; this.svg = null; this.elements = new Map(); }
+  init() {
+    const c = this.engine.config.canvas;
+    this.svg = this._el("svg", { viewBox: `0 0 ${c.width} ${c.height}`, preserveAspectRatio: "xMidYMid meet" });
+    this.svg.appendChild(this._el("rect", { x: 0, y: 0, width: c.width, height: c.height, fill: c.background }));
+    const defs = this._el("defs");
+    const m = this._el("marker", { id: "av-arrow", viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 8, markerHeight: 8, orient: "auto-start-reverse" });
+    m.appendChild(this._el("path", { d: "M 0 0 L 10 5 L 0 10 z", fill: "currentColor" })); defs.appendChild(m); this.svg.appendChild(defs);
+    this.regionLayer = this._el("g"); this.edgeLayer = this._el("g"); this.actorLayer = this._el("g");
+    this.svg.appendChild(this.regionLayer); this.svg.appendChild(this.edgeLayer); this.svg.appendChild(this.actorLayer);
+    this.container.appendChild(this.svg); this.render(this.engine.getScene());
+  }
+  render(scene) {
+    this.svg.classList.remove("av-transition-instant", "av-transition-swap");
+    if (scene.transition === "instant") this.svg.classList.add("av-transition-instant");
+    else if (scene.transition === "swap") this.svg.classList.add("av-transition-swap");
+    const ids = new Set(scene.actors.keys());
+    for (const [id, el] of this.elements) { if (!ids.has(id)) { el.group.remove(); this.elements.delete(id); } }
+    for (const [id, actor] of scene.actors) { this.elements.has(id) ? this._upd(id, actor, scene) : this._crt(actor, scene); }
+  }
+  _crt(a, scene) {
+    const g = this._el("g", { class: "av-actor", "data-id": a.id }); const e = { group: g, type: a.type }; this.elements.set(a.id, e);
+    if (a.type === "cell") this._bCell(g, a, e); else if (a.type === "node") this._bNode(g, a, e);
+    else if (a.type === "edge") this._bEdge(g, a, e, scene); else if (a.type === "pointer") this._bPtr(g, a, e, scene);
+    else if (a.type === "label") this._bLbl(g, a, e); else if (a.type === "region") this._bReg(g, a, e);
+    (a.type === "edge" ? this.edgeLayer : a.type === "region" ? this.regionLayer : this.actorLayer).appendChild(g);
+  }
+  _upd(id, a, scene) {
+    const e = this.elements.get(id);
+    if (a.type === "cell") this._uCell(a, e); else if (a.type === "node") this._uNode(a, e);
+    else if (a.type === "edge") this._uEdge(a, e, scene); else if (a.type === "pointer") this._uPtr(a, e, scene);
+    else if (a.type === "label") this._uLbl(a, e); else if (a.type === "region") this._uReg(a, e);
+  }
+  _rc(v, fb) { return this.engine.resolveColor(v ?? fb); }
+
+  // Cell
+  _bCell(g, a, e) {
+    const w = a.width||60, h = a.height||60;
+    e.rect = g.appendChild(this._el("rect", { x: a.x, y: a.y, width: w, height: h, rx: a.cornerRadius??4, fill: this._rc(a.fill,"$default"), stroke: this._rc(a.stroke,"$muted"), "stroke-width": a.strokeWidth??2, opacity: a.opacity??1 }));
+    e.label = g.appendChild(this._el("text", { x: a.x+w/2, y: a.y+h/2, "text-anchor": "middle", "dominant-baseline": "central", fill: this._rc(a.textColor,"$text"), "font-size": a.fontSize||16, "font-weight": "600", "font-family": "inherit" }));
+    e.label.textContent = a.label ?? String(a.value);
+    if (a.sublabel) { e.sub = g.appendChild(this._el("text", { x: a.x+w/2, y: a.y+h+16, "text-anchor": "middle", "dominant-baseline": "central", fill: this._rc(null,"$muted"), "font-size": 12, "font-family": "inherit" })); e.sub.textContent = a.sublabel; }
+  }
+  _uCell(a, e) {
+    const w = a.width||60, h = a.height||60;
+    this._sa(e.rect, { x: a.x, y: a.y, width: w, height: h, rx: a.cornerRadius??4, fill: this._rc(a.fill,"$default"), stroke: this._rc(a.stroke,"$muted"), "stroke-width": a.strokeWidth??2, opacity: a.opacity??1 });
+    this._sa(e.label, { x: a.x+w/2, y: a.y+h/2, fill: this._rc(a.textColor,"$text"), "font-size": a.fontSize||16 });
+    e.label.textContent = a.label ?? String(a.value);
+    if (e.sub) { this._sa(e.sub, { x: a.x+w/2, y: a.y+h+16 }); if (a.sublabel !== undefined) e.sub.textContent = a.sublabel; }
+  }
+
+  // Node
+  _bNode(g, a, e) {
+    const r = a.radius||25;
+    e.circle = g.appendChild(this._el("circle", { cx: a.x, cy: a.y, r, fill: this._rc(a.fill,"$default"), stroke: this._rc(a.stroke,"$muted"), "stroke-width": a.strokeWidth??2, opacity: a.opacity??1 }));
+    e.label = g.appendChild(this._el("text", { x: a.x, y: a.y, "text-anchor": "middle", "dominant-baseline": "central", fill: this._rc(a.textColor,"$text"), "font-size": a.fontSize||14, "font-weight": "600", "font-family": "inherit" }));
+    e.label.textContent = a.label ?? String(a.value);
+    if (a.sublabel) { e.sub = g.appendChild(this._el("text", { x: a.x, y: a.y+r+18, "text-anchor": "middle", "dominant-baseline": "central", fill: this._rc(null,"$muted"), "font-size": 12, "font-family": "inherit" })); e.sub.textContent = a.sublabel; }
+  }
+  _uNode(a, e) {
+    const r = a.radius||25;
+    this._sa(e.circle, { cx: a.x, cy: a.y, r, fill: this._rc(a.fill,"$default"), stroke: this._rc(a.stroke,"$muted"), "stroke-width": a.strokeWidth??2, opacity: a.opacity??1 });
+    this._sa(e.label, { x: a.x, y: a.y, fill: this._rc(a.textColor,"$text"), "font-size": a.fontSize||14 });
+    e.label.textContent = a.label ?? String(a.value);
+    if (e.sub) { this._sa(e.sub, { x: a.x, y: a.y+r+18 }); if (a.sublabel !== undefined) e.sub.textContent = a.sublabel; }
+  }
+
+  // Edge
+  _bEdge(g, a, e, scene) {
+    const { x1, y1, x2, y2 } = this._ec(a, scene);
+    e.line = g.appendChild(this._el("line", { x1, y1, x2, y2, stroke: this._rc(a.stroke,"$muted"), "stroke-width": a.strokeWidth??2, "stroke-dasharray": a.dashArray||"", opacity: a.opacity??1, "marker-end": a.directed ? "url(#av-arrow)" : "" }));
+    g.style.color = this._rc(a.stroke, "$muted");
+    const t = a.label || (a.weight != null ? String(a.weight) : "");
+    if (t) { e.mid = g.appendChild(this._el("text", { x: (x1+x2)/2, y: (y1+y2)/2-10, "text-anchor": "middle", "dominant-baseline": "central", fill: this._rc(a.stroke,"$muted"), "font-size": 12, "font-weight": "600", "font-family": "inherit" })); e.mid.textContent = t; }
+  }
+  _uEdge(a, e, scene) {
+    const { x1, y1, x2, y2 } = this._ec(a, scene);
+    this._sa(e.line, { x1, y1, x2, y2, stroke: this._rc(a.stroke,"$muted"), "stroke-width": a.strokeWidth??2, "stroke-dasharray": a.dashArray||"", opacity: a.opacity??1, "marker-end": a.directed ? "url(#av-arrow)" : "" });
+    e.group.style.color = this._rc(a.stroke, "$muted");
+    if (e.mid) this._sa(e.mid, { x: (x1+x2)/2, y: (y1+y2)/2-10, fill: this._rc(a.stroke,"$muted") });
+  }
+  _ec(a, scene) {
+    const s = scene.actors.get(a.source), t = scene.actors.get(a.target);
+    if (!s || !t) return { x1:0, y1:0, x2:0, y2:0 };
+    let x1 = s.type==="node" ? s.x : s.x+(s.width||60)/2, y1 = s.type==="node" ? s.y : s.y+(s.height||60)/2;
+    let x2 = t.type==="node" ? t.x : t.x+(t.width||60)/2, y2 = t.type==="node" ? t.y : t.y+(t.height||60)/2;
+    if (a.directed && t.type==="node") { const r=t.radius||25, dx=x2-x1, dy=y2-y1, d=Math.sqrt(dx*dx+dy*dy); if(d>0){x2-=(dx/d)*r; y2-=(dy/d)*r;} }
+    return { x1, y1, x2, y2 };
+  }
+
+  // Pointer
+  _bPtr(g, a, e, scene) {
+    const { px, py, tx, ty } = this._pc(a, scene);
+    e.tri = g.appendChild(this._el("polygon", { points: this._tp(a.position, tx, ty), fill: this._rc(a.fill,"$primary") }));
+    e.label = g.appendChild(this._el("text", { x: px, y: py, "text-anchor": "middle", "dominant-baseline": "central", fill: this._rc(a.textColor,"$primary"), "font-size": a.fontSize||14, "font-weight": "700", "font-family": "inherit" }));
+    e.label.textContent = a.label || ""; g.setAttribute("opacity", a.opacity??1);
+  }
+  _uPtr(a, e, scene) {
+    const { px, py, tx, ty } = this._pc(a, scene);
+    this._sa(e.tri, { points: this._tp(a.position, tx, ty), fill: this._rc(a.fill,"$primary") });
+    this._sa(e.label, { x: px, y: py, fill: this._rc(a.textColor,"$primary"), "font-size": a.fontSize||14 });
+    e.label.textContent = a.label || ""; e.group.setAttribute("opacity", a.opacity??1);
+  }
+  _pc(a, scene) {
+    const t = scene.actors.get(a.target); if (!t) return { px:0, py:0, tx:0, ty:0 };
+    let cx, cy, off;
+    if (t.type==="node") { cx=t.x; cy=t.y; off=(t.radius||25)+10; }
+    else if (t.type==="cell") { cx=t.x+(t.width||60)/2; cy=t.y+(t.height||60)/2; off=(t.height||60)/2+10; }
+    else { cx=t.x||0; cy=t.y||0; off=20; }
+    const p = a.position; let px, py, tx, ty;
+    if (p==="above") { tx=cx; ty=cy-off; px=cx; py=ty-16; }
+    else if (p==="below") { tx=cx; ty=cy+off; px=cx; py=ty+16; }
+    else if (p==="left") { tx=cx-off; ty=cy; px=tx-16; py=cy; }
+    else { tx=cx+off; ty=cy; px=tx+16; py=cy; }
+    return { px, py, tx, ty };
+  }
+  _tp(pos, tx, ty) { const s=7; if(pos==="above")return`${tx},${ty+s} ${tx-s},${ty-s} ${tx+s},${ty-s}`; if(pos==="below")return`${tx},${ty-s} ${tx-s},${ty+s} ${tx+s},${ty+s}`; if(pos==="left")return`${tx+s},${ty} ${tx-s},${ty-s} ${tx-s},${ty+s}`; return`${tx-s},${ty} ${tx+s},${ty-s} ${tx+s},${ty+s}`; }
+
+  // Label
+  _bLbl(g, a, e) { e.text = g.appendChild(this._el("text", { x: a.x, y: a.y, "text-anchor": a.anchor||"start", "dominant-baseline": "central", fill: this._rc(a.fill,"$text"), "font-size": a.fontSize||16, "font-weight": a.fontWeight||"normal", "font-family": "inherit", opacity: a.opacity??1 })); e.text.textContent = a.text; }
+  _uLbl(a, e) { this._sa(e.text, { x: a.x, y: a.y, "text-anchor": a.anchor||"start", fill: this._rc(a.fill,"$text"), "font-size": a.fontSize||16, "font-weight": a.fontWeight||"normal", opacity: a.opacity??1 }); e.text.textContent = a.text; }
+
+  // Region
+  _bReg(g, a, e) { e.rect = g.appendChild(this._el("rect", { x: a.x, y: a.y, width: a.width, height: a.height, rx: a.cornerRadius??8, fill: this._rc(a.fill,"$success"), stroke: this._rc(a.stroke,"$success"), "stroke-width": a.strokeWidth??2, opacity: a.opacity??0.15 })); if (a.label) { e.label = g.appendChild(this._el("text", { x: a.x+a.width/2, y: a.y+a.height/2, "text-anchor": "middle", "dominant-baseline": "central", fill: this._rc(a.stroke,"$success"), "font-size": 13, "font-weight": "600", "font-family": "inherit", opacity: 0.8 })); e.label.textContent = a.label; } }
+  _uReg(a, e) { this._sa(e.rect, { x: a.x, y: a.y, width: a.width, height: a.height, rx: a.cornerRadius??8, fill: this._rc(a.fill,"$success"), stroke: this._rc(a.stroke,"$success"), "stroke-width": a.strokeWidth??2, opacity: a.opacity??0.15 }); if (e.label) { this._sa(e.label, { x: a.x+a.width/2, y: a.y+a.height/2, fill: this._rc(a.stroke,"$success") }); if (a.label !== undefined) e.label.textContent = a.label; } }
+
+  _el(tag, attrs) { const el = document.createElementNS(SVG_NS, tag); if (attrs) this._sa(el, attrs); return el; }
+  _sa(el, attrs) { for (const [k, v] of Object.entries(attrs)) { if (v === undefined || v === null) continue; el.setAttribute(k, String(v)); } }
+}
+
+class Player {
+  constructor(container, viz) {
+    this.root = typeof container === "string" ? document.querySelector(container) : container;
+    this.engine = new Engine(viz); this.renderer = null; this.playing = false; this.timer = null; this.speed = 1;
+    this._build(); this._bind();
+  }
+  _build() {
+    this.root.innerHTML = ""; const meta = this.engine.viz.metadata;
+    const hdr = this._div("av-header"); const h1 = document.createElement("h1"); h1.textContent = meta.title; hdr.appendChild(h1);
+    const md = this._div("av-meta");
+    if (meta.category) { const b = document.createElement("span"); b.className = "av-badge"; b.textContent = meta.category; md.appendChild(b); }
+    if (meta.complexity?.time) { const b = document.createElement("span"); b.className = "av-badge"; b.textContent = meta.complexity.time; md.appendChild(b); }
+    if (meta.difficulty) { const b = document.createElement("span"); b.className = "av-badge"; b.textContent = meta.difficulty; md.appendChild(b); }
+    hdr.appendChild(md); this.root.appendChild(hdr);
+    const main = this._div("av-main"); const cw = this._div("av-canvas-wrap"); main.appendChild(cw); this.root.appendChild(main);
+    const desc = this._div("av-description"); this.descStep = document.createElement("span"); this.descStep.className = "av-description-step";
+    this.descText = document.createElement("span"); this.descText.className = "av-description-text";
+    desc.appendChild(this.descStep); desc.appendChild(this.descText); this.root.appendChild(desc);
+    const ctrl = this._div("av-controls");
+    this.btnPrev = this._btn("\u25C0", "av-btn"); this.btnPlay = this._btn("\u25B6", "av-btn av-btn-play"); this.btnNext = this._btn("\u25B6", "av-btn");
+    this.timeline = document.createElement("input"); this.timeline.type = "range"; this.timeline.className = "av-timeline"; this.timeline.min = -1; this.timeline.max = this.engine.totalSteps - 1; this.timeline.value = -1;
+    this.speedBtn = document.createElement("button"); this.speedBtn.className = "av-speed"; this.speedBtn.textContent = "1\u00d7";
+    this.stepCount = document.createElement("span"); this.stepCount.className = "av-step-count";
+    ctrl.appendChild(this.btnPrev); ctrl.appendChild(this.btnPlay); ctrl.appendChild(this.btnNext); ctrl.appendChild(this.timeline); ctrl.appendChild(this.speedBtn); ctrl.appendChild(this.stepCount);
+    this.root.appendChild(ctrl);
+    this.renderer = new Renderer(cw, this.engine); this.renderer.init(); this._updateUI();
+  }
+  _bind() {
+    this.btnPlay.addEventListener("click", () => this.togglePlay());
+    this.btnPrev.addEventListener("click", () => { this.pause(); this._step(-1); });
+    this.btnNext.addEventListener("click", () => { this.pause(); this._step(1); });
+    this.timeline.addEventListener("input", () => { this.pause(); this.renderer.render(this.engine.goToStep(parseInt(this.timeline.value))); this._updateUI(); });
+    this.speedBtn.addEventListener("click", () => { const i = SPEEDS.indexOf(this.speed); this.speed = SPEEDS[(i+1) % SPEEDS.length]; this.speedBtn.textContent = this.speed + "\u00d7"; });
+    document.addEventListener("keydown", (e) => {
+      if (e.target.tagName === "INPUT" && e.target.type !== "range") return;
+      if (e.key === " ") { e.preventDefault(); this.togglePlay(); }
+      else if (e.key === "ArrowRight") { e.preventDefault(); this.pause(); this._step(1); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); this.pause(); this._step(-1); }
+    });
+  }
+  togglePlay() { this.playing ? this.pause() : this.play(); }
+  play() { if (this.engine.atEnd) { this.engine.goToStep(-1); this._render(); } this.playing = true; this.btnPlay.textContent = "\u23F8"; this._tick(); }
+  pause() { this.playing = false; this.btnPlay.textContent = "\u25B6"; clearTimeout(this.timer); }
+  _tick() { if (!this.playing) return; const s = this.engine.nextStep(); if (s) { this.renderer.render(s); this._updateUI(); this.timer = setTimeout(() => this._tick(), this.engine.config.playback.stepDuration / this.speed); } else this.pause(); }
+  _step(d) { const s = d > 0 ? this.engine.nextStep() : this.engine.prevStep(); if (s) { this.renderer.render(s); this._updateUI(); } }
+  _render() { this.renderer.render(this.engine.getScene()); this._updateUI(); }
+  _updateUI() { const s = this.engine.currentStep, t = this.engine.totalSteps; this.timeline.value = s; this.stepCount.textContent = `${s+1} / ${t}`; const sc = this.engine.getScene(); this.descText.textContent = sc.description; this.descStep.textContent = s >= 0 ? `Step ${s+1}:` : ""; }
+  _div(c) { const d = document.createElement("div"); d.className = c; return d; }
+  _btn(t, c) { const b = document.createElement("button"); b.className = c; b.textContent = t; return b; }
+}
+
+// ─── Embedded Demo Data ─────────────────────────────────────────────────────
+
+const DEMOS = {
+  bubble: {"version":"1.0","metadata":{"algorithm":"bubble_sort","title":"Bubble Sort","description":"Repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order.","category":"sorting","complexity":{"time":"O(n\u00b2)","space":"O(1)"},"difficulty":"beginner","inputDescription":"Array: [5, 3, 8, 1]"},"config":{"canvas":{"width":1000,"height":400},"playback":{"stepDuration":1000}},"actors":[{"id":"c0","type":"cell","x":310,"y":160,"width":80,"height":80,"value":5,"sublabel":"0"},{"id":"c1","type":"cell","x":410,"y":160,"width":80,"height":80,"value":3,"sublabel":"1"},{"id":"c2","type":"cell","x":510,"y":160,"width":80,"height":80,"value":8,"sublabel":"2"},{"id":"c3","type":"cell","x":610,"y":160,"width":80,"height":80,"value":1,"sublabel":"3"},{"id":"title","type":"label","x":500,"y":40,"text":"Bubble Sort","fontSize":24,"fontWeight":"bold","anchor":"middle"},{"id":"status","type":"label","x":500,"y":340,"text":"Starting: [5, 3, 8, 1]","fontSize":16,"anchor":"middle","fill":"$muted"},{"id":"pass_label","type":"label","x":500,"y":80,"text":"","fontSize":14,"anchor":"middle","fill":"$muted"}],"steps":[{"description":"Pass 1: Compare elements at index 0 and 1","actions":[{"type":"update","target":"c0","props":{"fill":"$warning"}},{"type":"update","target":"c1","props":{"fill":"$warning"}},{"type":"update","target":"status","props":{"text":"Compare: 5 > 3?"}},{"type":"update","target":"pass_label","props":{"text":"Pass 1 of 3"}}],"transition":"highlight"},{"description":"5 > 3 is true \u2014 swap them","actions":[{"type":"update","target":"c0","props":{"value":3,"label":"3","fill":"$danger"}},{"type":"update","target":"c1","props":{"value":5,"label":"5","fill":"$danger"}},{"type":"update","target":"status","props":{"text":"Yes! Swap 5 and 3 \u2192 [3, 5, 8, 1]"}}],"transition":"swap"},{"description":"Compare elements at index 1 and 2","actions":[{"type":"update","target":"c0","props":{"fill":"$default"}},{"type":"update","target":"c1","props":{"fill":"$warning"}},{"type":"update","target":"c2","props":{"fill":"$warning"}},{"type":"update","target":"status","props":{"text":"Compare: 5 > 8?"}}],"transition":"highlight"},{"description":"5 > 8 is false \u2014 no swap needed","actions":[{"type":"update","target":"c1","props":{"fill":"$default"}},{"type":"update","target":"c2","props":{"fill":"$default"}},{"type":"update","target":"status","props":{"text":"No. 5 \u2264 8, no swap needed"}}]},{"description":"Compare elements at index 2 and 3","actions":[{"type":"update","target":"c2","props":{"fill":"$warning"}},{"type":"update","target":"c3","props":{"fill":"$warning"}},{"type":"update","target":"status","props":{"text":"Compare: 8 > 1?"}}],"transition":"highlight"},{"description":"8 > 1 is true \u2014 swap them","actions":[{"type":"update","target":"c2","props":{"value":1,"label":"1","fill":"$danger"}},{"type":"update","target":"c3","props":{"value":8,"label":"8","fill":"$danger"}},{"type":"update","target":"status","props":{"text":"Yes! Swap 8 and 1 \u2192 [3, 5, 1, 8]"}}],"transition":"swap"},{"description":"End of Pass 1. 8 is sorted","actions":[{"type":"update","target":"c2","props":{"fill":"$default"}},{"type":"update","target":"c3","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"status","props":{"text":"Pass 1 complete: 8 is sorted"}}]},{"description":"Pass 2: Compare elements at index 0 and 1","actions":[{"type":"update","target":"c0","props":{"fill":"$warning"}},{"type":"update","target":"c1","props":{"fill":"$warning"}},{"type":"update","target":"status","props":{"text":"Compare: 3 > 5?"}},{"type":"update","target":"pass_label","props":{"text":"Pass 2 of 3"}}],"transition":"highlight"},{"description":"3 > 5 is false \u2014 no swap needed","actions":[{"type":"update","target":"c0","props":{"fill":"$default"}},{"type":"update","target":"c1","props":{"fill":"$default"}},{"type":"update","target":"status","props":{"text":"No. 3 \u2264 5, no swap needed"}}]},{"description":"Compare elements at index 1 and 2","actions":[{"type":"update","target":"c1","props":{"fill":"$warning"}},{"type":"update","target":"c2","props":{"fill":"$warning"}},{"type":"update","target":"status","props":{"text":"Compare: 5 > 1?"}}],"transition":"highlight"},{"description":"5 > 1 is true \u2014 swap them","actions":[{"type":"update","target":"c1","props":{"value":1,"label":"1","fill":"$danger"}},{"type":"update","target":"c2","props":{"value":5,"label":"5","fill":"$danger"}},{"type":"update","target":"status","props":{"text":"Yes! Swap 5 and 1 \u2192 [3, 1, 5, 8]"}}],"transition":"swap"},{"description":"End of Pass 2. 5 is sorted","actions":[{"type":"update","target":"c1","props":{"fill":"$default"}},{"type":"update","target":"c2","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"status","props":{"text":"Pass 2 complete: 5 and 8 are sorted"}}]},{"description":"Pass 3: Compare elements at index 0 and 1","actions":[{"type":"update","target":"c0","props":{"fill":"$warning"}},{"type":"update","target":"c1","props":{"fill":"$warning"}},{"type":"update","target":"status","props":{"text":"Compare: 3 > 1?"}},{"type":"update","target":"pass_label","props":{"text":"Pass 3 of 3"}}],"transition":"highlight"},{"description":"3 > 1 is true \u2014 swap them","actions":[{"type":"update","target":"c0","props":{"value":1,"label":"1","fill":"$danger"}},{"type":"update","target":"c1","props":{"value":3,"label":"3","fill":"$danger"}},{"type":"update","target":"status","props":{"text":"Yes! Swap 3 and 1 \u2192 [1, 3, 5, 8]"}}],"transition":"swap"},{"description":"Array is fully sorted: [1, 3, 5, 8]","actions":[{"type":"update","target":"c0","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"c1","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"status","props":{"text":"Done! Array sorted: [1, 3, 5, 8]","fill":"$success"}},{"type":"update","target":"pass_label","props":{"text":"Complete"}}]}]},
+
+  bfs: {"version":"1.0","metadata":{"algorithm":"bfs","title":"Breadth-First Search","description":"Explores a graph level by level using a queue.","category":"graph","complexity":{"time":"O(V + E)","space":"O(V)"},"difficulty":"intermediate","inputDescription":"Undirected graph with 6 nodes (A-F), starting from A"},"config":{"canvas":{"width":1000,"height":700},"playback":{"stepDuration":1200}},"actors":[{"id":"nA","type":"node","x":500,"y":100,"value":"A","radius":30},{"id":"nB","type":"node","x":300,"y":250,"value":"B","radius":30},{"id":"nC","type":"node","x":700,"y":250,"value":"C","radius":30},{"id":"nD","type":"node","x":200,"y":420,"value":"D","radius":30},{"id":"nE","type":"node","x":500,"y":420,"value":"E","radius":30},{"id":"nF","type":"node","x":700,"y":420,"value":"F","radius":30},{"id":"eAB","type":"edge","source":"nA","target":"nB"},{"id":"eAC","type":"edge","source":"nA","target":"nC"},{"id":"eBD","type":"edge","source":"nB","target":"nD"},{"id":"eBE","type":"edge","source":"nB","target":"nE"},{"id":"eCE","type":"edge","source":"nC","target":"nE"},{"id":"eCF","type":"edge","source":"nC","target":"nF"},{"id":"title","type":"label","x":500,"y":35,"text":"Breadth-First Search","fontSize":24,"fontWeight":"bold","anchor":"middle"},{"id":"queue_label","type":"label","x":100,"y":560,"text":"Queue: []","fontSize":16,"fontWeight":"bold"},{"id":"visited_label","type":"label","x":100,"y":595,"text":"Visited: {}","fontSize":16,"fontWeight":"bold"},{"id":"status","type":"label","x":500,"y":650,"text":"Starting BFS from node A","fontSize":16,"anchor":"middle","fill":"$muted"}],"steps":[{"description":"Start BFS: Visit node A, add to queue","actions":[{"type":"update","target":"nA","props":{"fill":"$primary","stroke":"$primary","textColor":"#ffffff"}},{"type":"update","target":"queue_label","props":{"text":"Queue: [A]"}},{"type":"update","target":"visited_label","props":{"text":"Visited: {A}"}},{"type":"update","target":"status","props":{"text":"Enqueue starting node A"}}],"transition":"highlight"},{"description":"Dequeue A. Process neighbors: B, C","actions":[{"type":"update","target":"nA","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"queue_label","props":{"text":"Queue: [] \u2190 dequeued A"}},{"type":"update","target":"status","props":{"text":"Dequeue A \u2014 explore neighbors"}}]},{"description":"Visit B (unvisited) \u2014 enqueue","actions":[{"type":"update","target":"nB","props":{"fill":"$primary","stroke":"$primary","textColor":"#ffffff"}},{"type":"update","target":"eAB","props":{"stroke":"$primary","strokeWidth":3}},{"type":"update","target":"queue_label","props":{"text":"Queue: [B]"}},{"type":"update","target":"visited_label","props":{"text":"Visited: {A, B}"}},{"type":"update","target":"status","props":{"text":"B is unvisited \u2192 enqueue B"}}],"transition":"highlight"},{"description":"Visit C (unvisited) \u2014 enqueue","actions":[{"type":"update","target":"nC","props":{"fill":"$primary","stroke":"$primary","textColor":"#ffffff"}},{"type":"update","target":"eAC","props":{"stroke":"$primary","strokeWidth":3}},{"type":"update","target":"queue_label","props":{"text":"Queue: [B, C]"}},{"type":"update","target":"visited_label","props":{"text":"Visited: {A, B, C}"}},{"type":"update","target":"status","props":{"text":"C is unvisited \u2192 enqueue C"}}],"transition":"highlight"},{"description":"Dequeue B. Process neighbors: D, E","actions":[{"type":"update","target":"nB","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"queue_label","props":{"text":"Queue: [C] \u2190 dequeued B"}},{"type":"update","target":"status","props":{"text":"Dequeue B \u2014 explore neighbors"}}]},{"description":"Visit D (unvisited) \u2014 enqueue","actions":[{"type":"update","target":"nD","props":{"fill":"$primary","stroke":"$primary","textColor":"#ffffff"}},{"type":"update","target":"eBD","props":{"stroke":"$primary","strokeWidth":3}},{"type":"update","target":"queue_label","props":{"text":"Queue: [C, D]"}},{"type":"update","target":"visited_label","props":{"text":"Visited: {A, B, C, D}"}},{"type":"update","target":"status","props":{"text":"D is unvisited \u2192 enqueue D"}}],"transition":"highlight"},{"description":"Visit E (unvisited) \u2014 enqueue","actions":[{"type":"update","target":"nE","props":{"fill":"$primary","stroke":"$primary","textColor":"#ffffff"}},{"type":"update","target":"eBE","props":{"stroke":"$primary","strokeWidth":3}},{"type":"update","target":"queue_label","props":{"text":"Queue: [C, D, E]"}},{"type":"update","target":"visited_label","props":{"text":"Visited: {A, B, C, D, E}"}},{"type":"update","target":"status","props":{"text":"E is unvisited \u2192 enqueue E"}}],"transition":"highlight"},{"description":"Dequeue C. Process neighbors: E, F","actions":[{"type":"update","target":"nC","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"queue_label","props":{"text":"Queue: [D, E] \u2190 dequeued C"}},{"type":"update","target":"status","props":{"text":"Dequeue C \u2014 explore neighbors"}}]},{"description":"E already visited \u2014 skip","actions":[{"type":"update","target":"eCE","props":{"stroke":"$muted","dashArray":"5,5"}},{"type":"update","target":"status","props":{"text":"E is already visited \u2192 skip"}}]},{"description":"Visit F (unvisited) \u2014 enqueue","actions":[{"type":"update","target":"nF","props":{"fill":"$primary","stroke":"$primary","textColor":"#ffffff"}},{"type":"update","target":"eCF","props":{"stroke":"$primary","strokeWidth":3}},{"type":"update","target":"queue_label","props":{"text":"Queue: [D, E, F]"}},{"type":"update","target":"visited_label","props":{"text":"Visited: {A, B, C, D, E, F}"}},{"type":"update","target":"status","props":{"text":"F is unvisited \u2192 enqueue F"}}],"transition":"highlight"},{"description":"Dequeue D \u2014 no unvisited neighbors","actions":[{"type":"update","target":"nD","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"queue_label","props":{"text":"Queue: [E, F] \u2190 dequeued D"}},{"type":"update","target":"status","props":{"text":"Dequeue D \u2014 no unvisited neighbors"}}]},{"description":"Dequeue E \u2014 no unvisited neighbors","actions":[{"type":"update","target":"nE","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"queue_label","props":{"text":"Queue: [F] \u2190 dequeued E"}},{"type":"update","target":"status","props":{"text":"Dequeue E \u2014 no unvisited neighbors"}}]},{"description":"Dequeue F \u2014 no unvisited neighbors","actions":[{"type":"update","target":"nF","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"queue_label","props":{"text":"Queue: [] \u2190 dequeued F"}},{"type":"update","target":"status","props":{"text":"Dequeue F \u2014 no unvisited neighbors"}}]},{"description":"BFS complete! Traversal: A \u2192 B \u2192 C \u2192 D \u2192 E \u2192 F","actions":[{"type":"update","target":"queue_label","props":{"text":"Queue: [] (empty)"}},{"type":"update","target":"status","props":{"text":"BFS complete! Traversal: A \u2192 B \u2192 C \u2192 D \u2192 E \u2192 F","fill":"$success"}}]}]},
+
+  binary: {"version":"1.0","metadata":{"algorithm":"binary_search","title":"Binary Search","description":"Finds a target in a sorted array by halving the search space each step.","category":"searching","complexity":{"time":"O(log n)","space":"O(1)"},"difficulty":"beginner","inputDescription":"Sorted array: [2,5,8,12,16,23,38,56,72,91], target: 23"},"config":{"canvas":{"width":1000,"height":450},"playback":{"stepDuration":1200}},"actors":[{"id":"c0","type":"cell","x":100,"y":180,"width":70,"height":60,"value":2,"sublabel":"0"},{"id":"c1","type":"cell","x":180,"y":180,"width":70,"height":60,"value":5,"sublabel":"1"},{"id":"c2","type":"cell","x":260,"y":180,"width":70,"height":60,"value":8,"sublabel":"2"},{"id":"c3","type":"cell","x":340,"y":180,"width":70,"height":60,"value":12,"sublabel":"3"},{"id":"c4","type":"cell","x":420,"y":180,"width":70,"height":60,"value":16,"sublabel":"4"},{"id":"c5","type":"cell","x":500,"y":180,"width":70,"height":60,"value":23,"sublabel":"5"},{"id":"c6","type":"cell","x":580,"y":180,"width":70,"height":60,"value":38,"sublabel":"6"},{"id":"c7","type":"cell","x":660,"y":180,"width":70,"height":60,"value":56,"sublabel":"7"},{"id":"c8","type":"cell","x":740,"y":180,"width":70,"height":60,"value":72,"sublabel":"8"},{"id":"c9","type":"cell","x":820,"y":180,"width":70,"height":60,"value":91,"sublabel":"9"},{"id":"pL","type":"pointer","target":"c0","position":"below","label":"low","fill":"$primary"},{"id":"pR","type":"pointer","target":"c9","position":"below","label":"high","fill":"$danger"},{"id":"pM","type":"pointer","target":"c4","position":"above","label":"mid","fill":"$warning"},{"id":"title","type":"label","x":500,"y":35,"text":"Binary Search \u2014 target: 23","fontSize":24,"fontWeight":"bold","anchor":"middle"},{"id":"status","type":"label","x":500,"y":400,"text":"Search for 23 in sorted array","fontSize":16,"anchor":"middle","fill":"$muted"},{"id":"range_label","type":"label","x":500,"y":80,"text":"Search range: indices 0\u20139","fontSize":14,"anchor":"middle","fill":"$muted"}],"steps":[{"description":"Iteration 1: mid=4, arr[4]=16. Compare with target 23","actions":[{"type":"update","target":"c4","props":{"fill":"$warning","stroke":"$warning"}},{"type":"update","target":"status","props":{"text":"mid=4 \u2192 arr[4]=16. Is 16 == 23? No. 16 < 23."}},{"type":"update","target":"range_label","props":{"text":"Iteration 1: low=0, high=9, mid=4"}}],"transition":"highlight"},{"description":"16 < 23: eliminate left half. Set low=5","actions":[{"type":"update","target":"c0","props":{"fill":"$muted","opacity":0.3}},{"type":"update","target":"c1","props":{"fill":"$muted","opacity":0.3}},{"type":"update","target":"c2","props":{"fill":"$muted","opacity":0.3}},{"type":"update","target":"c3","props":{"fill":"$muted","opacity":0.3}},{"type":"update","target":"c4","props":{"fill":"$muted","opacity":0.3}},{"type":"update","target":"pL","props":{"target":"c5"}},{"type":"update","target":"pM","props":{"target":"c7"}},{"type":"update","target":"status","props":{"text":"16 < 23 \u2192 search right half. low = 5"}},{"type":"update","target":"range_label","props":{"text":"Eliminated left half (indices 0\u20134)"}}]},{"description":"Iteration 2: mid=7, arr[7]=56. Compare with target 23","actions":[{"type":"update","target":"c7","props":{"fill":"$warning","stroke":"$warning"}},{"type":"update","target":"status","props":{"text":"mid=7 \u2192 arr[7]=56. Is 56 == 23? No. 56 > 23."}},{"type":"update","target":"range_label","props":{"text":"Iteration 2: low=5, high=9, mid=7"}}],"transition":"highlight"},{"description":"56 > 23: eliminate right half. Set high=6","actions":[{"type":"update","target":"c7","props":{"fill":"$muted","opacity":0.3}},{"type":"update","target":"c8","props":{"fill":"$muted","opacity":0.3}},{"type":"update","target":"c9","props":{"fill":"$muted","opacity":0.3}},{"type":"update","target":"pR","props":{"target":"c6"}},{"type":"update","target":"pM","props":{"target":"c5"}},{"type":"update","target":"status","props":{"text":"56 > 23 \u2192 search left half. high = 6"}},{"type":"update","target":"range_label","props":{"text":"Eliminated right half (indices 7\u20139)"}}]},{"description":"Iteration 3: mid=5, arr[5]=23. Compare with target 23","actions":[{"type":"update","target":"c5","props":{"fill":"$warning","stroke":"$warning"}},{"type":"update","target":"status","props":{"text":"mid=5 \u2192 arr[5]=23. Is 23 == 23? YES!"}},{"type":"update","target":"range_label","props":{"text":"Iteration 3: low=5, high=6, mid=5"}}],"transition":"highlight"},{"description":"Found! Target 23 at index 5 in 3 iterations","actions":[{"type":"update","target":"c5","props":{"fill":"$success","stroke":"$success","textColor":"#ffffff"}},{"type":"update","target":"status","props":{"text":"Found 23 at index 5! (3 iterations \u2014 O(log n) confirmed)","fill":"$success"}},{"type":"update","target":"range_label","props":{"text":"Search complete"}},{"type":"remove","target":"pL"},{"type":"remove","target":"pR"},{"type":"update","target":"pM","props":{"label":"found!"}}]}]}
+};
+
+// ─── Init ───────────────────────────────────────────────────────────────────
+
+let currentPlayer = null;
+
+function loadDemo(name) {
+  if (currentPlayer) currentPlayer.pause();
+  const root = document.getElementById("algoviz-root");
+  root.style.display = "flex"; root.style.flexDirection = "column"; root.style.flex = "1";
+  currentPlayer = new Player(root, DEMOS[name]);
+  document.querySelectorAll(".av-demo-nav button").forEach(b => b.classList.toggle("active", b.dataset.demo === name));
+}
+
+document.querySelectorAll(".av-demo-nav button").forEach(btn => {
+  btn.addEventListener("click", () => loadDemo(btn.dataset.demo));
+});
+
+loadDemo("bubble");
+
+})();
+</script>
+</body>
+</html>

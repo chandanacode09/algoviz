@@ -1,0 +1,468 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "evaluate_rpn",
+    "title": "Evaluate Reverse Polish Notation",
+    "description": "Evaluate mathematical expressions in Reverse Polish Notation (RPN). Process tokens left-to-right: push operands onto stack, pop two operands when seeing an operator.",
+    "category": "other",
+    "complexity": {
+      "time": "O(n)",
+      "space": "O(n)"
+    },
+    "difficulty": "intermediate",
+    "inputDescription": "RPN expression: ['2', '1', '+', '3', '*'] evaluates to (2+1)*3 = 9"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 600
+    },
+    "playback": {
+      "stepDuration": 1100
+    }
+  },
+  "actors": [
+    {
+      "id": "title",
+      "type": "label",
+      "x": 50,
+      "y": 30,
+      "text": "Evaluate Reverse Polish Notation (RPN)",
+      "fontSize": 22,
+      "fontWeight": "bold",
+      "fill": "$text"
+    },
+    {
+      "id": "input_label",
+      "type": "label",
+      "x": 50,
+      "y": 80,
+      "text": "RPN Expression: ['2', '1', '+', '3', '*']",
+      "fontSize": 14,
+      "fill": "$muted"
+    },
+    {
+      "id": "token0",
+      "type": "cell",
+      "x": 50,
+      "y": 130,
+      "value": "2",
+      "width": 70,
+      "height": 60,
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 18
+    },
+    {
+      "id": "token1",
+      "type": "cell",
+      "x": 140,
+      "y": 130,
+      "value": "1",
+      "width": 70,
+      "height": 60,
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 18
+    },
+    {
+      "id": "token2",
+      "type": "cell",
+      "x": 230,
+      "y": 130,
+      "value": "+",
+      "width": 70,
+      "height": 60,
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 18
+    },
+    {
+      "id": "token3",
+      "type": "cell",
+      "x": 320,
+      "y": 130,
+      "value": "3",
+      "width": 70,
+      "height": 60,
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 18
+    },
+    {
+      "id": "token4",
+      "type": "cell",
+      "x": 410,
+      "y": 130,
+      "value": "*",
+      "width": 70,
+      "height": 60,
+      "fill": "$default",
+      "stroke": "$muted",
+      "textColor": "$text",
+      "fontSize": 18
+    },
+    {
+      "id": "current_pointer",
+      "type": "pointer",
+      "target": "token0",
+      "position": "above",
+      "label": "i",
+      "fill": "$warning",
+      "textColor": "$warning"
+    },
+    {
+      "id": "stack_label",
+      "type": "label",
+      "x": 600,
+      "y": 80,
+      "text": "Evaluation Stack",
+      "fontSize": 14,
+      "fontWeight": "bold",
+      "fill": "$primary"
+    },
+    {
+      "id": "stack_region",
+      "type": "region",
+      "x": 590,
+      "y": 110,
+      "width": 300,
+      "height": 400,
+      "fill": "$primary",
+      "stroke": "$primary",
+      "opacity": 0.1,
+      "label": "Stack"
+    },
+    {
+      "id": "status",
+      "type": "label",
+      "x": 50,
+      "y": 250,
+      "text": "Status: Initialize stack, i=0",
+      "fontSize": 12,
+      "fill": "$muted"
+    },
+    {
+      "id": "result_display",
+      "type": "label",
+      "x": 50,
+      "y": 280,
+      "text": "Current stack: []",
+      "fontSize": 12,
+      "fill": "$muted"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Token 0: '2' is a number. Push 2 onto stack.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "token0",
+          "props": {
+            "fill": "$success",
+            "stroke": "$success",
+            "textColor": "#fff"
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "s0",
+            "type": "cell",
+            "x": 700,
+            "y": 420,
+            "value": 2,
+            "width": 60,
+            "height": 60,
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff",
+            "fontSize": 18
+          }
+        },
+        {
+          "type": "update",
+          "target": "current_pointer",
+          "props": {
+            "target": "token0"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Status: '2' is operand, push to stack"
+          }
+        },
+        {
+          "type": "update",
+          "target": "result_display",
+          "props": {
+            "text": "Current stack: [2]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Token 1: '1' is a number. Push 1 onto stack.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "token0",
+          "props": {
+            "fill": "$default",
+            "stroke": "$muted",
+            "textColor": "$text"
+          }
+        },
+        {
+          "type": "update",
+          "target": "token1",
+          "props": {
+            "fill": "$success",
+            "stroke": "$success",
+            "textColor": "#fff"
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "s1",
+            "type": "cell",
+            "x": 700,
+            "y": 350,
+            "value": 1,
+            "width": 60,
+            "height": 60,
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff",
+            "fontSize": 18
+          }
+        },
+        {
+          "type": "update",
+          "target": "current_pointer",
+          "props": {
+            "target": "token1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Status: '1' is operand, push to stack"
+          }
+        },
+        {
+          "type": "update",
+          "target": "result_display",
+          "props": {
+            "text": "Current stack: [2, 1]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Token 2: '+' is an operator. Pop 1 and 2, compute 2+1=3, push 3.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "token1",
+          "props": {
+            "fill": "$default",
+            "stroke": "$muted",
+            "textColor": "$text"
+          }
+        },
+        {
+          "type": "update",
+          "target": "token2",
+          "props": {
+            "fill": "$danger",
+            "stroke": "$danger",
+            "textColor": "#fff"
+          }
+        },
+        {
+          "type": "remove",
+          "target": "s0"
+        },
+        {
+          "type": "remove",
+          "target": "s1"
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "s_add",
+            "type": "cell",
+            "x": 700,
+            "y": 350,
+            "value": 3,
+            "width": 60,
+            "height": 60,
+            "fill": "$success",
+            "stroke": "$success",
+            "textColor": "#fff",
+            "fontSize": 18
+          }
+        },
+        {
+          "type": "update",
+          "target": "current_pointer",
+          "props": {
+            "target": "token2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Status: '+' operator, pop 1 and 2, compute 2+1=3, push result"
+          }
+        },
+        {
+          "type": "update",
+          "target": "result_display",
+          "props": {
+            "text": "Current stack: [3]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Token 3: '3' is a number. Push 3 onto stack.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "token2",
+          "props": {
+            "fill": "$default",
+            "stroke": "$muted",
+            "textColor": "$text"
+          }
+        },
+        {
+          "type": "update",
+          "target": "token3",
+          "props": {
+            "fill": "$success",
+            "stroke": "$success",
+            "textColor": "#fff"
+          }
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "s2",
+            "type": "cell",
+            "x": 700,
+            "y": 280,
+            "value": 3,
+            "width": 60,
+            "height": 60,
+            "fill": "$primary",
+            "stroke": "$primary",
+            "textColor": "#fff",
+            "fontSize": 18
+          }
+        },
+        {
+          "type": "update",
+          "target": "current_pointer",
+          "props": {
+            "target": "token3"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Status: '3' is operand, push to stack"
+          }
+        },
+        {
+          "type": "update",
+          "target": "result_display",
+          "props": {
+            "text": "Current stack: [3, 3]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Token 4: '*' is an operator. Pop 3 and 3, compute 3*3=9, push 9. End of expression, return 9.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "token3",
+          "props": {
+            "fill": "$default",
+            "stroke": "$muted",
+            "textColor": "$text"
+          }
+        },
+        {
+          "type": "update",
+          "target": "token4",
+          "props": {
+            "fill": "$danger",
+            "stroke": "$danger",
+            "textColor": "#fff"
+          }
+        },
+        {
+          "type": "remove",
+          "target": "s_add"
+        },
+        {
+          "type": "remove",
+          "target": "s2"
+        },
+        {
+          "type": "create",
+          "actor": {
+            "id": "s_result",
+            "type": "cell",
+            "x": 700,
+            "y": 350,
+            "value": 9,
+            "width": 60,
+            "height": 60,
+            "fill": "$success",
+            "stroke": "$success",
+            "textColor": "#fff",
+            "fontSize": 18
+          }
+        },
+        {
+          "type": "update",
+          "target": "current_pointer",
+          "props": {
+            "target": "token4"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Status: '*' operator, pop 3 and 3, compute 3*3=9, push result"
+          }
+        },
+        {
+          "type": "update",
+          "target": "result_display",
+          "props": {
+            "text": "Current stack: [9] - Final result: 9"
+          }
+        }
+      ]
+    }
+  ]
+}

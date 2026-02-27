@@ -1,0 +1,399 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "Fibonacci",
+    "title": "Fibonacci Bottom-Up DP",
+    "description": "Compute the 6th Fibonacci number using dynamic programming, filling an array from left to right with base cases and recurrence relation.",
+    "category": "dynamic-programming",
+    "complexity": {
+      "time": "O(n)",
+      "space": "O(n)"
+    },
+    "difficulty": "beginner",
+    "inputDescription": "n=6: compute fib(6)"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 400
+    },
+    "playback": {
+      "stepDuration": 1000
+    }
+  },
+  "actors": [
+    {
+      "id": "title",
+      "type": "label",
+      "x": 50,
+      "y": 30,
+      "text": "Fibonacci Bottom-Up DP (n=6)",
+      "fontSize": 24,
+      "fontWeight": "bold",
+      "fill": "$text"
+    },
+    {
+      "id": "status",
+      "type": "label",
+      "x": 50,
+      "y": 65,
+      "text": "Computing dp[i] = dp[i-1] + dp[i-2]",
+      "fontSize": 14,
+      "fill": "$muted"
+    },
+    {
+      "id": "cell_0",
+      "type": "cell",
+      "x": 100,
+      "y": 150,
+      "value": 0,
+      "width": 60,
+      "height": 60,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "cell_1",
+      "type": "cell",
+      "x": 175,
+      "y": 150,
+      "value": 0,
+      "width": 60,
+      "height": 60,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "cell_2",
+      "type": "cell",
+      "x": 250,
+      "y": 150,
+      "value": 0,
+      "width": 60,
+      "height": 60,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "cell_3",
+      "type": "cell",
+      "x": 325,
+      "y": 150,
+      "value": 0,
+      "width": 60,
+      "height": 60,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "cell_4",
+      "type": "cell",
+      "x": 400,
+      "y": 150,
+      "value": 0,
+      "width": 60,
+      "height": 60,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "cell_5",
+      "type": "cell",
+      "x": 475,
+      "y": 150,
+      "value": 0,
+      "width": 60,
+      "height": 60,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "cell_6",
+      "type": "cell",
+      "x": 550,
+      "y": 150,
+      "value": 0,
+      "width": 60,
+      "height": 60,
+      "fill": "$default",
+      "stroke": "$text",
+      "textColor": "$text",
+      "fontSize": 16
+    },
+    {
+      "id": "index_label_0",
+      "type": "label",
+      "x": 130,
+      "y": 230,
+      "text": "i=0",
+      "fontSize": 12,
+      "fill": "$muted"
+    },
+    {
+      "id": "index_label_1",
+      "type": "label",
+      "x": 205,
+      "y": 230,
+      "text": "i=1",
+      "fontSize": 12,
+      "fill": "$muted"
+    },
+    {
+      "id": "index_label_2",
+      "type": "label",
+      "x": 280,
+      "y": 230,
+      "text": "i=2",
+      "fontSize": 12,
+      "fill": "$muted"
+    },
+    {
+      "id": "index_label_3",
+      "type": "label",
+      "x": 355,
+      "y": 230,
+      "text": "i=3",
+      "fontSize": 12,
+      "fill": "$muted"
+    },
+    {
+      "id": "index_label_4",
+      "type": "label",
+      "x": 430,
+      "y": 230,
+      "text": "i=4",
+      "fontSize": 12,
+      "fill": "$muted"
+    },
+    {
+      "id": "index_label_5",
+      "type": "label",
+      "x": 505,
+      "y": 230,
+      "text": "i=5",
+      "fontSize": 12,
+      "fill": "$muted"
+    },
+    {
+      "id": "index_label_6",
+      "type": "label",
+      "x": 580,
+      "y": 230,
+      "text": "i=6",
+      "fontSize": 12,
+      "fill": "$muted"
+    },
+    {
+      "id": "pointer",
+      "type": "pointer",
+      "target": "cell_0",
+      "position": "above",
+      "label": "current",
+      "fill": "$primary",
+      "textColor": "$text"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Initialize: Set base case dp[0] = 0",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_0",
+          "props": {
+            "value": 0,
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_0"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Base case: dp[0] = 0"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Set base case dp[1] = 1",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_1",
+          "props": {
+            "value": 1,
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Base case: dp[1] = 1"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Compute dp[2] = dp[1] + dp[0] = 1 + 0 = 1",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_2",
+          "props": {
+            "value": 1,
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "dp[2] = dp[1] + dp[0] = 1 + 0 = 1"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Compute dp[3] = dp[2] + dp[1] = 1 + 1 = 2",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_3",
+          "props": {
+            "value": 2,
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_3"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "dp[3] = dp[2] + dp[1] = 1 + 1 = 2"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Compute dp[4] = dp[3] + dp[2] = 2 + 1 = 3",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_4",
+          "props": {
+            "value": 3,
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_4"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "dp[4] = dp[3] + dp[2] = 2 + 1 = 3"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Compute dp[5] = dp[4] + dp[3] = 3 + 2 = 5",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_5",
+          "props": {
+            "value": 5,
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_5"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "dp[5] = dp[4] + dp[3] = 3 + 2 = 5"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Compute dp[6] = dp[5] + dp[4] = 5 + 3 = 8",
+      "actions": [
+        {
+          "type": "update",
+          "target": "cell_6",
+          "props": {
+            "value": 8,
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "pointer",
+          "props": {
+            "target": "cell_6"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Result: fib(6) = 8"
+          }
+        }
+      ]
+    }
+  ]
+}

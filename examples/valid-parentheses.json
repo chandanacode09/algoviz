@@ -1,0 +1,135 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "valid_parentheses",
+    "title": "Valid Parentheses (Stack)",
+    "description": "Use a stack to validate that brackets are properly matched and nested. Push opening brackets, pop and match on closing brackets.",
+    "category": "string",
+    "complexity": { "time": "O(n)", "space": "O(n)" },
+    "difficulty": "beginner",
+    "inputDescription": "String: \"({[]})\""
+  },
+  "config": {
+    "canvas": { "width": 1000, "height": 500 },
+    "playback": { "stepDuration": 900 }
+  },
+  "actors": [
+    { "id": "c0", "type": "cell", "x": 250, "y": 60, "width": 55, "height": 55, "value": "(", "sublabel": "0" },
+    { "id": "c1", "type": "cell", "x": 315, "y": 60, "width": 55, "height": 55, "value": "{", "sublabel": "1" },
+    { "id": "c2", "type": "cell", "x": 380, "y": 60, "width": 55, "height": 55, "value": "[", "sublabel": "2" },
+    { "id": "c3", "type": "cell", "x": 445, "y": 60, "width": 55, "height": 55, "value": "]", "sublabel": "3" },
+    { "id": "c4", "type": "cell", "x": 510, "y": 60, "width": 55, "height": 55, "value": "}", "sublabel": "4" },
+    { "id": "c5", "type": "cell", "x": 575, "y": 60, "width": 55, "height": 55, "value": ")", "sublabel": "5" },
+
+    { "id": "ptr", "type": "pointer", "target": "c0", "position": "above", "label": "i" },
+
+    { "id": "title", "type": "label", "x": 500, "y": 25, "text": "Valid Parentheses — \"({[]})\"", "fontSize": 20, "fontWeight": "bold", "anchor": "middle" },
+    { "id": "status", "type": "label", "x": 500, "y": 460, "text": "Scan left to right. Push opening brackets, pop on closing.", "fontSize": 14, "anchor": "middle", "fill": "$muted" },
+    { "id": "stack-label", "type": "label", "x": 500, "y": 180, "text": "Stack (grows right →)", "fontSize": 14, "fontWeight": "bold", "anchor": "middle", "fill": "$primary" },
+
+    { "id": "s0", "type": "cell", "x": 380, "y": 210, "width": 55, "height": 55, "value": "", "label": "", "opacity": 0 },
+    { "id": "s1", "type": "cell", "x": 445, "y": 210, "width": 55, "height": 55, "value": "", "label": "", "opacity": 0 },
+    { "id": "s2", "type": "cell", "x": 510, "y": 210, "width": 55, "height": 55, "value": "", "label": "", "opacity": 0 },
+
+    { "id": "result", "type": "label", "x": 500, "y": 350, "text": "", "fontSize": 28, "fontWeight": "bold", "anchor": "middle" }
+  ],
+  "steps": [
+    {
+      "description": "Read '(' at index 0. It's an opening bracket → push onto stack.",
+      "actions": [
+        { "type": "update", "target": "c0", "props": { "fill": "$primary" } },
+        { "type": "update", "target": "s0", "props": { "value": "(", "label": "(", "opacity": 1, "fill": "$primary" } },
+        { "type": "update", "target": "status", "props": { "text": "Push '(' onto stack. Stack: ['(']" } }
+      ]
+    },
+    {
+      "description": "Read '{' at index 1. Opening bracket → push onto stack.",
+      "actions": [
+        { "type": "update", "target": "c0", "props": { "fill": "$default" } },
+        { "type": "update", "target": "c1", "props": { "fill": "$primary" } },
+        { "type": "update", "target": "s0", "props": { "fill": "$default" } },
+        { "type": "update", "target": "s1", "props": { "value": "{", "label": "{", "opacity": 1, "fill": "$primary" } },
+        { "type": "update", "target": "ptr", "props": { "target": "c1" } },
+        { "type": "update", "target": "status", "props": { "text": "Push '{' onto stack. Stack: ['(', '{']" } }
+      ]
+    },
+    {
+      "description": "Read '[' at index 2. Opening bracket → push onto stack.",
+      "actions": [
+        { "type": "update", "target": "c1", "props": { "fill": "$default" } },
+        { "type": "update", "target": "c2", "props": { "fill": "$primary" } },
+        { "type": "update", "target": "s1", "props": { "fill": "$default" } },
+        { "type": "update", "target": "s2", "props": { "value": "[", "label": "[", "opacity": 1, "fill": "$primary" } },
+        { "type": "update", "target": "ptr", "props": { "target": "c2" } },
+        { "type": "update", "target": "status", "props": { "text": "Push '[' onto stack. Stack: ['(', '{', '[']" } }
+      ]
+    },
+    {
+      "description": "Read ']' at index 3. Closing bracket! Pop stack top '[' — matches ']'. ✓",
+      "actions": [
+        { "type": "update", "target": "c2", "props": { "fill": "$default" } },
+        { "type": "update", "target": "c3", "props": { "fill": "$warning" } },
+        { "type": "update", "target": "s2", "props": { "fill": "$success" } },
+        { "type": "update", "target": "ptr", "props": { "target": "c3" } },
+        { "type": "update", "target": "status", "props": { "text": "']' matches stack top '[' ✓ — Pop! Stack: ['(', '{']" } }
+      ]
+    },
+    {
+      "description": "Matched! Remove '[' from stack. Stack now has ['(', '{'].",
+      "actions": [
+        { "type": "update", "target": "c3", "props": { "fill": "$success" } },
+        { "type": "update", "target": "c2", "props": { "fill": "$success" } },
+        { "type": "update", "target": "s2", "props": { "opacity": 0, "value": "", "label": "" } },
+        { "type": "update", "target": "status", "props": { "text": "Pair matched: [ ] ✓  Stack: ['(', '{']" } }
+      ],
+      "transition": "instant"
+    },
+    {
+      "description": "Read '}' at index 4. Closing bracket! Pop stack top '{' — matches '}'. ✓",
+      "actions": [
+        { "type": "update", "target": "c4", "props": { "fill": "$warning" } },
+        { "type": "update", "target": "s1", "props": { "fill": "$success" } },
+        { "type": "update", "target": "ptr", "props": { "target": "c4" } },
+        { "type": "update", "target": "status", "props": { "text": "'}' matches stack top '{' ✓ — Pop! Stack: ['(']" } }
+      ]
+    },
+    {
+      "description": "Matched! Remove '{' from stack. Stack now has ['('].",
+      "actions": [
+        { "type": "update", "target": "c4", "props": { "fill": "$success" } },
+        { "type": "update", "target": "c1", "props": { "fill": "$success" } },
+        { "type": "update", "target": "s1", "props": { "opacity": 0, "value": "", "label": "" } },
+        { "type": "update", "target": "status", "props": { "text": "Pair matched: { } ✓  Stack: ['(']" } }
+      ],
+      "transition": "instant"
+    },
+    {
+      "description": "Read ')' at index 5. Closing bracket! Pop stack top '(' — matches ')'. ✓",
+      "actions": [
+        { "type": "update", "target": "c5", "props": { "fill": "$warning" } },
+        { "type": "update", "target": "s0", "props": { "fill": "$success" } },
+        { "type": "update", "target": "ptr", "props": { "target": "c5" } },
+        { "type": "update", "target": "status", "props": { "text": "')' matches stack top '(' ✓ — Pop! Stack: []" } }
+      ]
+    },
+    {
+      "description": "Matched! Stack is now empty. All characters processed.",
+      "actions": [
+        { "type": "update", "target": "c5", "props": { "fill": "$success" } },
+        { "type": "update", "target": "c0", "props": { "fill": "$success" } },
+        { "type": "update", "target": "s0", "props": { "opacity": 0, "value": "", "label": "" } },
+        { "type": "update", "target": "status", "props": { "text": "Pair matched: ( ) ✓  Stack: [] (empty)" } }
+      ],
+      "transition": "instant"
+    },
+    {
+      "description": "Stack is empty after processing all characters → string is VALID! ✓",
+      "actions": [
+        { "type": "update", "target": "result", "props": { "text": "✓ VALID", "fill": "$success" } },
+        { "type": "update", "target": "stack-label", "props": { "text": "Stack: empty ✓", "fill": "$success" } },
+        { "type": "update", "target": "status", "props": { "text": "All brackets matched. Stack empty at end → \"({[]})\" is valid!" } },
+        { "type": "update", "target": "ptr", "props": { "opacity": 0 } }
+      ]
+    }
+  ]
+}

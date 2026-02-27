@@ -1,0 +1,79 @@
+{
+  "name": "algoviz",
+  "version": "1.1.0",
+  "description": "LLM-driven algorithm visualization — composable primitives, agentic generation, interactive HTML artifacts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "bin": {
+    "algoviz": "dist/src/cli/index.js"
+  },
+  "exports": {
+    ".": {
+      "require": "./dist/src/index.js",
+      "types": "./dist/src/index.d.ts"
+    },
+    "./primitives": {
+      "require": "./dist/src/primitives/index.js",
+      "types": "./dist/src/primitives/index.d.ts"
+    },
+    "./generate": {
+      "require": "./dist/src/generate.js",
+      "types": "./dist/src/generate.d.ts"
+    }
+  },
+  "files": [
+    "dist/",
+    "schema.json",
+    "prompts/",
+    "artifact-player.html",
+    "examples/",
+    "SPEC.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "validate": "node dist/src/cli/index.js validate",
+    "render": "node dist/src/cli/index.js render",
+    "generate": "node dist/src/cli/index.js generate",
+    "test": "node test-primitives.js",
+    "test:gen": "node gen-test.js examples/gen/*.js --render",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "algorithm",
+    "visualization",
+    "animation",
+    "llm",
+    "claude",
+    "composable",
+    "primitives",
+    "json-schema",
+    "sorting",
+    "graph",
+    "data-structures",
+    "education",
+    "code-generation"
+  ],
+  "author": "sivaai09",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sivaai09/render_engine"
+  },
+  "dependencies": {
+    "ajv": "^8.18.0"
+  },
+  "peerDependencies": {
+    "@anthropic-ai/sdk": ">=0.30.0"
+  },
+  "peerDependenciesMeta": {
+    "@anthropic-ai/sdk": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
+    "@types/node": "^25.3.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}

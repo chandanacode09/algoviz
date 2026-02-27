@@ -1,0 +1,13 @@
+src/
+output/
+prompts/
+test-*.ts
+test-*.js
+test-*.html
+generate.ts
+validate.ts
+types.ts
+player.html
+tsconfig.json
+.gitignore
+node_modules/

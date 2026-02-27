@@ -1,0 +1,446 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://algoviz.dev/schema/v1/visualization.json",
+  "title": "AlgoViz Visualization v1",
+  "description": "Declarative algorithm visualization format. Designed for LLM generation: flat structures, minimal required fields, sensible defaults.",
+  "type": "object",
+  "required": ["version", "metadata", "actors", "steps"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0",
+      "description": "Schema version. Always \"1.0\" for this schema."
+    },
+    "metadata": {
+      "$ref": "#/definitions/metadata"
+    },
+    "config": {
+      "$ref": "#/definitions/config"
+    },
+    "actors": {
+      "type": "array",
+      "description": "All visual elements in their initial state. Each actor has a unique ID and a type that determines its visual representation.",
+      "items": {
+        "$ref": "#/definitions/actor"
+      },
+      "minItems": 1
+    },
+    "steps": {
+      "type": "array",
+      "description": "Ordered sequence of state changes. Each step has a human-readable description and a list of actions that modify actor properties. The visualization state at step N is computed by applying steps 0..N to the initial actor states.",
+      "items": {
+        "$ref": "#/definitions/step"
+      },
+      "minItems": 1
+    }
+  },
+
+  "definitions": {
+
+    "metadata": {
+      "type": "object",
+      "description": "Algorithm and educational metadata.",
+      "required": ["algorithm", "title"],
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": {
+          "type": "string",
+          "description": "Machine-readable algorithm identifier. Use snake_case.",
+          "examples": ["bubble_sort", "bfs", "dijkstra", "binary_search", "quick_sort"]
+        },
+        "title": {
+          "type": "string",
+          "description": "Human-readable title for the visualization.",
+          "examples": ["Bubble Sort", "Breadth-First Search"]
+        },
+        "description": {
+          "type": "string",
+          "description": "Brief description of what this visualization demonstrates."
+        },
+        "category": {
+          "type": "string",
+          "enum": ["sorting", "searching", "graph", "tree", "dynamic-programming", "backtracking", "string", "hashing", "heap", "linked-list", "other"],
+          "description": "Algorithm category."
+        },
+        "complexity": {
+          "description": "Time/space complexity. Can be a string (e.g. \"O(n²)\") or an object with time/space/best/worst/average fields.",
+          "oneOf": [
+            { "type": "string", "description": "Shorthand complexity, e.g. \"O(n²)\"" },
+            {
+              "type": "object",
+              "description": "Structured time and space complexity.",
+              "additionalProperties": false,
+              "properties": {
+                "time": { "type": "string", "examples": ["O(n²)", "O(n log n)", "O(V + E)"] },
+                "space": { "type": "string", "examples": ["O(1)", "O(n)", "O(V)"] },
+                "best": { "type": "string" },
+                "worst": { "type": "string" },
+                "average": { "type": "string" }
+              }
+            }
+          ]
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": ["beginner", "intermediate", "advanced"]
+        },
+        "inputDescription": {
+          "type": "string",
+          "description": "Describes the specific input used in this visualization.",
+          "examples": ["Array: [5, 3, 8, 1, 4]", "Graph with 6 nodes, starting from node A"]
+        },
+        "author": {
+          "type": "string",
+          "description": "Who generated this visualization (e.g., 'claude', 'human', 'gpt-4')."
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Searchable tags.",
+          "examples": [["sorting", "comparison", "in-place", "stable"]]
+        }
+      }
+    },
+
+    "config": {
+      "type": "object",
+      "description": "Canvas, theme, and playback configuration. All fields have sensible defaults.",
+      "additionalProperties": false,
+      "properties": {
+        "canvas": {
+          "type": "object",
+          "description": "Virtual coordinate space. The renderer scales this to fit the display. Default: 1000x600.",
+          "additionalProperties": false,
+          "properties": {
+            "width": { "type": "number", "default": 1000, "minimum": 200, "maximum": 2000 },
+            "height": { "type": "number", "default": 600, "minimum": 200, "maximum": 2000 },
+            "padding": { "type": "number", "default": 40, "minimum": 0 },
+            "background": { "type": "string", "default": "#ffffff", "description": "CSS color value." }
+          }
+        },
+        "theme": {
+          "type": "object",
+          "description": "Named color palette. Actors can reference these by name (e.g., \"$primary\") or use literal hex colors.",
+          "additionalProperties": false,
+          "properties": {
+            "default": { "type": "string", "default": "#e2e8f0" },
+            "primary": { "type": "string", "default": "#3b82f6" },
+            "secondary": { "type": "string", "default": "#8b5cf6" },
+            "success": { "type": "string", "default": "#10b981" },
+            "warning": { "type": "string", "default": "#f59e0b" },
+            "danger": { "type": "string", "default": "#ef4444" },
+            "text": { "type": "string", "default": "#1e293b" },
+            "muted": { "type": "string", "default": "#94a3b8" }
+          }
+        },
+        "playback": {
+          "type": "object",
+          "description": "Playback timing configuration.",
+          "additionalProperties": false,
+          "properties": {
+            "stepDuration": {
+              "type": "number",
+              "default": 800,
+              "minimum": 50,
+              "maximum": 5000,
+              "description": "Milliseconds per step during playback."
+            },
+            "autoPlay": {
+              "type": "boolean",
+              "default": false,
+              "description": "Start playing automatically when loaded."
+            }
+          }
+        }
+      }
+    },
+
+    "color": {
+      "type": "string",
+      "description": "CSS color value or theme reference (prefix with $). Examples: \"#3b82f6\", \"$primary\", \"$success\", \"rgba(0,0,0,0.5)\"."
+    },
+
+    "actor": {
+      "type": "object",
+      "description": "A visual element on the canvas. Discriminated by the 'type' field.",
+      "required": ["id", "type"],
+      "oneOf": [
+        { "$ref": "#/definitions/cellActor" },
+        { "$ref": "#/definitions/nodeActor" },
+        { "$ref": "#/definitions/edgeActor" },
+        { "$ref": "#/definitions/pointerActor" },
+        { "$ref": "#/definitions/labelActor" },
+        { "$ref": "#/definitions/regionActor" }
+      ]
+    },
+
+    "cellActor": {
+      "type": "object",
+      "description": "Rectangular box with a value. Use for array elements, table cells, matrix entries, stack/queue slots.",
+      "required": ["id", "type", "x", "y", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier. Convention: c0, c1, c2..." },
+        "type": { "const": "cell" },
+        "x": { "type": "number", "description": "Left edge x-coordinate in virtual canvas." },
+        "y": { "type": "number", "description": "Top edge y-coordinate in virtual canvas." },
+        "width": { "type": "number", "default": 60, "minimum": 10 },
+        "height": { "type": "number", "default": 60, "minimum": 10 },
+        "value": {
+          "oneOf": [{ "type": "number" }, { "type": "string" }],
+          "description": "The data value this cell holds."
+        },
+        "label": {
+          "type": "string",
+          "description": "Display text inside the cell. Defaults to string(value) if omitted."
+        },
+        "sublabel": {
+          "type": "string",
+          "description": "Secondary text below the cell (e.g., index number)."
+        },
+        "fill": { "$ref": "#/definitions/color", "default": "$default" },
+        "stroke": { "$ref": "#/definitions/color", "default": "$muted" },
+        "strokeWidth": { "type": "number", "default": 2 },
+        "textColor": { "$ref": "#/definitions/color", "default": "$text" },
+        "fontSize": { "type": "number", "default": 16 },
+        "cornerRadius": { "type": "number", "default": 4, "minimum": 0 },
+        "opacity": { "type": "number", "default": 1, "minimum": 0, "maximum": 1 }
+      }
+    },
+
+    "nodeActor": {
+      "type": "object",
+      "description": "Circular element with a value. Use for tree nodes, graph vertices, linked list nodes.",
+      "required": ["id", "type", "x", "y", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier. Convention: n0, n1, n2..." },
+        "type": { "const": "node" },
+        "x": { "type": "number", "description": "Center x-coordinate." },
+        "y": { "type": "number", "description": "Center y-coordinate." },
+        "radius": { "type": "number", "default": 25, "minimum": 5 },
+        "value": {
+          "oneOf": [{ "type": "number" }, { "type": "string" }],
+          "description": "The data value this node holds."
+        },
+        "label": {
+          "type": "string",
+          "description": "Display text inside the node. Defaults to string(value) if omitted."
+        },
+        "sublabel": {
+          "type": "string",
+          "description": "Secondary text below the node (e.g., distance label in Dijkstra)."
+        },
+        "fill": { "$ref": "#/definitions/color", "default": "$default" },
+        "stroke": { "$ref": "#/definitions/color", "default": "$muted" },
+        "strokeWidth": { "type": "number", "default": 2 },
+        "textColor": { "$ref": "#/definitions/color", "default": "$text" },
+        "fontSize": { "type": "number", "default": 14 },
+        "opacity": { "type": "number", "default": 1, "minimum": 0, "maximum": 1 }
+      }
+    },
+
+    "edgeActor": {
+      "type": "object",
+      "description": "Line connecting two nodes. Use for tree edges, graph edges, linked list links.",
+      "required": ["id", "type", "source", "target"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier. Convention: e0, e1, e2..." },
+        "type": { "const": "edge" },
+        "source": { "type": "string", "description": "ID of the source node actor." },
+        "target": { "type": "string", "description": "ID of the target node actor." },
+        "directed": { "type": "boolean", "default": false, "description": "If true, render an arrowhead at the target." },
+        "weight": {
+          "oneOf": [{ "type": "number" }, { "type": "string" }, { "type": "null" }],
+          "default": null,
+          "description": "Edge weight. Displayed as a label on the edge midpoint."
+        },
+        "label": {
+          "type": "string",
+          "description": "Custom label on the edge. Overrides weight display if both are set."
+        },
+        "stroke": { "$ref": "#/definitions/color", "default": "$muted" },
+        "strokeWidth": { "type": "number", "default": 2, "minimum": 1 },
+        "dashArray": {
+          "type": "string",
+          "default": "",
+          "description": "SVG dash pattern. Empty string = solid line. Example: \"5,5\" for dashed."
+        },
+        "opacity": { "type": "number", "default": 1, "minimum": 0, "maximum": 1 }
+      }
+    },
+
+    "pointerActor": {
+      "type": "object",
+      "description": "Arrow or marker that points at another actor. Use for index pointers, current-element markers, variable indicators.",
+      "required": ["id", "type", "target", "position"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier. Convention: p0, p1, p2..." },
+        "type": { "const": "pointer" },
+        "target": { "type": "string", "description": "ID of the actor this pointer points at." },
+        "position": {
+          "type": "string",
+          "enum": ["above", "below", "left", "right"],
+          "description": "Where the pointer appears relative to its target."
+        },
+        "label": {
+          "type": "string",
+          "description": "Text label on the pointer (e.g., \"i\", \"left\", \"pivot\")."
+        },
+        "fill": { "$ref": "#/definitions/color", "default": "$primary" },
+        "textColor": { "$ref": "#/definitions/color", "default": "$primary" },
+        "fontSize": { "type": "number", "default": 14 },
+        "opacity": { "type": "number", "default": 1, "minimum": 0, "maximum": 1 }
+      }
+    },
+
+    "labelActor": {
+      "type": "object",
+      "description": "Standalone text annotation. Use for titles, status text, complexity displays, step counters.",
+      "required": ["id", "type", "x", "y", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier. Convention: l0, l1, l2..." },
+        "type": { "const": "label" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "text": { "type": "string", "description": "The text content." },
+        "fontSize": { "type": "number", "default": 16 },
+        "fontWeight": {
+          "type": "string",
+          "enum": ["normal", "bold"],
+          "default": "normal"
+        },
+        "fill": { "$ref": "#/definitions/color", "default": "$text" },
+        "anchor": {
+          "type": "string",
+          "enum": ["start", "middle", "end"],
+          "default": "start",
+          "description": "Text alignment anchor point."
+        },
+        "opacity": { "type": "number", "default": 1, "minimum": 0, "maximum": 1 }
+      }
+    },
+
+    "regionActor": {
+      "type": "object",
+      "description": "Semi-transparent highlighted area. Use for sorted regions, search windows, recursion boundaries, partitions.",
+      "required": ["id", "type", "x", "y", "width", "height"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier. Convention: r0, r1, r2..." },
+        "type": { "const": "region" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "width": { "type": "number", "minimum": 1 },
+        "height": { "type": "number", "minimum": 1 },
+        "fill": { "$ref": "#/definitions/color", "default": "$success" },
+        "stroke": { "$ref": "#/definitions/color", "default": "$success" },
+        "strokeWidth": { "type": "number", "default": 2 },
+        "cornerRadius": { "type": "number", "default": 8, "minimum": 0 },
+        "label": { "type": "string", "description": "Label text displayed in the region." },
+        "opacity": { "type": "number", "default": 0.15, "minimum": 0, "maximum": 1 }
+      }
+    },
+
+    "step": {
+      "type": "object",
+      "description": "A single step in the visualization. Each step has a description and a list of actions that modify the scene.",
+      "required": ["description", "actions"],
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Human-readable explanation of what happens in this step. This is shown to the viewer."
+        },
+        "actions": {
+          "type": "array",
+          "description": "List of scene modifications applied simultaneously in this step.",
+          "items": {
+            "$ref": "#/definitions/action"
+          },
+          "minItems": 1
+        },
+        "narration": {
+          "type": "string",
+          "description": "Rich HTML narration with formatting spans. Supports <span class='highlight'>, <span class='warn'>, <span class='success'> for colored emphasis. Falls back to 'description' if omitted."
+        },
+        "phase": {
+          "type": "string",
+          "description": "Algorithm phase label. Common values: 'setup', 'main-loop', 'cleanup', 'base-case', 'optimization'. Shown as a badge in the player."
+        },
+        "annotation": {
+          "type": "string",
+          "enum": ["invariant", "initialization", "boundary", "decision", "warning", "explanation"],
+          "description": "Semantic label for what this step teaches. 'invariant' = proves correctness, 'warning' = common mistake, 'decision' = key comparison, 'boundary' = edge case, 'initialization' = setup logic, 'explanation' = concept insight."
+        },
+        "transition": {
+          "type": "string",
+          "enum": ["instant", "smooth", "swap", "highlight", "fade"],
+          "default": "smooth",
+          "description": "Animation hint for the renderer. 'instant' = no animation, 'smooth' = interpolate, 'swap' = swap animation, 'highlight' = flash then settle, 'fade' = opacity transition."
+        }
+      }
+    },
+
+    "action": {
+      "type": "object",
+      "description": "A single modification to the scene. Three types: 'update' changes existing actor properties, 'create' adds a new actor, 'remove' deletes an actor.",
+      "oneOf": [
+        { "$ref": "#/definitions/updateAction" },
+        { "$ref": "#/definitions/createAction" },
+        { "$ref": "#/definitions/removeAction" }
+      ]
+    },
+
+    "updateAction": {
+      "type": "object",
+      "description": "Change one or more properties of an existing actor.",
+      "required": ["type", "target", "props"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "update" },
+        "target": {
+          "type": "string",
+          "description": "ID of the actor to modify."
+        },
+        "props": {
+          "type": "object",
+          "description": "Property key-value pairs to update. Keys must be valid properties for the actor's type. Values replace the current property value.",
+          "minProperties": 1,
+          "additionalProperties": true
+        }
+      }
+    },
+
+    "createAction": {
+      "type": "object",
+      "description": "Add a new actor to the scene mid-visualization.",
+      "required": ["type", "actor"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "create" },
+        "actor": {
+          "$ref": "#/definitions/actor",
+          "description": "Full actor definition to add to the scene."
+        }
+      }
+    },
+
+    "removeAction": {
+      "type": "object",
+      "description": "Remove an actor from the scene.",
+      "required": ["type", "target"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "remove" },
+        "target": {
+          "type": "string",
+          "description": "ID of the actor to remove."
+        }
+      }
+    }
+  }
+}

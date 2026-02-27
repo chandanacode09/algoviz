@@ -1,0 +1,622 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "algorithm": "three_sum",
+    "title": "3Sum Problem Visualization",
+    "description": "Finding all unique triplets that sum to zero in [-1, 0, 1, 2, -1, -4] using two-pointer technique",
+    "category": "searching",
+    "complexity": {
+      "time": "O(n²)",
+      "space": "O(1)"
+    },
+    "difficulty": "intermediate",
+    "inputDescription": "Array of 6 integers: [-1, 0, 1, 2, -1, -4]. Sorted: [-4, -1, -1, 0, 1, 2]"
+  },
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 600
+    },
+    "playback": {
+      "stepDuration": 1000
+    }
+  },
+  "actors": [
+    {
+      "id": "c0",
+      "type": "cell",
+      "x": 150,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": -4,
+      "sublabel": "0"
+    },
+    {
+      "id": "c1",
+      "type": "cell",
+      "x": 220,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": -1,
+      "sublabel": "1"
+    },
+    {
+      "id": "c2",
+      "type": "cell",
+      "x": 290,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": -1,
+      "sublabel": "2"
+    },
+    {
+      "id": "c3",
+      "type": "cell",
+      "x": 360,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": 0,
+      "sublabel": "3"
+    },
+    {
+      "id": "c4",
+      "type": "cell",
+      "x": 430,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": 1,
+      "sublabel": "4"
+    },
+    {
+      "id": "c5",
+      "type": "cell",
+      "x": 500,
+      "y": 200,
+      "width": 60,
+      "height": 60,
+      "value": 2,
+      "sublabel": "5"
+    },
+    {
+      "id": "i-ptr",
+      "type": "pointer",
+      "target": "c0",
+      "position": "above",
+      "label": "i",
+      "fill": "$primary"
+    },
+    {
+      "id": "left-ptr",
+      "type": "pointer",
+      "target": "c1",
+      "position": "below",
+      "label": "left",
+      "fill": "$warning"
+    },
+    {
+      "id": "right-ptr",
+      "type": "pointer",
+      "target": "c5",
+      "position": "below",
+      "label": "right",
+      "fill": "$success"
+    },
+    {
+      "id": "triplet-region",
+      "type": "region",
+      "x": 140,
+      "y": 180,
+      "width": 400,
+      "height": 100,
+      "fill": "$primary",
+      "opacity": 0,
+      "cornerRadius": 4
+    },
+    {
+      "id": "title",
+      "type": "label",
+      "x": 500,
+      "y": 40,
+      "text": "3Sum - Sorted Array",
+      "fontSize": 24,
+      "fontWeight": "bold",
+      "anchor": "middle"
+    },
+    {
+      "id": "status",
+      "type": "label",
+      "x": 500,
+      "y": 350,
+      "text": "Array sorted: [-4, -1, -1, 0, 1, 2]. Finding triplets with sum = 0.",
+      "fontSize": 14,
+      "anchor": "middle"
+    },
+    {
+      "id": "results",
+      "type": "label",
+      "x": 500,
+      "y": 420,
+      "text": "Triplets found: []",
+      "fontSize": 13,
+      "anchor": "middle",
+      "fill": "$success"
+    }
+  ],
+  "steps": [
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "3Sum - Iteration i=0 (pivot=-4)"
+          }
+        },
+        {
+          "type": "update",
+          "target": "i-ptr",
+          "props": {
+            "target": "c0"
+          }
+        },
+        {
+          "type": "update",
+          "target": "left-ptr",
+          "props": {
+            "target": "c1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "right-ptr",
+          "props": {
+            "target": "c5"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c0",
+          "props": {
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "triplet-region",
+          "props": {
+            "opacity": 0.1,
+            "x": 140,
+            "y": 180,
+            "width": 400
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Fix i=-4. Use two pointers on remaining array. Sum: -4 + (-1) + 2 = -3 (too small)"
+          }
+        }
+      ],
+      "description": "Step 1 of 3Sum Problem Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "left-ptr",
+          "props": {
+            "target": "c2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c1",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Move left pointer. Sum: -4 + (-1) + 2 = -3 (still too small)"
+          }
+        }
+      ],
+      "description": "Step 2 of 3Sum Problem Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "left-ptr",
+          "props": {
+            "target": "c3"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c3",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Move left pointer. Sum: -4 + 0 + 2 = -2 (still too small)"
+          }
+        }
+      ],
+      "description": "Step 3 of 3Sum Problem Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "left-ptr",
+          "props": {
+            "target": "c4"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c3",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c4",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Move left pointer. Sum: -4 + 1 + 2 = -1 (still too small). Left and right converged."
+          }
+        }
+      ],
+      "description": "Step 4 of 3Sum Problem Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "3Sum - Iteration i=1 (pivot=-1)"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c0",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c4",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "i-ptr",
+          "props": {
+            "target": "c1"
+          }
+        },
+        {
+          "type": "update",
+          "target": "left-ptr",
+          "props": {
+            "target": "c2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "right-ptr",
+          "props": {
+            "target": "c5"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c1",
+          "props": {
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "triplet-region",
+          "props": {
+            "x": 210,
+            "y": 180,
+            "width": 330
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Fix i=-1. Sum: -1 + (-1) + 2 = 0. FOUND TRIPLET!"
+          }
+        }
+      ],
+      "description": "Step 5 of 3Sum Problem Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "c1",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c5",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "results",
+          "props": {
+            "text": "Triplets found: [[-1, -1, 2]]"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Triplet [-1, -1, 2] recorded. Continue searching."
+          }
+        }
+      ],
+      "description": "Step 6 of 3Sum Problem Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "3Sum - Iteration i=2 (pivot=-1, duplicate skip)"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c1",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c5",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "i-ptr",
+          "props": {
+            "target": "c2"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "fill": "$muted"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Skip i=2 because c2=-1 is same as c1. Move to next iteration."
+          }
+        }
+      ],
+      "description": "Step 7 of 3Sum Problem Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "3Sum - Iteration i=3 (pivot=0)"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c2",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "i-ptr",
+          "props": {
+            "target": "c3"
+          }
+        },
+        {
+          "type": "update",
+          "target": "left-ptr",
+          "props": {
+            "target": "c4"
+          }
+        },
+        {
+          "type": "update",
+          "target": "right-ptr",
+          "props": {
+            "target": "c5"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c3",
+          "props": {
+            "fill": "$primary"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c4",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c5",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "triplet-region",
+          "props": {
+            "x": 350,
+            "y": 180,
+            "width": 170
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Fix i=0. Sum: 0 + 1 + 2 = 3 (too large). Move right pointer left."
+          }
+        }
+      ],
+      "description": "Step 8 of 3Sum Problem Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "right-ptr",
+          "props": {
+            "target": "c4"
+          }
+        },
+        {
+          "type": "update",
+          "target": "title",
+          "props": {
+            "text": "3Sum - Complete"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c3",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "c4",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "triplet-region",
+          "props": {
+            "opacity": 0
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Search complete. All unique triplets that sum to zero found."
+          }
+        }
+      ],
+      "description": "Step 9 of 3Sum Problem Visualization"
+    },
+    {
+      "actions": [
+        {
+          "type": "update",
+          "target": "results",
+          "props": {
+            "text": "Final triplets: [[-1, -1, 2], [-1, 0, 1]]"
+          }
+        },
+        {
+          "type": "update",
+          "target": "status",
+          "props": {
+            "text": "Algorithm complete. Found 2 unique triplets that sum to zero."
+          }
+        }
+      ],
+      "description": "Step 10 of 3Sum Problem Visualization"
+    }
+  ]
+}

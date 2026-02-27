@@ -1,0 +1,404 @@
+{
+  "metadata": {
+    "title": "Binary Tree Preorder Traversal",
+    "description": "Preorder DFS traversal of a 7-node binary tree. Visit root, then left subtree, then right subtree.",
+    "category": "tree",
+    "difficulty": "beginner",
+    "complexity": {
+      "time": "O(n)",
+      "space": "O(h)"
+    },
+    "algorithm": "preorder_traversal"
+  },
+  "actors": [
+    {
+      "id": "title",
+      "type": "label",
+      "x": 500,
+      "y": 20,
+      "text": "Preorder Traversal: Root → Left → Right",
+      "fontSize": 20,
+      "fontWeight": "bold",
+      "anchor": "middle"
+    },
+    {
+      "id": "tree-label",
+      "type": "label",
+      "x": 50,
+      "y": 60,
+      "text": "Binary Tree:",
+      "fontSize": 13,
+      "fontWeight": "bold",
+      "anchor": "start"
+    },
+    {
+      "id": "n1",
+      "type": "node",
+      "x": 300,
+      "y": 100,
+      "value": "1",
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 14
+    },
+    {
+      "id": "n2",
+      "type": "node",
+      "x": 170,
+      "y": 180,
+      "value": "2",
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 14
+    },
+    {
+      "id": "n3",
+      "type": "node",
+      "x": 430,
+      "y": 180,
+      "value": "3",
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 14
+    },
+    {
+      "id": "n4",
+      "type": "node",
+      "x": 80,
+      "y": 260,
+      "value": "4",
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 14
+    },
+    {
+      "id": "n5",
+      "type": "node",
+      "x": 260,
+      "y": 260,
+      "value": "5",
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 14
+    },
+    {
+      "id": "n6",
+      "type": "node",
+      "x": 350,
+      "y": 260,
+      "value": "6",
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 14
+    },
+    {
+      "id": "n7",
+      "type": "node",
+      "x": 520,
+      "y": 260,
+      "value": "7",
+      "radius": 25,
+      "fill": "$default",
+      "stroke": "$text",
+      "strokeWidth": 2,
+      "fontSize": 14
+    },
+    {
+      "id": "e1-2",
+      "type": "edge",
+      "source": "n1",
+      "target": "n2",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "e1-3",
+      "type": "edge",
+      "source": "n1",
+      "target": "n3",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "e2-4",
+      "type": "edge",
+      "source": "n2",
+      "target": "n4",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "e2-5",
+      "type": "edge",
+      "source": "n2",
+      "target": "n5",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "e3-6",
+      "type": "edge",
+      "source": "n3",
+      "target": "n6",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "e3-7",
+      "type": "edge",
+      "source": "n3",
+      "target": "n7",
+      "stroke": "$text",
+      "strokeWidth": 2
+    },
+    {
+      "id": "output-label",
+      "type": "label",
+      "x": 650,
+      "y": 100,
+      "text": "Traversal Order:",
+      "fontSize": 13,
+      "fontWeight": "bold",
+      "anchor": "start"
+    },
+    {
+      "id": "output-bg",
+      "type": "region",
+      "x": 650,
+      "y": 130,
+      "width": 300,
+      "height": 80,
+      "fill": "$muted",
+      "cornerRadius": 4
+    },
+    {
+      "id": "output-text",
+      "type": "label",
+      "x": 670,
+      "y": 155,
+      "text": "",
+      "fontSize": 12,
+      "anchor": "start",
+      "fill": "$text"
+    }
+  ],
+  "steps": [
+    {
+      "description": "Initialize: Preorder traversal starts at root. Visit root first, then left subtree, then right subtree.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "output-text",
+          "props": {
+            "text": "Order: "
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit node 1 (root). Add to output. Go to left subtree (node 2).",
+      "actions": [
+        {
+          "type": "update",
+          "target": "n1",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "output-text",
+          "props": {
+            "text": "Order: [1]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit node 2 (left child of 1). Add to output. Go to left subtree (node 4).",
+      "actions": [
+        {
+          "type": "update",
+          "target": "n1",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "n2",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "output-text",
+          "props": {
+            "text": "Order: [1, 2]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit node 4 (left child of 2). No children. Add to output. Backtrack to node 2.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "n2",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "n4",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "output-text",
+          "props": {
+            "text": "Order: [1, 2, 4]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit node 5 (right child of 2). No children. Add to output. Backtrack to node 2, then to node 1.",
+      "actions": [
+        {
+          "type": "update",
+          "target": "n4",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "n5",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "output-text",
+          "props": {
+            "text": "Order: [1, 2, 4, 5]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Backtracked to 1. Now visit right subtree. Visit node 3. Add to output. Go to left subtree (node 6).",
+      "actions": [
+        {
+          "type": "update",
+          "target": "n5",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "n3",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "output-text",
+          "props": {
+            "text": "Order: [1, 2, 4, 5, 3]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Visit node 6 (left child of 3). Add to output. Then visit node 7 (right child of 3).",
+      "actions": [
+        {
+          "type": "update",
+          "target": "n3",
+          "props": {
+            "fill": "$default"
+          }
+        },
+        {
+          "type": "update",
+          "target": "n6",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "output-text",
+          "props": {
+            "text": "Order: [1, 2, 4, 5, 3, 6]"
+          }
+        }
+      ]
+    },
+    {
+      "description": "Complete: Preorder traversal finished. Final order: [1, 2, 4, 5, 3, 6, 7].",
+      "actions": [
+        {
+          "type": "update",
+          "target": "n6",
+          "props": {
+            "fill": "$success"
+          }
+        },
+        {
+          "type": "update",
+          "target": "n7",
+          "props": {
+            "fill": "$warning"
+          }
+        },
+        {
+          "type": "update",
+          "target": "output-text",
+          "props": {
+            "text": "Final: [1, 2, 4, 5, 3, 6, 7]"
+          }
+        },
+        {
+          "type": "update",
+          "target": "n7",
+          "props": {
+            "fill": "$success"
+          }
+        }
+      ]
+    }
+  ],
+  "version": "1.0",
+  "config": {
+    "canvas": {
+      "width": 1000,
+      "height": 600,
+      "background": "$default"
+    },
+    "playback": {
+      "stepDuration": 1000
+    }
+  }
+}
