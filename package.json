@@ -57,7 +57,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sivaai09/render_engine"
+    "url": "https://github.com/chandanacode09/algoviz"
   },
   "dependencies": {
     "ajv": "^8.18.0"
