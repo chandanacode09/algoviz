@@ -58,8 +58,6 @@ npx tsc
 - `viz()` auto-validates on construction
 
 ## Known Issues
-- LLM generation ~26% first-pass success (see PHASE0-REPORT.md) — prompts improved with WRONG/RIGHT examples + pre-flight checklists
+- LLM generation success rate untested since prompt/token improvements (was ~26%, likely higher now)
 - `create.actor` vs `update.target`/`remove.target` asymmetry (mitigated by normalize.ts)
 - No animation sequencing within steps (all actions simultaneous)
-- No actor composition/grouping
-- Test coverage ~60% (edge cases, performance, concurrency not covered)

@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlgoViz Playground</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0c12; --surface: #12141d; --surface2: #1a1d2b; --surface3: #242838;
+  --border: #2a3050; --border-active: #4f6fff; --border-subtle: #1e2236;
+  --text: #edf0ff; --text-muted: #8892b0; --text-dim: #5a6380;
+  --accent: #6c8cff; --accent-bright: #8facff; --accent-glow: rgba(108,140,255,0.3);
+  --accent-subtle: rgba(108,140,255,0.08);
+  --success: #34d399; --success-glow: rgba(52,211,153,0.25);
+  --warning: #fbbf24; --warning-glow: rgba(251,191,36,0.2);
+  --danger: #f87171; --danger-glow: rgba(248,113,113,0.2);
+  --radius: 10px; --radius-sm: 6px; --radius-lg: 14px;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: local('Inter'), local('Inter-Regular');
+}
+
+body {
+  font-family: var(--font); background: var(--bg); color: var(--text);
+  min-height: 100vh; -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ================================================================
+   HEADER
+   ================================================================ */
+.pg-header {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 28px 40px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.pg-header::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse 600px 200px at 50% 0%, var(--accent-glow), transparent);
+  pointer-events: none;
+}
+.pg-header h1 {
+  font-size: 32px; font-weight: 800; letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #fff 0%, var(--accent-bright) 50%, var(--accent) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; position: relative; margin-bottom: 6px;
+}
+.pg-header .tagline {
+  font-size: 15px; color: var(--text-muted); font-weight: 400;
+  position: relative; letter-spacing: 0.01em;
+}
+.pg-header .tagline strong {
+  color: var(--accent-bright); font-weight: 600;
+}
+
+/* ================================================================
+   LAYOUT
+   ================================================================ */
+.pg-container {
+  max-width: 1280px; margin: 0 auto; padding: 24px 32px 48px;
+  display: grid; grid-template-columns: 300px 1fr; gap: 24px;
+  min-height: calc(100vh - 110px);
+}
+
+/* ================================================================
+   SIDEBAR — Algorithm Selector + Info
+   ================================================================ */
+.pg-sidebar {
+  display: flex; flex-direction: column; gap: 16px;
+}
+.pg-panel {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 20px;
+  box-shadow: var(--shadow-md);
+}
+.pg-panel-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--text-dim); margin-bottom: 14px;
+}
+
+/* Algorithm list */
+.pg-algo-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.pg-algo-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: var(--radius);
+  cursor: pointer; transition: all 0.2s; border: 1px solid transparent;
+  font-size: 14px; font-weight: 500; color: var(--text-muted);
+}
+.pg-algo-item:hover {
+  background: var(--surface2); color: var(--text);
+  border-color: var(--border);
+}
+.pg-algo-item.active {
+  background: var(--accent-subtle); color: var(--accent-bright);
+  border-color: rgba(108,140,255,0.25);
+}
+.pg-algo-item .algo-icon {
+  width: 32px; height: 32px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+  background: var(--surface2);
+}
+.pg-algo-item.active .algo-icon {
+  background: rgba(108,140,255,0.15);
+}
+.pg-algo-item .algo-name { flex: 1; }
+.pg-algo-item .algo-diff {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.04em; padding: 2px 6px; border-radius: 4px;
+  background: var(--surface3); color: var(--text-dim);
+}
+.pg-algo-item .algo-diff.beginner { color: var(--success); background: var(--success-glow); }
+.pg-algo-item .algo-diff.intermediate { color: var(--warning); background: var(--warning-glow); }
+.pg-algo-item .algo-diff.advanced { color: var(--danger); background: var(--danger-glow); }
+
+/* Info panel */
+.pg-info-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+.pg-info-item {
+  background: var(--surface2); border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+.pg-info-item .info-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--text-dim); margin-bottom: 4px;
+}
+.pg-info-item .info-value {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  font-family: var(--mono);
+}
+.pg-info-item.full { grid-column: 1 / -1; }
+.pg-info-item .info-value.desc {
+  font-family: var(--font); font-weight: 400; font-size: 13px;
+  line-height: 1.5; color: var(--text-muted);
+}
+.pg-tag-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.pg-tag {
+  font-size: 10px; font-weight: 600; padding: 2px 8px;
+  border-radius: 20px; background: var(--surface3); color: var(--text-dim);
+  font-family: var(--mono); letter-spacing: 0.02em;
+}
+
+/* Custom JSON panel */
+.pg-json-panel textarea {
+  width: 100%; height: 140px; resize: vertical;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px;
+  font-family: var(--mono); font-size: 12px; line-height: 1.5;
+  color: var(--text); outline: none; transition: border-color 0.2s;
+}
+.pg-json-panel textarea:focus {
+  border-color: var(--accent);
+}
+.pg-json-panel textarea::placeholder {
+  color: var(--text-dim);
+}
+.pg-json-btn {
+  margin-top: 10px; width: 100%; padding: 10px;
+  background: var(--accent); color: #fff; border: none;
+  border-radius: var(--radius-sm); font-size: 13px; font-weight: 700;
+  font-family: var(--font); cursor: pointer; transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+.pg-json-btn:hover { background: var(--accent-bright); transform: translateY(-1px); }
+.pg-json-btn:active { transform: translateY(0); }
+.pg-json-error {
+  margin-top: 8px; padding: 8px 12px; border-radius: var(--radius-sm);
+  background: var(--danger-glow); color: var(--danger);
+  font-size: 12px; font-family: var(--mono); display: none;
+  line-height: 1.4; word-break: break-word;
+}
+
+/* ================================================================
+   MAIN PLAYER AREA
+   ================================================================ */
+.pg-player-wrap {
+  display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  min-height: 0;
+}
+
+/* Player internal header */
+.av-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; background: var(--surface);
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.av-header h1 {
+  font-size: 16px; font-weight: 700; letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--text) 0%, var(--accent-bright) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.av-meta { display: flex; gap: 8px; }
+.av-badge {
+  background: var(--surface2); padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  border: 1px solid var(--border); letter-spacing: 0.02em;
+  font-family: var(--mono);
+}
+.av-badge-accent { color: var(--accent); border-color: rgba(108,140,255,0.3); background: rgba(108,140,255,0.08); }
+
+/* Canvas */
+.av-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+.av-canvas-wrap {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  padding: 16px; min-height: 360px; position: relative;
+}
+.av-canvas-wrap svg {
+  width: 100%; height: 100%; max-width: 100%; max-height: 100%;
+  filter: drop-shadow(0 4px 20px rgba(0,0,0,0.15));
+}
+
+/* SVG Transitions */
+.av-actor { transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+.av-transition-instant .av-actor { transition: none !important; }
+.av-transition-swap .av-actor {
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes av-pulse {
+  0%, 100% { filter: drop-shadow(0 0 0px transparent); }
+  50% { filter: drop-shadow(0 0 12px var(--accent-glow)); }
+}
+@keyframes av-glow-success {
+  0%, 100% { filter: drop-shadow(0 0 0px transparent); }
+  50% { filter: drop-shadow(0 0 8px var(--success-glow)); }
+}
+
+.av-actor-active { animation: av-pulse 1.2s ease-in-out infinite; }
+.av-actor-done { animation: av-glow-success 2s ease-in-out 1; }
+
+/* Description Panel */
+.av-description {
+  padding: 14px 20px; background: var(--surface);
+  border-top: 1px solid var(--border); min-height: 52px;
+  display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+}
+.av-description-step {
+  font-size: 12px; color: var(--accent); font-weight: 700;
+  white-space: nowrap; font-family: var(--mono);
+  background: rgba(108,140,255,0.1); padding: 3px 8px;
+  border-radius: var(--radius-sm); min-width: 56px; text-align: center;
+}
+.av-description-text {
+  font-size: 15px; line-height: 1.5; font-weight: 500;
+  color: var(--text);
+}
+.av-description-text:empty::after {
+  content: 'Press play or use arrow keys to start';
+  color: var(--text-dim); font-style: italic; font-weight: 400;
+}
+.av-description-text .highlight { color: var(--accent); font-weight: 600; }
+.av-description-text .warn { color: var(--warning); font-weight: 600; }
+.av-description-text .success { color: var(--success); font-weight: 600; }
+.av-description-text .danger { color: var(--danger); font-weight: 600; }
+
+.av-annotation-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+  padding: 2px 8px; border-radius: 4px; text-transform: uppercase;
+  white-space: nowrap; font-family: var(--mono);
+}
+.av-annotation-badge[data-type="invariant"] { background: var(--success-glow); color: var(--success); }
+.av-annotation-badge[data-type="warning"] { background: var(--warning-glow); color: var(--warning); }
+.av-annotation-badge[data-type="boundary"] { background: var(--danger-glow); color: var(--danger); }
+.av-annotation-badge[data-type="decision"] { background: var(--accent-glow); color: var(--accent); }
+.av-annotation-badge[data-type="initialization"] { background: var(--surface2); color: var(--text-muted); }
+.av-annotation-badge[data-type="explanation"] { background: var(--accent-glow); color: var(--accent-bright); }
+.av-phase-badge {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.04em;
+  padding: 2px 8px; border-radius: 4px; text-transform: uppercase;
+  white-space: nowrap; font-family: var(--mono);
+  background: var(--surface3); color: var(--text-dim);
+}
+
+/* Controls */
+.av-controls {
+  display: flex; align-items: center; gap: 8px;
+  padding: 14px 20px; background: var(--surface2);
+  border-top: 1px solid var(--border); flex-shrink: 0;
+}
+.av-btn {
+  background: var(--surface3); border: 1px solid var(--border); color: var(--text-muted);
+  width: 36px; height: 36px; border-radius: var(--radius);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; transition: all 0.2s; flex-shrink: 0;
+}
+.av-btn:hover { background: var(--surface3); color: var(--text); border-color: var(--border-active); }
+.av-btn:active { transform: scale(0.95); }
+.av-btn.av-btn-play {
+  width: 44px; height: 44px; background: var(--accent); border-color: var(--accent);
+  border-radius: 50%; font-size: 16px; color: white;
+  box-shadow: 0 0 20px var(--accent-glow);
+  transition: all 0.2s;
+}
+.av-btn.av-btn-play:hover { background: var(--accent-bright); box-shadow: 0 0 30px var(--accent-glow); transform: scale(1.05); }
+.av-btn.av-btn-play:active { transform: scale(0.95); }
+
+.av-timeline {
+  flex: 1; height: 6px; -webkit-appearance: none; appearance: none;
+  background: var(--surface3); border-radius: 3px; outline: none; cursor: pointer;
+}
+.av-timeline::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 16px; height: 16px;
+  background: var(--accent); border-radius: 50%; cursor: grab;
+  box-shadow: 0 0 8px var(--accent-glow); transition: transform 0.15s;
+}
+.av-timeline::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.av-timeline::-moz-range-thumb {
+  width: 16px; height: 16px; background: var(--accent);
+  border-radius: 50%; border: none; cursor: grab;
+}
+
+.av-speed {
+  background: var(--surface3); border: 1px solid var(--border); color: var(--text-muted);
+  padding: 4px 8px; border-radius: var(--radius-sm); font-size: 12px;
+  font-family: var(--mono); font-weight: 600;
+  cursor: pointer; min-width: 48px; text-align: center;
+  transition: all 0.2s;
+}
+.av-speed:hover { border-color: var(--border-active); color: var(--text); }
+
+.av-step-count {
+  font-size: 12px; color: var(--text-dim); white-space: nowrap;
+  min-width: 55px; text-align: right; font-family: var(--mono);
+  font-weight: 500;
+}
+
+/* Legend */
+.av-legend {
+  display: flex; gap: 16px; padding: 8px 20px;
+  background: var(--surface); border-top: 1px solid var(--border);
+  flex-shrink: 0; justify-content: center;
+}
+.av-legend-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--text-dim); font-weight: 500;
+}
+.av-legend-dot {
+  width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0;
+  box-shadow: 0 0 4px rgba(0,0,0,0.2);
+}
+
+/* ================================================================
+   KEYBOARD SHORTCUTS HINT
+   ================================================================ */
+.pg-shortcuts {
+  display: flex; justify-content: center; gap: 20px;
+  padding: 8px 20px; flex-shrink: 0;
+  border-top: 1px solid var(--border-subtle);
+  background: var(--surface);
+}
+.pg-shortcut {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--text-dim);
+}
+.pg-key {
+  background: var(--surface3); border: 1px solid var(--border);
+  border-radius: 4px; padding: 1px 6px; font-size: 10px;
+  font-family: var(--mono); font-weight: 700; color: var(--text-muted);
+  min-width: 22px; text-align: center;
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 900px) {
+  .pg-container {
+    grid-template-columns: 1fr; padding: 16px;
+  }
+  .pg-header { padding: 20px 16px; }
+  .pg-header h1 { font-size: 24px; }
+  .av-canvas-wrap { min-height: 280px; }
+}
+
+/* ================================================================
+   SCROLLBAR STYLING
+   ================================================================ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border); }
+
+/* ================================================================
+   LOADING FADE-IN
+   ================================================================ */
+@keyframes pg-fadein {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.pg-container { animation: pg-fadein 0.4s ease-out; }
+</style>
+</head>
+<body>
+
+<!-- ================================================================
+     HEADER
+     ================================================================ -->
+<header class="pg-header">
+  <h1>AlgoViz Playground</h1>
+  <p class="tagline">Interactive algorithm visualizations -- <strong>no install required</strong></p>
+</header>
+
+<!-- ================================================================
+     MAIN LAYOUT
+     ================================================================ -->
+<div class="pg-container">
+
+  <!-- SIDEBAR -->
+  <aside class="pg-sidebar">
+
+    <!-- Algorithm Selector -->
+    <div class="pg-panel">
+      <div class="pg-panel-title">Algorithms</div>
+      <ul class="pg-algo-list" id="algo-list"></ul>
+    </div>
+
+    <!-- Info Panel -->
+    <div class="pg-panel" id="info-panel">
+      <div class="pg-panel-title">Details</div>
+      <div class="pg-info-grid" id="info-grid">
+        <div class="pg-info-item full">
+          <div class="info-label">Select an algorithm</div>
+          <div class="info-value desc">Choose from the list above to see algorithm details and visualization.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom JSON -->
+    <div class="pg-panel pg-json-panel">
+      <div class="pg-panel-title">Paste Custom JSON</div>
+      <textarea id="json-input" placeholder='Paste AlgoViz JSON here...&#10;&#10;{&#10;  "version": "1.0",&#10;  "metadata": { ... },&#10;  "actors": [ ... ],&#10;  "steps": [ ... ]&#10;}'></textarea>
+      <button class="pg-json-btn" id="load-json-btn">Load JSON</button>
+      <div class="pg-json-error" id="json-error"></div>
+    </div>
+
+  </aside>
+
+  <!-- PLAYER -->
+  <main class="pg-player-wrap" id="player-root">
+    <div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:500px;flex-direction:column;gap:12px;color:var(--text-dim);">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4">
+        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+      </svg>
+      <span style="font-size:15px;font-weight:500;">Select an algorithm to begin</span>
+    </div>
+  </main>
+
+</div>
+
+<!-- ================================================================
+     EMBEDDED VISUALIZATION DATA
+     ================================================================ -->
+<script>
+const ALGORITHMS = {
+  "bubble-sort": {"version":"1.0","metadata":{"algorithm":"bubble_sort","title":"Bubble Sort","description":"Repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order. The pass through the list is repeated until the list is sorted.","category":"sorting","complexity":{"time":"O(n\u00b2)","space":"O(1)","best":"O(n)","worst":"O(n\u00b2)","average":"O(n\u00b2)"},"difficulty":"beginner","inputDescription":"Array: [5, 3, 8, 1]","author":"claude","tags":["sorting","comparison","in-place","stable"]},"config":{"canvas":{"width":1000,"height":400},"playback":{"stepDuration":1000}},"actors":[{"id":"c0","type":"cell","x":310,"y":160,"width":80,"height":80,"value":5,"sublabel":"0"},{"id":"c1","type":"cell","x":410,"y":160,"width":80,"height":80,"value":3,"sublabel":"1"},{"id":"c2","type":"cell","x":510,"y":160,"width":80,"height":80,"value":8,"sublabel":"2"},{"id":"c3","type":"cell","x":610,"y":160,"width":80,"height":80,"value":1,"sublabel":"3"},{"id":"title","type":"label","x":500,"y":40,"text":"Bubble Sort","fontSize":24,"fontWeight":"bold","anchor":"middle"},{"id":"status","type":"label","x":500,"y":340,"text":"Starting: [5, 3, 8, 1]","fontSize":16,"anchor":"middle","fill":"$muted"},{"id":"pass_label","type":"label","x":500,"y":80,"text":"","fontSize":14,"anchor":"middle","fill":"$muted"}],"steps":[{"description":"Pass 1: Compare elements at index 0 and 1","actions":[{"type":"update","target":"c0","props":{"fill":"$warning"}},{"type":"update","target":"c1","props":{"fill":"$warning"}},{"type":"update","target":"status","props":{"text":"Compare: 5 > 3?"}},{"type":"update","target":"pass_label","props":{"text":"Pass 1 of 3"}}],"transition":"highlight"},{"description":"5 > 3 is true \u2014 swap them","actions":[{"type":"update","target":"c0","props":{"value":3,"label":"3","fill":"$danger"}},{"type":"update","target":"c1","props":{"value":5,"label":"5","fill":"$danger"}},{"type":"update","target":"status","props":{"text":"Yes! Swap 5 and 3 \u2192 [3, 5, 8, 1]"}}],"transition":"swap"},{"description":"Reset colors. Compare elements at index 1 and 2","actions":[{"type":"update","target":"c0","props":{"fill":"$default"}},{"type":"update","target":"c1","props":{"fill":"$warning"}},{"type":"update","target":"c2","props":{"fill":"$warning"}},{"type":"update","target":"status","props":{"text":"Compare: 5 > 8?"}}],"transition":"highlight"},{"description":"5 > 8 is false \u2014 no swap needed","actions":[{"type":"update","target":"c1","props":{"fill":"$default"}},{"type":"update","target":"c2","props":{"fill":"$default"}},{"type":"update","target":"status","props":{"text":"No. 5 \u2264 8, no swap needed"}}]},{"description":"Compare elements at index 2 and 3","actions":[{"type":"update","target":"c2","props":{"fill":"$warning"}},{"type":"update","target":"c3","props":{"fill":"$warning"}},{"type":"update","target":"status","props":{"text":"Compare: 8 > 1?"}}],"transition":"highlight"},{"description":"8 > 1 is true \u2014 swap them","actions":[{"type":"update","target":"c2","props":{"value":1,"label":"1","fill":"$danger"}},{"type":"update","target":"c3","props":{"value":8,"label":"8","fill":"$danger"}},{"type":"update","target":"status","props":{"text":"Yes! Swap 8 and 1 \u2192 [3, 5, 1, 8]"}}],"transition":"swap"},{"description":"End of Pass 1. 8 is now in its final position (largest element bubbled to the end)","actions":[{"type":"update","target":"c2","props":{"fill":"$default"}},{"type":"update","target":"c3","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"status","props":{"text":"Pass 1 complete: 8 is sorted"}}]},{"description":"Pass 2: Compare elements at index 0 and 1","actions":[{"type":"update","target":"c0","props":{"fill":"$warning"}},{"type":"update","target":"c1","props":{"fill":"$warning"}},{"type":"update","target":"status","props":{"text":"Compare: 3 > 5?"}},{"type":"update","target":"pass_label","props":{"text":"Pass 2 of 3"}}],"transition":"highlight"},{"description":"3 > 5 is false \u2014 no swap needed","actions":[{"type":"update","target":"c0","props":{"fill":"$default"}},{"type":"update","target":"c1","props":{"fill":"$default"}},{"type":"update","target":"status","props":{"text":"No. 3 \u2264 5, no swap needed"}}]},{"description":"Compare elements at index 1 and 2","actions":[{"type":"update","target":"c1","props":{"fill":"$warning"}},{"type":"update","target":"c2","props":{"fill":"$warning"}},{"type":"update","target":"status","props":{"text":"Compare: 5 > 1?"}}],"transition":"highlight"},{"description":"5 > 1 is true \u2014 swap them","actions":[{"type":"update","target":"c1","props":{"value":1,"label":"1","fill":"$danger"}},{"type":"update","target":"c2","props":{"value":5,"label":"5","fill":"$danger"}},{"type":"update","target":"status","props":{"text":"Yes! Swap 5 and 1 \u2192 [3, 1, 5, 8]"}}],"transition":"swap"},{"description":"End of Pass 2. 5 is now in its final position","actions":[{"type":"update","target":"c1","props":{"fill":"$default"}},{"type":"update","target":"c2","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"status","props":{"text":"Pass 2 complete: 5 and 8 are sorted"}}]},{"description":"Pass 3: Compare elements at index 0 and 1","actions":[{"type":"update","target":"c0","props":{"fill":"$warning"}},{"type":"update","target":"c1","props":{"fill":"$warning"}},{"type":"update","target":"status","props":{"text":"Compare: 3 > 1?"}},{"type":"update","target":"pass_label","props":{"text":"Pass 3 of 3"}}],"transition":"highlight"},{"description":"3 > 1 is true \u2014 swap them","actions":[{"type":"update","target":"c0","props":{"value":1,"label":"1","fill":"$danger"}},{"type":"update","target":"c1","props":{"value":3,"label":"3","fill":"$danger"}},{"type":"update","target":"status","props":{"text":"Yes! Swap 3 and 1 \u2192 [1, 3, 5, 8]"}}],"transition":"swap"},{"description":"Array is fully sorted: [1, 3, 5, 8]","actions":[{"type":"update","target":"c0","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"c1","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"status","props":{"text":"Done! Array sorted: [1, 3, 5, 8]","fill":"$success"}},{"type":"update","target":"pass_label","props":{"text":"Complete"}}]}]},
+
+  "binary-search": {"version":"1.0","metadata":{"algorithm":"binary_search","title":"Binary Search","description":"Efficiently finds a target value in a sorted array by repeatedly dividing the search space in half. Compares the target to the middle element and eliminates half the remaining elements each step.","category":"searching","complexity":{"time":"O(log n)","space":"O(1)","best":"O(1)","worst":"O(log n)"},"difficulty":"beginner","inputDescription":"Sorted array: [2, 5, 8, 12, 16, 23, 38, 56, 72, 91], target: 23","author":"claude","tags":["searching","divide-and-conquer","sorted-array"]},"config":{"canvas":{"width":1000,"height":450},"playback":{"stepDuration":1200}},"actors":[{"id":"c0","type":"cell","x":100,"y":180,"width":70,"height":60,"value":2,"sublabel":"0"},{"id":"c1","type":"cell","x":180,"y":180,"width":70,"height":60,"value":5,"sublabel":"1"},{"id":"c2","type":"cell","x":260,"y":180,"width":70,"height":60,"value":8,"sublabel":"2"},{"id":"c3","type":"cell","x":340,"y":180,"width":70,"height":60,"value":12,"sublabel":"3"},{"id":"c4","type":"cell","x":420,"y":180,"width":70,"height":60,"value":16,"sublabel":"4"},{"id":"c5","type":"cell","x":500,"y":180,"width":70,"height":60,"value":23,"sublabel":"5"},{"id":"c6","type":"cell","x":580,"y":180,"width":70,"height":60,"value":38,"sublabel":"6"},{"id":"c7","type":"cell","x":660,"y":180,"width":70,"height":60,"value":56,"sublabel":"7"},{"id":"c8","type":"cell","x":740,"y":180,"width":70,"height":60,"value":72,"sublabel":"8"},{"id":"c9","type":"cell","x":820,"y":180,"width":70,"height":60,"value":91,"sublabel":"9"},{"id":"pL","type":"pointer","target":"c0","position":"below","label":"low","fill":"$primary"},{"id":"pR","type":"pointer","target":"c9","position":"below","label":"high","fill":"$danger"},{"id":"pM","type":"pointer","target":"c4","position":"above","label":"mid","fill":"$warning"},{"id":"title","type":"label","x":500,"y":35,"text":"Binary Search \u2014 target: 23","fontSize":24,"fontWeight":"bold","anchor":"middle"},{"id":"status","type":"label","x":500,"y":400,"text":"Search for 23 in sorted array","fontSize":16,"anchor":"middle","fill":"$muted"},{"id":"range_label","type":"label","x":500,"y":80,"text":"Search range: indices 0\u20139","fontSize":14,"anchor":"middle","fill":"$muted"}],"steps":[{"description":"Iteration 1: low=0, high=9, mid=4. Compare arr[4]=16 with target 23","actions":[{"type":"update","target":"c4","props":{"fill":"$warning","stroke":"$warning"}},{"type":"update","target":"status","props":{"text":"mid=4 \u2192 arr[4]=16. Is 16 == 23? No. 16 < 23."}},{"type":"update","target":"range_label","props":{"text":"Iteration 1: low=0, high=9, mid=4"}}],"transition":"highlight"},{"description":"16 < 23: target is in the right half. Eliminate indices 0\u20134. Set low=5","actions":[{"type":"update","target":"c0","props":{"fill":"$muted","opacity":0.3}},{"type":"update","target":"c1","props":{"fill":"$muted","opacity":0.3}},{"type":"update","target":"c2","props":{"fill":"$muted","opacity":0.3}},{"type":"update","target":"c3","props":{"fill":"$muted","opacity":0.3}},{"type":"update","target":"c4","props":{"fill":"$muted","opacity":0.3}},{"type":"update","target":"pL","props":{"target":"c5"}},{"type":"update","target":"pM","props":{"target":"c7"}},{"type":"update","target":"status","props":{"text":"16 < 23 \u2192 search right half. low = mid + 1 = 5"}},{"type":"update","target":"range_label","props":{"text":"Eliminated left half (indices 0\u20134)"}}]},{"description":"Iteration 2: low=5, high=9, mid=7. Compare arr[7]=56 with target 23","actions":[{"type":"update","target":"c7","props":{"fill":"$warning","stroke":"$warning"}},{"type":"update","target":"status","props":{"text":"mid=7 \u2192 arr[7]=56. Is 56 == 23? No. 56 > 23."}},{"type":"update","target":"range_label","props":{"text":"Iteration 2: low=5, high=9, mid=7"}}],"transition":"highlight"},{"description":"56 > 23: target is in the left half. Eliminate indices 7\u20139. Set high=6","actions":[{"type":"update","target":"c7","props":{"fill":"$muted","opacity":0.3}},{"type":"update","target":"c8","props":{"fill":"$muted","opacity":0.3}},{"type":"update","target":"c9","props":{"fill":"$muted","opacity":0.3}},{"type":"update","target":"pR","props":{"target":"c6"}},{"type":"update","target":"pM","props":{"target":"c5"}},{"type":"update","target":"status","props":{"text":"56 > 23 \u2192 search left half. high = mid - 1 = 6"}},{"type":"update","target":"range_label","props":{"text":"Eliminated right half (indices 7\u20139)"}}]},{"description":"Iteration 3: low=5, high=6, mid=5. Compare arr[5]=23 with target 23","actions":[{"type":"update","target":"c5","props":{"fill":"$warning","stroke":"$warning"}},{"type":"update","target":"status","props":{"text":"mid=5 \u2192 arr[5]=23. Is 23 == 23? YES!"}},{"type":"update","target":"range_label","props":{"text":"Iteration 3: low=5, high=6, mid=5"}}],"transition":"highlight"},{"description":"Found! Target 23 is at index 5. Search complete in 3 iterations (log\u2082(10) \u2248 3.32)","actions":[{"type":"update","target":"c5","props":{"fill":"$success","stroke":"$success","textColor":"#ffffff"}},{"type":"update","target":"status","props":{"text":"Found 23 at index 5! (3 iterations \u2014 O(log n) confirmed)","fill":"$success"}},{"type":"update","target":"range_label","props":{"text":"Search complete"}},{"type":"remove","target":"pL"},{"type":"remove","target":"pR"},{"type":"update","target":"pM","props":{"label":"found!"}}]}]},
+
+  "bfs-graph": {"version":"1.0","metadata":{"algorithm":"bfs","title":"Breadth-First Search","description":"Explores a graph level by level, visiting all neighbors of a node before moving to the next level. Uses a queue to track nodes to visit.","category":"graph","complexity":{"time":"O(V + E)","space":"O(V)","worst":"O(V + E)"},"difficulty":"intermediate","inputDescription":"Undirected graph with 6 nodes (A-F), starting from node A","author":"claude","tags":["graph","traversal","queue","shortest-path","level-order"]},"config":{"canvas":{"width":1000,"height":700},"playback":{"stepDuration":1200}},"actors":[{"id":"nA","type":"node","x":500,"y":100,"value":"A","radius":30},{"id":"nB","type":"node","x":300,"y":250,"value":"B","radius":30},{"id":"nC","type":"node","x":700,"y":250,"value":"C","radius":30},{"id":"nD","type":"node","x":200,"y":420,"value":"D","radius":30},{"id":"nE","type":"node","x":500,"y":420,"value":"E","radius":30},{"id":"nF","type":"node","x":700,"y":420,"value":"F","radius":30},{"id":"eAB","type":"edge","source":"nA","target":"nB"},{"id":"eAC","type":"edge","source":"nA","target":"nC"},{"id":"eBD","type":"edge","source":"nB","target":"nD"},{"id":"eBE","type":"edge","source":"nB","target":"nE"},{"id":"eCE","type":"edge","source":"nC","target":"nE"},{"id":"eCF","type":"edge","source":"nC","target":"nF"},{"id":"title","type":"label","x":500,"y":35,"text":"Breadth-First Search","fontSize":24,"fontWeight":"bold","anchor":"middle"},{"id":"queue_label","type":"label","x":100,"y":560,"text":"Queue: []","fontSize":16,"fontWeight":"bold"},{"id":"visited_label","type":"label","x":100,"y":595,"text":"Visited: {}","fontSize":16,"fontWeight":"bold"},{"id":"status","type":"label","x":500,"y":650,"text":"Starting BFS from node A","fontSize":16,"anchor":"middle","fill":"$muted"}],"steps":[{"description":"Start BFS: Visit node A (the source), add it to the queue and mark as visited","actions":[{"type":"update","target":"nA","props":{"fill":"$primary","stroke":"$primary","textColor":"#ffffff"}},{"type":"update","target":"queue_label","props":{"text":"Queue: [A]"}},{"type":"update","target":"visited_label","props":{"text":"Visited: {A}"}},{"type":"update","target":"status","props":{"text":"Enqueue starting node A"}}],"transition":"highlight"},{"description":"Dequeue A. Process its neighbors: B and C","actions":[{"type":"update","target":"nA","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"queue_label","props":{"text":"Queue: []  \u2190 dequeued A"}},{"type":"update","target":"status","props":{"text":"Dequeue A \u2014 explore its neighbors"}}]},{"description":"Visit neighbor B (unvisited) \u2014 add to queue","actions":[{"type":"update","target":"nB","props":{"fill":"$primary","stroke":"$primary","textColor":"#ffffff"}},{"type":"update","target":"eAB","props":{"stroke":"$primary","strokeWidth":3}},{"type":"update","target":"queue_label","props":{"text":"Queue: [B]"}},{"type":"update","target":"visited_label","props":{"text":"Visited: {A, B}"}},{"type":"update","target":"status","props":{"text":"B is unvisited \u2192 enqueue B"}}],"transition":"highlight"},{"description":"Visit neighbor C (unvisited) \u2014 add to queue","actions":[{"type":"update","target":"nC","props":{"fill":"$primary","stroke":"$primary","textColor":"#ffffff"}},{"type":"update","target":"eAC","props":{"stroke":"$primary","strokeWidth":3}},{"type":"update","target":"queue_label","props":{"text":"Queue: [B, C]"}},{"type":"update","target":"visited_label","props":{"text":"Visited: {A, B, C}"}},{"type":"update","target":"status","props":{"text":"C is unvisited \u2192 enqueue C"}}],"transition":"highlight"},{"description":"Dequeue B. Process its neighbors: D and E","actions":[{"type":"update","target":"nB","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"queue_label","props":{"text":"Queue: [C]  \u2190 dequeued B"}},{"type":"update","target":"status","props":{"text":"Dequeue B \u2014 explore its neighbors"}}]},{"description":"Visit neighbor D (unvisited) \u2014 add to queue","actions":[{"type":"update","target":"nD","props":{"fill":"$primary","stroke":"$primary","textColor":"#ffffff"}},{"type":"update","target":"eBD","props":{"stroke":"$primary","strokeWidth":3}},{"type":"update","target":"queue_label","props":{"text":"Queue: [C, D]"}},{"type":"update","target":"visited_label","props":{"text":"Visited: {A, B, C, D}"}},{"type":"update","target":"status","props":{"text":"D is unvisited \u2192 enqueue D"}}],"transition":"highlight"},{"description":"Visit neighbor E (unvisited) \u2014 add to queue","actions":[{"type":"update","target":"nE","props":{"fill":"$primary","stroke":"$primary","textColor":"#ffffff"}},{"type":"update","target":"eBE","props":{"stroke":"$primary","strokeWidth":3}},{"type":"update","target":"queue_label","props":{"text":"Queue: [C, D, E]"}},{"type":"update","target":"visited_label","props":{"text":"Visited: {A, B, C, D, E}"}},{"type":"update","target":"status","props":{"text":"E is unvisited \u2192 enqueue E"}}],"transition":"highlight"},{"description":"Dequeue C. Process its neighbors: E and F","actions":[{"type":"update","target":"nC","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"queue_label","props":{"text":"Queue: [D, E]  \u2190 dequeued C"}},{"type":"update","target":"status","props":{"text":"Dequeue C \u2014 explore its neighbors"}}]},{"description":"Neighbor E is already visited \u2014 skip","actions":[{"type":"update","target":"eCE","props":{"stroke":"$muted","dashArray":"5,5"}},{"type":"update","target":"status","props":{"text":"E is already visited \u2192 skip"}}]},{"description":"Visit neighbor F (unvisited) \u2014 add to queue","actions":[{"type":"update","target":"nF","props":{"fill":"$primary","stroke":"$primary","textColor":"#ffffff"}},{"type":"update","target":"eCF","props":{"stroke":"$primary","strokeWidth":3}},{"type":"update","target":"queue_label","props":{"text":"Queue: [D, E, F]"}},{"type":"update","target":"visited_label","props":{"text":"Visited: {A, B, C, D, E, F}"}},{"type":"update","target":"status","props":{"text":"F is unvisited \u2192 enqueue F"}}],"transition":"highlight"},{"description":"Dequeue D. D has no unvisited neighbors","actions":[{"type":"update","target":"nD","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"queue_label","props":{"text":"Queue: [E, F]  \u2190 dequeued D"}},{"type":"update","target":"status","props":{"text":"Dequeue D \u2014 no unvisited neighbors"}}]},{"description":"Dequeue E. E has no unvisited neighbors","actions":[{"type":"update","target":"nE","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"queue_label","props":{"text":"Queue: [F]  \u2190 dequeued E"}},{"type":"update","target":"status","props":{"text":"Dequeue E \u2014 no unvisited neighbors"}}]},{"description":"Dequeue F. F has no unvisited neighbors","actions":[{"type":"update","target":"nF","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"queue_label","props":{"text":"Queue: []  \u2190 dequeued F"}},{"type":"update","target":"status","props":{"text":"Dequeue F \u2014 no unvisited neighbors"}}]},{"description":"BFS complete. All 6 nodes visited in order: A \u2192 B \u2192 C \u2192 D \u2192 E \u2192 F","actions":[{"type":"update","target":"queue_label","props":{"text":"Queue: [] (empty)"}},{"type":"update","target":"status","props":{"text":"BFS complete! Traversal order: A \u2192 B \u2192 C \u2192 D \u2192 E \u2192 F","fill":"$success"}}]}]},
+
+  "dijkstra": {"version":"1.0","metadata":{"algorithm":"dijkstra","title":"Dijkstra's Shortest Path","description":"Find shortest paths from source node A to all other nodes in a weighted directed graph using a priority queue.","category":"graph","complexity":{"time":"O((V+E) log V)","space":"O(V)"},"difficulty":"intermediate","inputDescription":"Weighted directed graph with 5 nodes, source = A"},"config":{"canvas":{"width":1000,"height":550},"playback":{"stepDuration":1200}},"actors":[{"id":"nA","type":"node","x":200,"y":200,"value":"A","radius":30,"fill":"$primary","sublabel":"dist: 0"},{"id":"nB","type":"node","x":500,"y":80,"value":"B","radius":30,"sublabel":"dist: \u221e"},{"id":"nC","type":"node","x":500,"y":320,"value":"C","radius":30,"sublabel":"dist: \u221e"},{"id":"nD","type":"node","x":780,"y":80,"value":"D","radius":30,"sublabel":"dist: \u221e"},{"id":"nE","type":"node","x":780,"y":320,"value":"E","radius":30,"sublabel":"dist: \u221e"},{"id":"eAB","type":"edge","source":"nA","target":"nB","directed":true,"weight":4,"label":"4"},{"id":"eAC","type":"edge","source":"nA","target":"nC","directed":true,"weight":2,"label":"2"},{"id":"eBC","type":"edge","source":"nB","target":"nC","directed":true,"weight":1,"label":"1"},{"id":"eBD","type":"edge","source":"nB","target":"nD","directed":true,"weight":5,"label":"5"},{"id":"eCB","type":"edge","source":"nC","target":"nB","directed":true,"weight":1,"label":"1"},{"id":"eCE","type":"edge","source":"nC","target":"nE","directed":true,"weight":7,"label":"7"},{"id":"eDE","type":"edge","source":"nD","target":"nE","directed":true,"weight":1,"label":"1"},{"id":"title","type":"label","x":500,"y":30,"text":"Dijkstra's Shortest Path from A","fontSize":22,"fontWeight":"bold","anchor":"middle"},{"id":"status","type":"label","x":500,"y":510,"text":"Priority Queue: [(A, 0)]","fontSize":14,"anchor":"middle","fill":"$muted"},{"id":"visited","type":"label","x":500,"y":475,"text":"Visited: { }","fontSize":14,"anchor":"middle","fill":"$primary"}],"steps":[{"description":"Start at source A (distance 0). Explore neighbors: B via edge weight 4, C via edge weight 2.","actions":[{"type":"update","target":"nA","props":{"fill":"$warning","stroke":"$warning"}},{"type":"update","target":"eAB","props":{"stroke":"$warning","strokeWidth":3}},{"type":"update","target":"eAC","props":{"stroke":"$warning","strokeWidth":3}},{"type":"update","target":"nB","props":{"sublabel":"dist: 4"}},{"type":"update","target":"nC","props":{"sublabel":"dist: 2"}},{"type":"update","target":"status","props":{"text":"Priority Queue: [(C, 2), (B, 4)]"}},{"type":"update","target":"visited","props":{"text":"Visited: { }"}}]},{"description":"Mark A as visited. Dequeue C (dist=2). C is the closest unvisited node.","actions":[{"type":"update","target":"nA","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"eAB","props":{"stroke":"$muted","strokeWidth":2}},{"type":"update","target":"eAC","props":{"stroke":"$success","strokeWidth":3}},{"type":"update","target":"nC","props":{"fill":"$warning","stroke":"$warning"}},{"type":"update","target":"status","props":{"text":"Priority Queue: [(B, 4)] \u2014 Dequeued (C, 2)"}},{"type":"update","target":"visited","props":{"text":"Visited: { A }"}}]},{"description":"From C: check B via C\u2192B (2+1=3 < 4, update!). Check E via C\u2192E (2+7=9).","actions":[{"type":"update","target":"eCB","props":{"stroke":"$warning","strokeWidth":3}},{"type":"update","target":"eCE","props":{"stroke":"$warning","strokeWidth":3}},{"type":"update","target":"nB","props":{"sublabel":"dist: 3 (was 4)","stroke":"$warning"}},{"type":"update","target":"nE","props":{"sublabel":"dist: 9"}},{"type":"update","target":"status","props":{"text":"Priority Queue: [(B, 3), (E, 9)] \u2014 B updated: 2+1=3 < 4"}}]},{"description":"Mark C as visited. Dequeue B (dist=3). B is the closest unvisited node.","actions":[{"type":"update","target":"nC","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"eCB","props":{"stroke":"$success","strokeWidth":3}},{"type":"update","target":"eCE","props":{"stroke":"$muted","strokeWidth":2}},{"type":"update","target":"nB","props":{"fill":"$warning","stroke":"$warning"}},{"type":"update","target":"status","props":{"text":"Priority Queue: [(E, 9)] \u2014 Dequeued (B, 3)"}},{"type":"update","target":"visited","props":{"text":"Visited: { A, C }"}}]},{"description":"From B: check C (visited, skip). Check D via B\u2192D (3+5=8). D updated to 8.","actions":[{"type":"update","target":"eBC","props":{"stroke":"$muted","dashArray":"6,4"}},{"type":"update","target":"eBD","props":{"stroke":"$warning","strokeWidth":3}},{"type":"update","target":"nD","props":{"sublabel":"dist: 8","stroke":"$warning"}},{"type":"update","target":"status","props":{"text":"Priority Queue: [(D, 8), (E, 9)] \u2014 C already visited, skip"}}]},{"description":"Mark B as visited. Dequeue D (dist=8). Check D\u2192E: 8+1=9, same as current 9, no update.","actions":[{"type":"update","target":"nB","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"eBD","props":{"stroke":"$success","strokeWidth":3}},{"type":"update","target":"nD","props":{"fill":"$warning","stroke":"$warning"}},{"type":"update","target":"eDE","props":{"stroke":"$warning","strokeWidth":3}},{"type":"update","target":"status","props":{"text":"Priority Queue: [(E, 9)] \u2014 D\u2192E: 8+1=9, no improvement"}},{"type":"update","target":"visited","props":{"text":"Visited: { A, C, B }"}}]},{"description":"Mark D as visited. Dequeue E (dist=9). E has no outgoing edges. Mark E visited.","actions":[{"type":"update","target":"nD","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"eDE","props":{"stroke":"$muted","strokeWidth":2}},{"type":"update","target":"nE","props":{"fill":"$warning","stroke":"$warning"}},{"type":"update","target":"status","props":{"text":"Priority Queue: [] \u2014 Dequeued (E, 9), no outgoing edges"}},{"type":"update","target":"visited","props":{"text":"Visited: { A, C, B, D }"}}]},{"description":"All nodes visited! Shortest paths: A\u2192A=0, A\u2192C=2, A\u2192B=3, A\u2192D=8, A\u2192E=9","actions":[{"type":"update","target":"nE","props":{"fill":"$success","stroke":"$success"}},{"type":"update","target":"nA","props":{"sublabel":"0"}},{"type":"update","target":"nB","props":{"sublabel":"3"}},{"type":"update","target":"nC","props":{"sublabel":"2"}},{"type":"update","target":"nD","props":{"sublabel":"8"}},{"type":"update","target":"nE","props":{"sublabel":"9"}},{"type":"update","target":"eAC","props":{"stroke":"$success","strokeWidth":4}},{"type":"update","target":"eCB","props":{"stroke":"$success","strokeWidth":4}},{"type":"update","target":"eBD","props":{"stroke":"$success","strokeWidth":4}},{"type":"update","target":"eCE","props":{"stroke":"$success","strokeWidth":3}},{"type":"update","target":"eAB","props":{"stroke":"$muted","dashArray":"6,4","opacity":0.4}},{"type":"update","target":"eBC","props":{"stroke":"$muted","dashArray":"6,4","opacity":0.4}},{"type":"update","target":"eDE","props":{"stroke":"$muted","dashArray":"6,4","opacity":0.4}},{"type":"update","target":"status","props":{"text":"Shortest paths from A: B=3 (A\u2192C\u2192B), C=2 (A\u2192C), D=8 (A\u2192C\u2192B\u2192D), E=9 (A\u2192C\u2192E)"}},{"type":"update","target":"visited","props":{"text":"\u2713 All nodes visited \u2014 shortest path tree shown in green","fill":"$success"}}]}]},
+
+  "merge-sort": {"version":"1.0","metadata":{"algorithm":"merge_sort","title":"Merge Sort","description":"Divide the array in half recursively, then merge sorted halves back together. Demonstrates the divide-and-conquer pattern.","category":"sorting","complexity":{"time":"O(n log n)","space":"O(n)","best":"O(n log n)","worst":"O(n log n)"},"difficulty":"intermediate","inputDescription":"Array: [5, 2, 8, 1, 9, 3]","tags":["sorting","divide-and-conquer","stable","recursive"]},"config":{"canvas":{"width":1000,"height":550},"playback":{"stepDuration":900}},"actors":[{"id":"c0","type":"cell","x":200,"y":80,"width":70,"height":60,"value":5,"sublabel":"0"},{"id":"c1","type":"cell","x":290,"y":80,"width":70,"height":60,"value":2,"sublabel":"1"},{"id":"c2","type":"cell","x":380,"y":80,"width":70,"height":60,"value":8,"sublabel":"2"},{"id":"c3","type":"cell","x":470,"y":80,"width":70,"height":60,"value":1,"sublabel":"3"},{"id":"c4","type":"cell","x":560,"y":80,"width":70,"height":60,"value":9,"sublabel":"4"},{"id":"c5","type":"cell","x":650,"y":80,"width":70,"height":60,"value":3,"sublabel":"5"},{"id":"title","type":"label","x":500,"y":30,"text":"Merge Sort \u2014 [5, 2, 8, 1, 9, 3]","fontSize":22,"fontWeight":"bold","anchor":"middle"},{"id":"status","type":"label","x":500,"y":510,"text":"Input array. We'll divide, then merge sorted halves.","fontSize":15,"anchor":"middle","fill":"$muted"},{"id":"phase","type":"label","x":500,"y":480,"text":"Phase: DIVIDE","fontSize":14,"fontWeight":"bold","anchor":"middle","fill":"$primary"},{"id":"left-label","type":"label","x":280,"y":180,"text":"","fontSize":13,"anchor":"middle","fill":"$muted"},{"id":"right-label","type":"label","x":630,"y":180,"text":"","fontSize":13,"anchor":"middle","fill":"$muted"},{"id":"m0","type":"cell","x":200,"y":320,"width":70,"height":60,"value":"","label":"","opacity":0,"sublabel":"0"},{"id":"m1","type":"cell","x":290,"y":320,"width":70,"height":60,"value":"","label":"","opacity":0,"sublabel":"1"},{"id":"m2","type":"cell","x":380,"y":320,"width":70,"height":60,"value":"","label":"","opacity":0,"sublabel":"2"},{"id":"m3","type":"cell","x":470,"y":320,"width":70,"height":60,"value":"","label":"","opacity":0,"sublabel":"3"},{"id":"m4","type":"cell","x":560,"y":320,"width":70,"height":60,"value":"","label":"","opacity":0,"sublabel":"4"},{"id":"m5","type":"cell","x":650,"y":320,"width":70,"height":60,"value":"","label":"","opacity":0,"sublabel":"5"},{"id":"merge-label","type":"label","x":500,"y":300,"text":"","fontSize":14,"fontWeight":"bold","anchor":"middle","fill":"$primary"}],"steps":[{"description":"Split array into left half [5, 2, 8] and right half [1, 9, 3]","actions":[{"type":"update","target":"c0","props":{"fill":"$primary"}},{"type":"update","target":"c1","props":{"fill":"$primary"}},{"type":"update","target":"c2","props":{"fill":"$primary"}},{"type":"update","target":"c3","props":{"fill":"$warning"}},{"type":"update","target":"c4","props":{"fill":"$warning"}},{"type":"update","target":"c5","props":{"fill":"$warning"}},{"type":"update","target":"left-label","props":{"text":"Left: [5, 2, 8]"}},{"type":"update","target":"right-label","props":{"text":"Right: [1, 9, 3]"}},{"type":"update","target":"status","props":{"text":"Divide array at midpoint (index 3). Left=[5,2,8], Right=[1,9,3]"}}]},{"description":"Recursively sort left half: [5, 2, 8] \u2192 split into [5] and [2, 8]","actions":[{"type":"update","target":"c0","props":{"fill":"$success"}},{"type":"update","target":"c1","props":{"fill":"$danger"}},{"type":"update","target":"c2","props":{"fill":"$danger"}},{"type":"update","target":"c3","props":{"fill":"$default","opacity":0.4}},{"type":"update","target":"c4","props":{"fill":"$default","opacity":0.4}},{"type":"update","target":"c5","props":{"fill":"$default","opacity":0.4}},{"type":"update","target":"left-label","props":{"text":"[5] already sorted | [2, 8] needs sorting"}},{"type":"update","target":"right-label","props":{"text":""}},{"type":"update","target":"status","props":{"text":"[5] is a single element (already sorted). Now sort [2, 8]."}}]},{"description":"Sort [2, 8]: already in order. Merge [5] + [2, 8] \u2192 [2, 5, 8]","actions":[{"type":"update","target":"c0","props":{"fill":"$success"}},{"type":"update","target":"c1","props":{"fill":"$success"}},{"type":"update","target":"c2","props":{"fill":"$success"}},{"type":"update","target":"c0","props":{"value":2,"label":"2"}},{"type":"update","target":"c1","props":{"value":5,"label":"5"}},{"type":"update","target":"c2","props":{"value":8,"label":"8"}},{"type":"update","target":"left-label","props":{"text":"Left sorted: [2, 5, 8] \u2713"}},{"type":"update","target":"status","props":{"text":"Merge [5] and [2,8]: compare 5>2, so 2 goes first \u2192 [2, 5, 8]"}},{"type":"update","target":"phase","props":{"text":"Phase: MERGE (left half)"}}],"transition":"swap"},{"description":"Now sort right half: [1, 9, 3] \u2192 split into [1] and [9, 3]","actions":[{"type":"update","target":"c0","props":{"fill":"$default","opacity":0.4}},{"type":"update","target":"c1","props":{"fill":"$default","opacity":0.4}},{"type":"update","target":"c2","props":{"fill":"$default","opacity":0.4}},{"type":"update","target":"c3","props":{"fill":"$success","opacity":1}},{"type":"update","target":"c4","props":{"fill":"$danger","opacity":1}},{"type":"update","target":"c5","props":{"fill":"$danger","opacity":1}},{"type":"update","target":"left-label","props":{"text":""}},{"type":"update","target":"right-label","props":{"text":"[1] sorted | [9, 3] needs sorting"}},{"type":"update","target":"status","props":{"text":"[1] is single (sorted). Now sort [9, 3]."}},{"type":"update","target":"phase","props":{"text":"Phase: DIVIDE (right half)"}}]},{"description":"Sort [9, 3]: 9 > 3, swap \u2192 [3, 9]. Merge [1] + [3, 9] \u2192 [1, 3, 9]","actions":[{"type":"update","target":"c3","props":{"fill":"$success","value":1,"label":"1"}},{"type":"update","target":"c4","props":{"fill":"$success","value":3,"label":"3"}},{"type":"update","target":"c5","props":{"fill":"$success","value":9,"label":"9"}},{"type":"update","target":"right-label","props":{"text":"Right sorted: [1, 3, 9] \u2713"}},{"type":"update","target":"status","props":{"text":"Merge [1] and [3,9]: 1<3, so 1 first \u2192 [1, 3, 9]"}},{"type":"update","target":"phase","props":{"text":"Phase: MERGE (right half)"}}],"transition":"swap"},{"description":"Final merge: combine sorted [2, 5, 8] and [1, 3, 9]. Compare heads: 1 < 2 \u2192 take 1","actions":[{"type":"update","target":"c0","props":{"fill":"$primary","opacity":1}},{"type":"update","target":"c1","props":{"fill":"$default","opacity":1}},{"type":"update","target":"c2","props":{"fill":"$default","opacity":1}},{"type":"update","target":"c3","props":{"fill":"$warning"}},{"type":"update","target":"c4","props":{"fill":"$default"}},{"type":"update","target":"c5","props":{"fill":"$default"}},{"type":"update","target":"merge-label","props":{"text":"Merging into output array \u2193"}},{"type":"update","target":"m0","props":{"value":1,"label":"1","opacity":1,"fill":"$success"}},{"type":"update","target":"left-label","props":{"text":"Left: [2, 5, 8]"}},{"type":"update","target":"right-label","props":{"text":"Right: [1\u2190, 3, 9]"}},{"type":"update","target":"status","props":{"text":"Compare 2 vs 1: 1 < 2, take 1 from right. Output: [1]"}},{"type":"update","target":"phase","props":{"text":"Phase: FINAL MERGE"}}]},{"description":"Compare heads: 2 < 3 \u2192 take 2 from left","actions":[{"type":"update","target":"c0","props":{"fill":"$warning"}},{"type":"update","target":"c3","props":{"fill":"$default","opacity":0.3}},{"type":"update","target":"c4","props":{"fill":"$primary"}},{"type":"update","target":"m1","props":{"value":2,"label":"2","opacity":1,"fill":"$success"}},{"type":"update","target":"left-label","props":{"text":"Left: [2\u2190, 5, 8]"}},{"type":"update","target":"right-label","props":{"text":"Right: [3, 9]"}},{"type":"update","target":"status","props":{"text":"Compare 2 vs 3: 2 < 3, take 2 from left. Output: [1, 2]"}}]},{"description":"Compare heads: 5 > 3 \u2192 take 3 from right","actions":[{"type":"update","target":"c0","props":{"fill":"$default","opacity":0.3}},{"type":"update","target":"c1","props":{"fill":"$primary"}},{"type":"update","target":"c4","props":{"fill":"$warning"}},{"type":"update","target":"m2","props":{"value":3,"label":"3","opacity":1,"fill":"$success"}},{"type":"update","target":"left-label","props":{"text":"Left: [5, 8]"}},{"type":"update","target":"right-label","props":{"text":"Right: [3\u2190, 9]"}},{"type":"update","target":"status","props":{"text":"Compare 5 vs 3: 3 < 5, take 3 from right. Output: [1, 2, 3]"}}]},{"description":"Compare heads: 5 < 9 \u2192 take 5 from left","actions":[{"type":"update","target":"c1","props":{"fill":"$warning"}},{"type":"update","target":"c4","props":{"fill":"$default","opacity":0.3}},{"type":"update","target":"c5","props":{"fill":"$primary"}},{"type":"update","target":"m3","props":{"value":5,"label":"5","opacity":1,"fill":"$success"}},{"type":"update","target":"left-label","props":{"text":"Left: [5\u2190, 8]"}},{"type":"update","target":"right-label","props":{"text":"Right: [9]"}},{"type":"update","target":"status","props":{"text":"Compare 5 vs 9: 5 < 9, take 5 from left. Output: [1, 2, 3, 5]"}}]},{"description":"Compare heads: 8 < 9 \u2192 take 8 from left","actions":[{"type":"update","target":"c1","props":{"fill":"$default","opacity":0.3}},{"type":"update","target":"c2","props":{"fill":"$warning"}},{"type":"update","target":"m4","props":{"value":8,"label":"8","opacity":1,"fill":"$success"}},{"type":"update","target":"left-label","props":{"text":"Left: [8\u2190]"}},{"type":"update","target":"right-label","props":{"text":"Right: [9]"}},{"type":"update","target":"status","props":{"text":"Compare 8 vs 9: 8 < 9, take 8 from left. Output: [1, 2, 3, 5, 8]"}}]},{"description":"Left exhausted. Take remaining 9 from right","actions":[{"type":"update","target":"c2","props":{"fill":"$default","opacity":0.3}},{"type":"update","target":"c5","props":{"fill":"$warning"}},{"type":"update","target":"m5","props":{"value":9,"label":"9","opacity":1,"fill":"$success"}},{"type":"update","target":"left-label","props":{"text":"Left: [] (empty)"}},{"type":"update","target":"right-label","props":{"text":"Right: [9\u2190]"}},{"type":"update","target":"status","props":{"text":"Left half exhausted. Append remaining 9. Output: [1, 2, 3, 5, 8, 9]"}}]},{"description":"Merge sort complete! Array sorted: [1, 2, 3, 5, 8, 9]","actions":[{"type":"update","target":"c0","props":{"opacity":0.15}},{"type":"update","target":"c1","props":{"opacity":0.15}},{"type":"update","target":"c2","props":{"opacity":0.15}},{"type":"update","target":"c3","props":{"opacity":0.15}},{"type":"update","target":"c4","props":{"opacity":0.15}},{"type":"update","target":"c5","props":{"opacity":0.15}},{"type":"update","target":"m0","props":{"fill":"$success"}},{"type":"update","target":"m1","props":{"fill":"$success"}},{"type":"update","target":"m2","props":{"fill":"$success"}},{"type":"update","target":"m3","props":{"fill":"$success"}},{"type":"update","target":"m4","props":{"fill":"$success"}},{"type":"update","target":"m5","props":{"fill":"$success"}},{"type":"update","target":"merge-label","props":{"text":"\u2713 Sorted Result"}},{"type":"update","target":"left-label","props":{"text":""}},{"type":"update","target":"right-label","props":{"text":""}},{"type":"update","target":"status","props":{"text":"Merge sort complete! [5,2,8,1,9,3] \u2192 [1,2,3,5,8,9] in O(n log n) time."}},{"type":"update","target":"phase","props":{"text":"\u2713 SORTED","fill":"$success"}}]}]}
+};
+
+// Algorithm display metadata
+const ALGO_META = [
+  { key: "bubble-sort",    icon: "\u2195",  name: "Bubble Sort" },
+  { key: "binary-search",  icon: "\ud83d\udd0d", name: "Binary Search" },
+  { key: "bfs-graph",      icon: "\ud83c\udf10", name: "BFS Graph" },
+  { key: "dijkstra",       icon: "\ud83d\udee4",  name: "Dijkstra's Algorithm" },
+  { key: "merge-sort",     icon: "\ud83d\udd00", name: "Merge Sort" }
+];
+</script>
+
+<!-- ================================================================
+     RENDERING ENGINE (from artifact-player.html)
+     ================================================================ -->
+<script>
+(function(){"use strict";
+
+const D = {
+  canvas: { width: 1000, height: 600, padding: 40, background: "#ffffff" },
+  theme: {
+    default: "#e2e8f0", primary: "#6c8cff", secondary: "#a78bfa",
+    success: "#34d399", warning: "#fbbf24", danger: "#f87171",
+    text: "#1e293b", muted: "#94a3b8"
+  },
+  playback: { stepDuration: 800, autoPlay: false }
+};
+
+const SPEEDS = [0.25, 0.5, 1, 1.5, 2, 3];
+const NS = "http://www.w3.org/2000/svg";
+
+// ---- State Engine ----
+
+class Engine {
+  constructor(v) {
+    this.viz = v;
+    this.config = this._mc(v.config || {});
+    this.totalSteps = v.steps.length;
+    this.currentStep = -1;
+    this.actorStates = new Map();
+    this._init();
+  }
+
+  _mc(c) {
+    return {
+      canvas: { ...D.canvas, ...(c.canvas || {}) },
+      theme: { ...D.theme, ...(c.theme || {}) },
+      playback: { ...D.playback, ...(c.playback || {}) }
+    };
+  }
+
+  _init() {
+    this.actorStates.clear();
+    for (const a of this.viz.actors) this.actorStates.set(a.id, { ...a });
+    this.currentStep = -1;
+  }
+
+  resolveColor(c) {
+    if (!c) return null;
+    if (typeof c === "string" && c.startsWith("$"))
+      return this.config.theme[c.slice(1)] || c;
+    return c;
+  }
+
+  _apply(actions) {
+    for (const a of actions) {
+      if (a.type === "update") {
+        const s = this.actorStates.get(a.target);
+        if (s) Object.assign(s, a.props);
+      } else if (a.type === "create") {
+        this.actorStates.set(a.actor.id, { ...a.actor });
+      } else if (a.type === "remove") {
+        this.actorStates.delete(a.target);
+      }
+    }
+  }
+
+  goToStep(n) {
+    n = Math.max(-1, Math.min(n, this.totalSteps - 1));
+    this._init();
+    for (let i = 0; i <= n; i++) this._apply(this.viz.steps[i].actions);
+    this.currentStep = n;
+    return this.getScene();
+  }
+
+  nextStep() { return this.currentStep < this.totalSteps - 1 ? this.goToStep(this.currentStep + 1) : null; }
+  prevStep() { return this.currentStep >= 0 ? this.goToStep(this.currentStep - 1) : null; }
+
+  getScene() {
+    const changedIds = new Set();
+    if (this.currentStep >= 0) {
+      for (const a of this.viz.steps[this.currentStep].actions) {
+        if (a.type === "update") changedIds.add(a.target);
+        else if (a.type === "create") changedIds.add(a.actor.id);
+      }
+    }
+    const curStep = this.currentStep >= 0 ? this.viz.steps[this.currentStep] : null;
+    return {
+      stepIndex: this.currentStep,
+      description: curStep ? curStep.description : (this.viz.metadata.description || ""),
+      narration: curStep?.narration || null,
+      phase: curStep?.phase || null,
+      annotation: curStep?.annotation || null,
+      transition: curStep ? (curStep.transition || "smooth") : "instant",
+      actors: new Map(this.actorStates),
+      changedIds,
+    };
+  }
+
+  get atEnd() { return this.currentStep >= this.totalSteps - 1; }
+  get atStart() { return this.currentStep <= -1; }
+}
+
+// ---- SVG Renderer ----
+
+class Renderer {
+  constructor(c, e) {
+    this.container = c;
+    this.engine = e;
+    this.svg = null;
+    this.elements = new Map();
+    this.defs = null;
+    this._uid = 'av-' + Math.random().toString(36).slice(2,8);
+  }
+
+  init() {
+    const cfg = this.engine.config.canvas;
+    const uid = this._uid;
+    this.svg = this._el("svg", {
+      viewBox: `0 0 ${cfg.width} ${cfg.height}`,
+      preserveAspectRatio: "xMidYMid meet"
+    });
+
+    this.defs = this._el("defs");
+
+    const m = this._el("marker", {
+      id: uid + "-arrow", viewBox: "0 0 10 10",
+      refX: 9, refY: 5, markerWidth: 8, markerHeight: 8,
+      orient: "auto-start-reverse"
+    });
+    m.appendChild(this._el("path", { d: "M 0 0 L 10 5 L 0 10 z", fill: "currentColor" }));
+    this.defs.appendChild(m);
+
+    const shadowFilter = this._el("filter", { id: uid + "-shadow", x: "-10%", y: "-10%", width: "130%", height: "140%" });
+    const feFlood = this._el("feFlood", { "flood-color": "rgba(0,0,0,0.08)", result: "flood" });
+    const feComposite = this._el("feComposite", { in: "flood", in2: "SourceGraphic", operator: "in", result: "shadow" });
+    const feOffset = this._el("feGaussianBlur", { in: "shadow", stdDeviation: "3", result: "blur" });
+    const feOff = this._el("feOffset", { in: "blur", dx: "0", dy: "3", result: "offsetBlur" });
+    const feMerge = this._el("feMerge");
+    feMerge.appendChild(this._el("feMergeNode", { in: "offsetBlur" }));
+    feMerge.appendChild(this._el("feMergeNode", { in: "SourceGraphic" }));
+    shadowFilter.appendChild(feFlood);
+    shadowFilter.appendChild(feComposite);
+    shadowFilter.appendChild(feOffset);
+    shadowFilter.appendChild(feOff);
+    shadowFilter.appendChild(feMerge);
+    this.defs.appendChild(shadowFilter);
+
+    const glowFilter = this._el("filter", { id: uid + "-glow", x: "-30%", y: "-30%", width: "160%", height: "160%" });
+    const glowBlur = this._el("feGaussianBlur", { in: "SourceGraphic", stdDeviation: "4", result: "blur" });
+    const glowMerge = this._el("feMerge");
+    glowMerge.appendChild(this._el("feMergeNode", { in: "blur" }));
+    glowMerge.appendChild(this._el("feMergeNode", { in: "SourceGraphic" }));
+    glowFilter.appendChild(glowBlur);
+    glowFilter.appendChild(glowMerge);
+    this.defs.appendChild(glowFilter);
+
+    this.svg.appendChild(this.defs);
+
+    const bg = this._el("rect", {
+      x: 0, y: 0, width: cfg.width, height: cfg.height,
+      fill: cfg.background, class: "av-bg", rx: 12
+    });
+    this.svg.appendChild(bg);
+
+    const pattern = this._el("pattern", {
+      id: uid + "-dots", width: 30, height: 30, patternUnits: "userSpaceOnUse"
+    });
+    pattern.appendChild(this._el("circle", { cx: 15, cy: 15, r: 0.8, fill: "#e0e4ea" }));
+    this.defs.appendChild(pattern);
+    this.svg.appendChild(this._el("rect", {
+      x: 0, y: 0, width: cfg.width, height: cfg.height,
+      fill: `url(#${uid}-dots)`, opacity: 0.6
+    }));
+
+    this.regionLayer = this._el("g", { class: "av-layer-regions" });
+    this.edgeLayer = this._el("g", { class: "av-layer-edges" });
+    this.actorLayer = this._el("g", { class: "av-layer-actors" });
+    this.svg.appendChild(this.regionLayer);
+    this.svg.appendChild(this.edgeLayer);
+    this.svg.appendChild(this.actorLayer);
+
+    this.container.appendChild(this.svg);
+    this.render(this.engine.getScene());
+  }
+
+  render(scene) {
+    this.svg.classList.remove("av-transition-instant", "av-transition-swap", "av-transition-smooth");
+    if (scene.transition === "instant") this.svg.classList.add("av-transition-instant");
+    else if (scene.transition === "swap") this.svg.classList.add("av-transition-swap");
+
+    const ids = new Set(scene.actors.keys());
+    for (const [id, el] of this.elements) {
+      if (!ids.has(id)) { el.group.remove(); this.elements.delete(id); }
+    }
+    for (const [id, actor] of scene.actors) {
+      if (this.elements.has(id)) this._update(id, actor, scene);
+      else this._create(actor, scene);
+    }
+  }
+
+  _create(a, scene) {
+    const g = this._el("g", { class: "av-actor", "data-id": a.id });
+    const entry = { group: g, type: a.type };
+    this.elements.set(a.id, entry);
+    const rc = this._rc;
+    const uid = this._uid;
+
+    switch (a.type) {
+      case "cell": {
+        const w = a.width || 60, h = a.height || 60;
+        const fill = rc(a.fill, "$default");
+        entry.rect = this._add(g, "rect", {
+          x: a.x, y: a.y, width: w, height: h,
+          rx: a.cornerRadius ?? 8, ry: a.cornerRadius ?? 8,
+          fill: fill,
+          stroke: rc(a.stroke, "$muted"), "stroke-width": a.strokeWidth ?? 1.5,
+          opacity: a.opacity ?? 1,
+          filter: `url(#${uid}-shadow)`
+        });
+        entry.label = this._addText(g, a.x + w / 2, a.y + h / 2,
+          a.label ?? String(a.value), {
+            fill: rc(a.textColor, "$text"),
+            "font-size": a.fontSize || 18,
+            "font-weight": "700",
+            "font-family": "'JetBrains Mono', monospace"
+          });
+        if (a.sublabel) {
+          entry.sublabel = this._addText(g, a.x + w / 2, a.y + h + 18,
+            a.sublabel, {
+              fill: rc(null, "$muted"),
+              "font-size": 11,
+              "font-family": "'JetBrains Mono', monospace",
+              opacity: 0.7
+            });
+        }
+        break;
+      }
+      case "node": {
+        const r = a.radius || 25;
+        const fill = rc(a.fill, "$default");
+        entry.circle = this._add(g, "circle", {
+          cx: a.x, cy: a.y, r,
+          fill: fill,
+          stroke: rc(a.stroke, "$muted"), "stroke-width": a.strokeWidth ?? 2,
+          opacity: a.opacity ?? 1,
+          filter: `url(#${uid}-shadow)`
+        });
+        entry.label = this._addText(g, a.x, a.y,
+          a.label ?? String(a.value), {
+            fill: rc(a.textColor, "$text"),
+            "font-size": a.fontSize || 15,
+            "font-weight": "700"
+          });
+        if (a.sublabel) {
+          entry.sublabel = this._addText(g, a.x, a.y + r + 20,
+            a.sublabel, { fill: rc(null, "$muted"), "font-size": 12 });
+        }
+        break;
+      }
+      case "edge": {
+        const { x1, y1, x2, y2 } = this._ec(a, scene);
+        entry.line = this._add(g, "line", {
+          x1, y1, x2, y2,
+          stroke: rc(a.stroke, "$muted"),
+          "stroke-width": a.strokeWidth ?? 2,
+          "stroke-linecap": "round",
+          "stroke-dasharray": a.dashArray || "",
+          opacity: a.opacity ?? 0.6,
+          "marker-end": a.directed ? `url(#${uid}-arrow)` : ""
+        });
+        g.style.color = rc(a.stroke, "$muted");
+        const t = a.label || (a.weight != null ? String(a.weight) : "");
+        if (t) {
+          entry.midLabel = this._addText(g,
+            (x1 + x2) / 2, (y1 + y2) / 2 - 12, t, {
+              fill: rc(null, "$text"), "font-size": 12, "font-weight": "600",
+              "font-family": "'JetBrains Mono', monospace"
+            });
+        }
+        break;
+      }
+      case "pointer": {
+        const { px, py, tx, ty } = this._pc(a, scene);
+        entry.tri = this._add(g, "polygon", {
+          points: this._tp(a.position, tx, ty),
+          fill: rc(a.fill, "$primary")
+        });
+        entry.label = this._addText(g, px, py, a.label || "", {
+          fill: rc(a.textColor, "$primary"),
+          "font-size": a.fontSize || 13,
+          "font-weight": "700",
+          "font-family": "'JetBrains Mono', monospace"
+        });
+        g.setAttribute("opacity", a.opacity ?? 1);
+        break;
+      }
+      case "label": {
+        entry.text = this._addText(g, a.x, a.y, a.text, {
+          "text-anchor": a.anchor || "start",
+          fill: rc(a.fill, "$text"),
+          "font-size": a.fontSize || 16,
+          "font-weight": a.fontWeight || "normal",
+          opacity: a.opacity ?? 1
+        });
+        break;
+      }
+      case "region": {
+        entry.rect = this._add(g, "rect", {
+          x: a.x, y: a.y, width: a.width, height: a.height,
+          rx: a.cornerRadius ?? 10,
+          fill: rc(a.fill, "$success"),
+          stroke: rc(a.stroke, "$success"),
+          "stroke-width": a.strokeWidth ?? 1.5,
+          opacity: a.opacity ?? 0.12,
+          "stroke-dasharray": "4 2"
+        });
+        if (a.label) {
+          entry.label = this._addText(g,
+            a.x + a.width / 2, a.y + a.height / 2, a.label, {
+              fill: rc(a.stroke, "$success"),
+              "font-size": 13, "font-weight": "600", opacity: 0.7
+            });
+        }
+        break;
+      }
+    }
+
+    const layer = a.type === "edge" ? this.edgeLayer
+      : a.type === "region" ? this.regionLayer
+      : this.actorLayer;
+    layer.appendChild(g);
+  }
+
+  _update(id, a, scene) {
+    const e = this.elements.get(id);
+    const rc = this._rc;
+    const changed = scene.changedIds && scene.changedIds.has(id);
+    const uid = this._uid;
+
+    switch (a.type) {
+      case "cell": {
+        const w = a.width || 60, h = a.height || 60;
+        const fill = rc(a.fill, "$default");
+        const isActive = fill && fill !== rc(null, "$default") && fill !== rc(null, "$success");
+        this._sa(e.rect, {
+          x: a.x, y: a.y, width: w, height: h,
+          rx: a.cornerRadius ?? 8, ry: a.cornerRadius ?? 8,
+          fill: fill,
+          stroke: rc(a.stroke, "$muted"), "stroke-width": a.strokeWidth ?? 1.5,
+          opacity: a.opacity ?? 1,
+          filter: isActive && changed ? `url(#${uid}-glow)` : `url(#${uid}-shadow)`
+        });
+        if (changed && isActive) {
+          e.group.style.transformOrigin = `${a.x + w/2}px ${a.y + h/2}px`;
+          e.group.style.transform = "scale(1.08)";
+          setTimeout(() => { if (e.group) e.group.style.transform = "scale(1)"; }, 400);
+        }
+        this._sa(e.label, {
+          x: a.x + w / 2, y: a.y + h / 2,
+          fill: rc(a.textColor, "$text"), "font-size": a.fontSize || 18
+        });
+        e.label.textContent = a.label ?? String(a.value);
+        if (e.sublabel) {
+          this._sa(e.sublabel, { x: a.x + w / 2, y: a.y + h + 18 });
+          if (a.sublabel !== undefined) e.sublabel.textContent = a.sublabel;
+        }
+        break;
+      }
+      case "node": {
+        const r = a.radius || 25;
+        const fill = rc(a.fill, "$default");
+        const isActive = fill && fill !== rc(null, "$default") && fill !== rc(null, "$success");
+        this._sa(e.circle, {
+          cx: a.x, cy: a.y, r,
+          fill: fill,
+          stroke: rc(a.stroke, "$muted"), "stroke-width": a.strokeWidth ?? 2,
+          opacity: a.opacity ?? 1,
+          filter: isActive && changed ? `url(#${uid}-glow)` : `url(#${uid}-shadow)`
+        });
+        if (changed && isActive) {
+          e.group.style.transformOrigin = `${a.x}px ${a.y}px`;
+          e.group.style.transform = "scale(1.15)";
+          setTimeout(() => { if (e.group) e.group.style.transform = "scale(1)"; }, 400);
+        }
+        this._sa(e.label, {
+          x: a.x, y: a.y,
+          fill: rc(a.textColor, "$text"), "font-size": a.fontSize || 15
+        });
+        e.label.textContent = a.label ?? String(a.value);
+        if (e.sublabel) {
+          this._sa(e.sublabel, { x: a.x, y: a.y + r + 20 });
+          if (a.sublabel !== undefined) e.sublabel.textContent = a.sublabel;
+        }
+        break;
+      }
+      case "edge": {
+        const { x1, y1, x2, y2 } = this._ec(a, scene);
+        const stroke = rc(a.stroke, "$muted");
+        const sw = a.strokeWidth ?? 2;
+        const isHighlighted = sw > 2;
+        this._sa(e.line, {
+          x1, y1, x2, y2,
+          stroke: stroke,
+          "stroke-width": sw,
+          "stroke-linecap": "round",
+          "stroke-dasharray": a.dashArray || "",
+          opacity: isHighlighted ? 1 : (a.opacity ?? 0.6),
+          "marker-end": a.directed ? `url(#${uid}-arrow)` : ""
+        });
+        e.group.style.color = stroke;
+        if (e.midLabel) {
+          this._sa(e.midLabel, {
+            x: (x1 + x2) / 2, y: (y1 + y2) / 2 - 12,
+            fill: rc(null, "$text")
+          });
+        }
+        break;
+      }
+      case "pointer": {
+        const { px, py, tx, ty } = this._pc(a, scene);
+        this._sa(e.tri, { points: this._tp(a.position, tx, ty), fill: rc(a.fill, "$primary") });
+        this._sa(e.label, {
+          x: px, y: py,
+          fill: rc(a.textColor, "$primary"), "font-size": a.fontSize || 13
+        });
+        e.label.textContent = a.label || "";
+        e.group.setAttribute("opacity", a.opacity ?? 1);
+        break;
+      }
+      case "label": {
+        this._sa(e.text, {
+          x: a.x, y: a.y, "text-anchor": a.anchor || "start",
+          fill: rc(a.fill, "$text"),
+          "font-size": a.fontSize || 16,
+          "font-weight": a.fontWeight || "normal",
+          opacity: a.opacity ?? 1
+        });
+        e.text.textContent = a.text;
+        break;
+      }
+      case "region": {
+        this._sa(e.rect, {
+          x: a.x, y: a.y, width: a.width, height: a.height,
+          rx: a.cornerRadius ?? 10,
+          fill: rc(a.fill, "$success"),
+          stroke: rc(a.stroke, "$success"),
+          "stroke-width": a.strokeWidth ?? 1.5,
+          opacity: a.opacity ?? 0.12
+        });
+        if (e.label) {
+          this._sa(e.label, {
+            x: a.x + a.width / 2, y: a.y + a.height / 2,
+            fill: rc(a.stroke, "$success")
+          });
+          if (a.label !== undefined) e.label.textContent = a.label;
+        }
+        break;
+      }
+    }
+  }
+
+  _ec(a, scene) {
+    const src = scene.actors.get(a.source), tgt = scene.actors.get(a.target);
+    if (!src || !tgt) return { x1: 0, y1: 0, x2: 0, y2: 0 };
+    let x1, y1, x2, y2;
+    if (src.type === "node") { x1 = src.x; y1 = src.y; }
+    else { x1 = src.x + (src.width || 60) / 2; y1 = src.y + (src.height || 60) / 2; }
+    if (tgt.type === "node") { x2 = tgt.x; y2 = tgt.y; }
+    else { x2 = tgt.x + (tgt.width || 60) / 2; y2 = tgt.y + (tgt.height || 60) / 2; }
+    if (a.directed && tgt.type === "node") {
+      const r = tgt.radius || 25;
+      const dx = x2 - x1, dy = y2 - y1, d = Math.sqrt(dx * dx + dy * dy);
+      if (d > 0) { x2 -= (dx / d) * r; y2 -= (dy / d) * r; }
+    }
+    return { x1, y1, x2, y2 };
+  }
+
+  _pc(a, scene) {
+    const t = scene.actors.get(a.target);
+    if (!t) return { px: 0, py: 0, tx: 0, ty: 0 };
+    let cx, cy, o;
+    if (t.type === "node") { cx = t.x; cy = t.y; o = (t.radius || 25) + 12; }
+    else if (t.type === "cell") { cx = t.x + (t.width || 60) / 2; cy = t.y + (t.height || 60) / 2; o = (t.height || 60) / 2 + 12; }
+    else { cx = t.x || 0; cy = t.y || 0; o = 22; }
+    const p = a.position; let px, py, tx, ty;
+    if (p === "above") { tx = cx; ty = cy - o; px = cx; py = ty - 18; }
+    else if (p === "below") { tx = cx; ty = cy + o; px = cx; py = ty + 18; }
+    else if (p === "left") { tx = cx - o; ty = cy; px = tx - 18; py = cy; }
+    else { tx = cx + o; ty = cy; px = tx + 18; py = cy; }
+    return { px, py, tx, ty };
+  }
+
+  _tp(p, tx, ty) {
+    const s = 6;
+    if (p === "above") return `${tx},${ty+s} ${tx-s},${ty-s} ${tx+s},${ty-s}`;
+    if (p === "below") return `${tx},${ty-s} ${tx-s},${ty+s} ${tx+s},${ty+s}`;
+    if (p === "left") return `${tx+s},${ty} ${tx-s},${ty-s} ${tx-s},${ty+s}`;
+    return `${tx-s},${ty} ${tx+s},${ty-s} ${tx+s},${ty+s}`;
+  }
+
+  get _rc() { return (v, f) => { const c = v ?? f; return this.engine.resolveColor(c); }; }
+
+  _el(t, a) {
+    const e = document.createElementNS(NS, t);
+    if (a) this._sa(e, a);
+    return e;
+  }
+
+  _sa(e, a) {
+    for (const [k, v] of Object.entries(a)) {
+      if (v === undefined || v === null) continue;
+      e.setAttribute(k, String(v));
+    }
+  }
+
+  _add(g, t, a) { const e = this._el(t, a); g.appendChild(e); return e; }
+
+  _addText(g, x, y, text, extra) {
+    const e = this._el("text", {
+      x, y, "text-anchor": "middle", "dominant-baseline": "central",
+      "font-family": "inherit", ...extra
+    });
+    e.textContent = text;
+    g.appendChild(e);
+    return e;
+  }
+}
+
+// ---- Player UI ----
+
+class Player {
+  constructor(container, viz) {
+    this.root = typeof container === "string" ? document.querySelector(container) : container;
+    this.engine = new Engine(viz);
+    this.renderer = null;
+    this.playing = false;
+    this.timer = null;
+    this.speed = 1;
+    this._keyHandler = null;
+    this._build();
+    this._bind();
+  }
+
+  _build() {
+    this.root.innerHTML = "";
+    const viz = this.engine.viz, meta = viz.metadata;
+
+    // Header
+    const header = this._div("av-header");
+    const h1 = document.createElement("h1");
+    h1.textContent = meta.title;
+    header.appendChild(h1);
+    const metaDiv = this._div("av-meta");
+    if (meta.category) {
+      const b = document.createElement("span");
+      b.className = "av-badge av-badge-accent";
+      b.textContent = meta.category;
+      metaDiv.appendChild(b);
+    }
+    if (meta.complexity?.time) {
+      const b = document.createElement("span");
+      b.className = "av-badge";
+      b.textContent = meta.complexity.time;
+      metaDiv.appendChild(b);
+    }
+    if (meta.difficulty) {
+      const b = document.createElement("span");
+      b.className = "av-badge";
+      b.textContent = meta.difficulty;
+      metaDiv.appendChild(b);
+    }
+    header.appendChild(metaDiv);
+    this.root.appendChild(header);
+
+    // Canvas
+    const main = this._div("av-main");
+    const cw = this._div("av-canvas-wrap");
+    main.appendChild(cw);
+    this.root.appendChild(main);
+
+    // Legend
+    const legend = this._div("av-legend");
+    const legendItems = [
+      ["#e2e8f0", "Default"],
+      ["#6c8cff", "Active"],
+      ["#fbbf24", "Comparing"],
+      ["#f87171", "Swapping"],
+      ["#34d399", "Sorted/Done"]
+    ];
+    for (const [color, text] of legendItems) {
+      const item = this._div("av-legend-item");
+      const dot = document.createElement("span");
+      dot.className = "av-legend-dot";
+      dot.style.background = color;
+      const lbl = document.createElement("span");
+      lbl.textContent = text;
+      item.appendChild(dot);
+      item.appendChild(lbl);
+      legend.appendChild(item);
+    }
+    this.root.appendChild(legend);
+
+    // Description
+    const desc = this._div("av-description");
+    this.descStep = document.createElement("span");
+    this.descStep.className = "av-description-step";
+    this.annotationBadge = document.createElement("span");
+    this.annotationBadge.className = "av-annotation-badge";
+    this.annotationBadge.style.display = "none";
+    this.phaseBadge = document.createElement("span");
+    this.phaseBadge.className = "av-phase-badge";
+    this.phaseBadge.style.display = "none";
+    this.descText = document.createElement("span");
+    this.descText.className = "av-description-text";
+    desc.appendChild(this.descStep);
+    desc.appendChild(this.annotationBadge);
+    desc.appendChild(this.phaseBadge);
+    desc.appendChild(this.descText);
+    this.root.appendChild(desc);
+
+    // Controls
+    const ctrl = this._div("av-controls");
+    this.btnPrev = this._btn("\u25C0", "av-btn", "Previous (\u2190)");
+    this.btnPlay = this._btn("\u25B6", "av-btn av-btn-play", "Play/Pause (Space)");
+    this.btnNext = this._btn("\u25B6", "av-btn", "Next (\u2192)");
+    this.timeline = document.createElement("input");
+    this.timeline.type = "range";
+    this.timeline.className = "av-timeline";
+    this.timeline.min = -1;
+    this.timeline.max = this.engine.totalSteps - 1;
+    this.timeline.value = -1;
+    this.speedBtn = document.createElement("button");
+    this.speedBtn.className = "av-speed";
+    this.speedBtn.textContent = "1\u00d7";
+    this.stepCount = document.createElement("span");
+    this.stepCount.className = "av-step-count";
+
+    [this.btnPrev, this.btnPlay, this.btnNext, this.timeline, this.speedBtn, this.stepCount]
+      .forEach(e => ctrl.appendChild(e));
+    this.root.appendChild(ctrl);
+
+    // Shortcuts
+    const shortcuts = this._div("pg-shortcuts");
+    const shortcutData = [
+      ["\u2190", "Prev"], ["\u2192", "Next"], ["Space", "Play/Pause"], ["Home", "Start"], ["End", "End"]
+    ];
+    for (const [key, label] of shortcutData) {
+      const item = this._div("pg-shortcut");
+      const k = document.createElement("span");
+      k.className = "pg-key";
+      k.textContent = key;
+      const l = document.createElement("span");
+      l.textContent = label;
+      item.appendChild(k);
+      item.appendChild(l);
+      shortcuts.appendChild(item);
+    }
+    this.root.appendChild(shortcuts);
+
+    // Init renderer
+    this.renderer = new Renderer(cw, this.engine);
+    this.renderer.init();
+    this._updateUI();
+  }
+
+  _bind() {
+    this.btnPlay.addEventListener("click", () => this.togglePlay());
+    this.btnPrev.addEventListener("click", () => { this.pause(); this._step(-1); });
+    this.btnNext.addEventListener("click", () => { this.pause(); this._step(1); });
+    this.timeline.addEventListener("input", () => {
+      this.pause();
+      const s = this.engine.goToStep(parseInt(this.timeline.value));
+      this.renderer.render(s);
+      this._updateUI();
+    });
+    this.speedBtn.addEventListener("click", () => {
+      const i = SPEEDS.indexOf(this.speed);
+      this.speed = SPEEDS[(i + 1) % SPEEDS.length];
+      this.speedBtn.textContent = this.speed + "\u00d7";
+    });
+    // Remove old key handler if any
+    if (this._keyHandler) document.removeEventListener("keydown", this._keyHandler);
+    this._keyHandler = (e) => {
+      if (e.target.tagName === "TEXTAREA") return;
+      if (e.target.tagName === "INPUT" && e.target.type !== "range") return;
+      switch (e.key) {
+        case " ": e.preventDefault(); this.togglePlay(); break;
+        case "ArrowRight": e.preventDefault(); this.pause(); this._step(1); break;
+        case "ArrowLeft": e.preventDefault(); this.pause(); this._step(-1); break;
+        case "Home": e.preventDefault(); this.pause(); this.engine.goToStep(-1); this._render(); break;
+        case "End": e.preventDefault(); this.pause(); this.engine.goToStep(this.engine.totalSteps - 1); this._render(); break;
+      }
+    };
+    document.addEventListener("keydown", this._keyHandler);
+  }
+
+  destroy() {
+    this.pause();
+    if (this._keyHandler) document.removeEventListener("keydown", this._keyHandler);
+    this.root.innerHTML = "";
+  }
+
+  togglePlay() { this.playing ? this.pause() : this.play(); }
+
+  play() {
+    if (this.engine.atEnd) { this.engine.goToStep(-1); this._render(); }
+    this.playing = true;
+    this.btnPlay.textContent = "\u23F8";
+    this._tick();
+  }
+
+  pause() {
+    this.playing = false;
+    if (this.btnPlay) this.btnPlay.textContent = "\u25B6";
+    clearTimeout(this.timer);
+  }
+
+  _tick() {
+    if (!this.playing) return;
+    const s = this.engine.nextStep();
+    if (s) {
+      this.renderer.render(s);
+      this._updateUI();
+      this.timer = setTimeout(() => this._tick(), this.engine.config.playback.stepDuration / this.speed);
+    } else {
+      this.pause();
+    }
+  }
+
+  _step(d) {
+    const s = d > 0 ? this.engine.nextStep() : this.engine.prevStep();
+    if (s) { this.renderer.render(s); this._updateUI(); }
+  }
+
+  _render() { this.renderer.render(this.engine.getScene()); this._updateUI(); }
+
+  _updateUI() {
+    const s = this.engine.currentStep, t = this.engine.totalSteps;
+    this.timeline.value = s;
+    this.stepCount.textContent = `${s + 1} / ${t}`;
+    const sc = this.engine.getScene();
+    if (sc.narration) {
+      this.descText.innerHTML = this._sanitize(sc.narration);
+    } else {
+      this.descText.textContent = sc.description;
+    }
+    this.descStep.textContent = s >= 0 ? `${s + 1}` : "";
+    this.descStep.style.display = s >= 0 ? "" : "none";
+    if (sc.annotation) {
+      this.annotationBadge.textContent = sc.annotation;
+      this.annotationBadge.dataset.type = sc.annotation;
+      this.annotationBadge.style.display = "";
+    } else { this.annotationBadge.style.display = "none"; }
+    if (sc.phase) {
+      this.phaseBadge.textContent = sc.phase;
+      this.phaseBadge.style.display = "";
+    } else { this.phaseBadge.style.display = "none"; }
+  }
+
+  _sanitize(html) {
+    const tmp = document.createElement("div");
+    tmp.innerHTML = html;
+    tmp.querySelectorAll("script,style,iframe,object,embed,form,input,link").forEach(e => e.remove());
+    tmp.querySelectorAll("*").forEach(el => {
+      for (const attr of [...el.attributes]) {
+        if (attr.name === "class" || attr.name === "style") continue;
+        if (attr.name.startsWith("on")) el.removeAttribute(attr.name);
+      }
+    });
+    return tmp.innerHTML;
+  }
+  _div(c) { const d = document.createElement("div"); d.className = c; return d; }
+  _btn(t, c, title) {
+    const b = document.createElement("button"); b.className = c;
+    b.textContent = t; if (title) b.title = title; return b;
+  }
+}
+
+// Expose globally
+window.AlgoVizPlayer = Player;
+
+})();
+</script>
+
+<!-- ================================================================
+     PLAYGROUND APP LOGIC
+     ================================================================ -->
+<script>
+(function() {
+  "use strict";
+
+  let currentPlayer = null;
+  let currentAlgoKey = null;
+
+  // Build algorithm list
+  const algoList = document.getElementById("algo-list");
+  ALGO_META.forEach(({ key, icon, name }) => {
+    const data = ALGORITHMS[key];
+    const meta = data.metadata;
+    const li = document.createElement("li");
+    li.className = "pg-algo-item";
+    li.dataset.key = key;
+    li.innerHTML = `
+      <span class="algo-icon">${icon}</span>
+      <span class="algo-name">${name}</span>
+      <span class="algo-diff ${meta.difficulty || ''}">${meta.difficulty || ''}</span>
+    `;
+    li.addEventListener("click", () => loadAlgorithm(key));
+    algoList.appendChild(li);
+  });
+
+  function loadAlgorithm(key) {
+    const data = ALGORITHMS[key];
+    if (!data) return;
+
+    // Update active state
+    currentAlgoKey = key;
+    document.querySelectorAll(".pg-algo-item").forEach(el => {
+      el.classList.toggle("active", el.dataset.key === key);
+    });
+
+    // Update info panel
+    updateInfoPanel(data);
+
+    // Load player
+    loadPlayer(data);
+  }
+
+  function updateInfoPanel(data) {
+    const meta = data.metadata;
+    const grid = document.getElementById("info-grid");
+    let html = '';
+
+    if (meta.category) {
+      html += `<div class="pg-info-item">
+        <div class="info-label">Category</div>
+        <div class="info-value">${esc(meta.category)}</div>
+      </div>`;
+    }
+    if (meta.difficulty) {
+      html += `<div class="pg-info-item">
+        <div class="info-label">Difficulty</div>
+        <div class="info-value">${esc(meta.difficulty)}</div>
+      </div>`;
+    }
+    if (meta.complexity?.time) {
+      html += `<div class="pg-info-item">
+        <div class="info-label">Time</div>
+        <div class="info-value">${esc(meta.complexity.time)}</div>
+      </div>`;
+    }
+    if (meta.complexity?.space) {
+      html += `<div class="pg-info-item">
+        <div class="info-label">Space</div>
+        <div class="info-value">${esc(meta.complexity.space)}</div>
+      </div>`;
+    }
+    if (meta.inputDescription) {
+      html += `<div class="pg-info-item full">
+        <div class="info-label">Input</div>
+        <div class="info-value">${esc(meta.inputDescription)}</div>
+      </div>`;
+    }
+    if (meta.description) {
+      html += `<div class="pg-info-item full">
+        <div class="info-label">Description</div>
+        <div class="info-value desc">${esc(meta.description)}</div>
+      </div>`;
+    }
+    if (meta.tags && meta.tags.length > 0) {
+      html += `<div class="pg-info-item full">
+        <div class="info-label">Tags</div>
+        <div class="pg-tag-list">${meta.tags.map(t => `<span class="pg-tag">${esc(t)}</span>`).join('')}</div>
+      </div>`;
+    }
+
+    grid.innerHTML = html;
+  }
+
+  function loadPlayer(data) {
+    const root = document.getElementById("player-root");
+
+    // Destroy previous player
+    if (currentPlayer) {
+      currentPlayer.destroy();
+      currentPlayer = null;
+    }
+
+    try {
+      currentPlayer = new window.AlgoVizPlayer(root, data);
+    } catch (e) {
+      root.innerHTML = `<div style="padding:40px;color:var(--danger);font-family:var(--mono);font-size:14px;">
+        Error loading visualization:<br><br>${esc(e.message)}
+      </div>`;
+    }
+  }
+
+  // Custom JSON loading
+  const loadJsonBtn = document.getElementById("load-json-btn");
+  const jsonInput = document.getElementById("json-input");
+  const jsonError = document.getElementById("json-error");
+
+  loadJsonBtn.addEventListener("click", () => {
+    jsonError.style.display = "none";
+    const raw = jsonInput.value.trim();
+    if (!raw) {
+      showError("Please paste AlgoViz JSON data.");
+      return;
+    }
+    try {
+      const data = JSON.parse(raw);
+      if (!data.version) {
+        showError('Missing required "version" field. Expected "1.0".');
+        return;
+      }
+      if (!data.actors || !Array.isArray(data.actors)) {
+        showError('Missing or invalid "actors" array.');
+        return;
+      }
+      if (!data.steps || !Array.isArray(data.steps)) {
+        showError('Missing or invalid "steps" array.');
+        return;
+      }
+      if (!data.metadata) {
+        data.metadata = { title: "Custom Visualization", algorithm: "custom" };
+      }
+
+      // Deselect built-in algorithms
+      currentAlgoKey = null;
+      document.querySelectorAll(".pg-algo-item").forEach(el => el.classList.remove("active"));
+
+      updateInfoPanel(data);
+      loadPlayer(data);
+    } catch (e) {
+      showError("Invalid JSON: " + e.message);
+    }
+  });
+
+  function showError(msg) {
+    jsonError.textContent = msg;
+    jsonError.style.display = "block";
+  }
+
+  function esc(s) {
+    if (!s) return '';
+    const d = document.createElement("div");
+    d.textContent = String(s);
+    return d.innerHTML;
+  }
+
+  // Auto-load first algorithm
+  loadAlgorithm("bubble-sort");
+
+})();
+</script>
+
+</body>
+</html>
